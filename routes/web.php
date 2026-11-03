@@ -3,14 +3,17 @@
 use App\Http\Controllers\Admin\DivisiController;
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\KomsatController;
+use App\Http\Controllers\Admin\KoreksiController as AdminKoreksiController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\MonitoringKegiatanController;
 use App\Http\Controllers\Admin\PeriodeController;
 use App\Http\Controllers\Admin\PesertaKegiatanController;
 use App\Http\Controllers\KehadiranFotoController;
+use App\Http\Controllers\KoreksiBuktiController;
 use App\Http\Controllers\Mahasiswa\AbsensiController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanController;
+use App\Http\Controllers\Mahasiswa\KoreksiController as MahasiswaKoreksiController;
 use App\Http\Controllers\Mahasiswa\RiwayatController;
 use App\Http\Controllers\Public\JadwalController;
 use Illuminate\Support\Facades\Route;
@@ -81,7 +84,9 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('divisi/{divisi}/aktif', [DivisiController::class, 'toggleAktif'])->name('divisi.toggle-aktif');
 
         Route::get('kehadiran', [MonitoringKegiatanController::class, 'index'])->name('kehadiran.index');
-        Route::inertia('koreksi', 'admin/placeholder', ['module' => 'Koreksi'])->name('koreksi.index');
+        Route::get('koreksi', [AdminKoreksiController::class, 'index'])->name('koreksi.index');
+        Route::get('koreksi/{koreksi}', [AdminKoreksiController::class, 'show'])->name('koreksi.show');
+        Route::post('koreksi/{koreksi}/keputusan', [AdminKoreksiController::class, 'decide'])->name('koreksi.decide');
         Route::inertia('rekap', 'admin/placeholder', ['module' => 'Laporan'])->name('rekap.index');
         Route::inertia('kepengurusan', 'admin/placeholder', ['module' => 'Kepengurusan'])->name('kepengurusan.index');
     });
@@ -99,11 +104,13 @@ Route::middleware(['auth'])->group(function () {
             ->name('mahasiswa.absensi.submit');
         Route::get('kehadiran', [RiwayatController::class, 'kehadiran'])->name('mahasiswa.kehadiran.index');
         Route::get('poin/riwayat', [RiwayatController::class, 'poin'])->name('mahasiswa.poin.riwayat');
-        Route::inertia('koreksi', 'mahasiswa/placeholder', ['module' => 'Koreksi'])->name('mahasiswa.koreksi.index');
+        Route::get('koreksi', [MahasiswaKoreksiController::class, 'index'])->name('mahasiswa.koreksi.index');
+        Route::post('koreksi', [MahasiswaKoreksiController::class, 'store'])->middleware('throttle:10,1')->name('mahasiswa.koreksi.store');
         Route::inertia('mahasiswa/kepengurusan', 'mahasiswa/placeholder', ['module' => 'Kepengurusan'])->name('mahasiswa.kepengurusan.index');
     });
 
     Route::get('kehadiran/{kehadiran}/foto', KehadiranFotoController::class)->name('kehadiran.foto');
+    Route::get('koreksi/{koreksi}/bukti', KoreksiBuktiController::class)->name('koreksi.bukti');
 });
 
 require __DIR__.'/settings.php';

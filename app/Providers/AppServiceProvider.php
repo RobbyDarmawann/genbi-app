@@ -3,11 +3,14 @@
 namespace App\Providers;
 
 use App\Http\Responses\LoginResponse as CustomLoginResponse;
+use App\Models\Koreksi;
+use App\Policies\KoreksiPolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -28,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Koreksi::class, KoreksiPolicy::class);
         $this->configureDefaults();
         $this->configureRateLimiting();
     }
