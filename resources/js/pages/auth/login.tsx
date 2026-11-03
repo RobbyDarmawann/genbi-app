@@ -1,11 +1,13 @@
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { home } from '@/routes';
 import { store } from '@/routes/login';
 
 type Props = {
@@ -17,6 +19,12 @@ export default function Login({ status }: Props) {
         <>
             <Head title="Masuk" />
 
+            {status && (
+                <div className="rounded-md border border-success/30 bg-success/10 p-3 text-center text-sm font-medium text-success">
+                    {status}
+                </div>
+            )}
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
@@ -24,7 +32,7 @@ export default function Login({ status }: Props) {
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-5">
                             <div className="grid gap-2">
                                 <Label htmlFor="username">Username</Label>
                                 <Input
@@ -36,6 +44,7 @@ export default function Login({ status }: Props) {
                                     tabIndex={1}
                                     autoComplete="username"
                                     placeholder="Masukkan username"
+                                    className="h-11 md:h-9"
                                 />
                                 <InputError message={errors.username} />
                             </div>
@@ -49,11 +58,12 @@ export default function Login({ status }: Props) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Masukkan password"
+                                    className="h-11 md:h-9"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
-                            <div className="flex items-center space-x-3">
+                            <div className="flex min-h-11 items-center gap-3 md:min-h-0">
                                 <Checkbox
                                     id="remember"
                                     name="remember"
@@ -64,7 +74,7 @@ export default function Login({ status }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-2 h-11 w-full md:h-9"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -73,20 +83,27 @@ export default function Login({ status }: Props) {
                                 Masuk
                             </Button>
                         </div>
+
+                        <div className="space-y-2 border-t pt-4 text-center text-xs text-muted-foreground">
+                            <p>
+                                Belum memiliki akun atau lupa password? Hubungi
+                                Divisi Internal Manajemen.
+                            </p>
+                            <p>
+                                <TextLink href={home()} className="text-xs">
+                                    Kembali ke Beranda
+                                </TextLink>
+                            </p>
+                        </div>
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
 
 Login.layout = {
-    title: 'Masuk ke Sistem',
-    description: 'Masukkan username dan password Anda untuk melanjutkan',
+    title: 'Masuk ke Akun GenBI',
+    description:
+        'Gunakan username dan password yang diberikan oleh Divisi Internal Manajemen.',
 };

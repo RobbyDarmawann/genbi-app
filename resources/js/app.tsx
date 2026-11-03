@@ -32,7 +32,7 @@ void createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: 'oklch(0.382 0.180 262.23)',
     },
 });
 
