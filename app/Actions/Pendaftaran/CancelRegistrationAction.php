@@ -40,9 +40,10 @@ class CancelRegistrationAction
                 ]);
             }
 
-            if (! in_array($lockedActivity->status, [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung], true)) {
+            $statusEfektif = $lockedActivity->statusEfektif();
+            if (in_array($statusEfektif, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true)) {
                 throw ValidationException::withMessages([
-                    'pendaftaran' => 'Pendaftaran tidak dapat dibatalkan karena kegiatan sudah selesai, terkunci, atau dibatalkan.',
+                    'pendaftaran' => 'Pendaftaran tidak dapat dibatalkan karena kegiatan belum diterbitkan atau sudah ditutup.',
                 ]);
             }
 

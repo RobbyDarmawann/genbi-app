@@ -37,7 +37,7 @@ class DashboardController extends Controller
         // Kegiatan saya yang akan datang (terdaftar aktif)
         $kegiatanMendatang = $mahasiswa->pendaftaran()
             ->where('status', StatusPendaftaran::Terdaftar)
-            ->whereHas('kegiatan', fn ($q) => $q->whereIn('status', [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung]))
+            ->whereHas('kegiatan', fn ($q) => $q->where('status', StatusKegiatan::Terbit))
             ->with(['kegiatan.komsat:id,kode,nama', 'kehadiran'])
             ->latest('id')
             ->limit(5)
@@ -49,8 +49,8 @@ class DashboardController extends Controller
                 'jam_mulai' => $p->kegiatan->jam_mulai,
                 'jam_selesai' => $p->kegiatan->jam_selesai,
                 'lokasi_nama' => $p->kegiatan->lokasi_nama,
-                'status_kegiatan' => $p->kegiatan->status->value,
-                'status_kegiatan_label' => $p->kegiatan->status->label(),
+                'status_kegiatan' => $p->kegiatan->statusEfektif()->value,
+                'status_kegiatan_label' => $p->kegiatan->statusEfektifLabel(),
                 'peran_label' => $p->peran->label(),
                 'kehadiran' => $p->kehadiran ? [
                     'id' => $p->kehadiran->id,

@@ -88,12 +88,14 @@ class PesertaKegiatanController extends Controller
                 ];
             });
 
+        $statusEfektif = $kegiatan->statusEfektif();
+
         return Inertia::render('admin/kegiatan/peserta', [
             'kegiatan' => [
                 'id' => $kegiatan->id,
                 'judul' => $kegiatan->judul,
-                'status' => $kegiatan->status->value,
-                'status_label' => $kegiatan->status->label(),
+                'status' => $statusEfektif->value,
+                'status_label' => $statusEfektif->label(),
                 'kuota' => $kegiatan->kuota,
                 'jumlah_terdaftar' => $jumlahTerdaftar,
                 'jumlah_hadir' => $jumlahHadir,

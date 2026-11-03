@@ -200,7 +200,7 @@ describe('Creation and Validation', function () {
 });
 
 describe('Status Workflow and Locking', function () {
-    test('follows status transition workflow draft to terbit to berlangsung to selesai to terkunci', function () {
+    test('follows status transition workflow draft to terbit and time-based running to finished to locked', function () {
         $kegiatan = Kegiatan::factory()->create([
             'status' => StatusKegiatan::Draft,
             'dibuat_oleh' => $this->internal->id,
@@ -228,23 +228,26 @@ describe('Status Workflow and Locking', function () {
             'user_id' => $this->internal->id,
         ]);
 
-        // terbit -> berlangsung
-        $this->actingAs($this->internal)
-            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'berlangsung'])
-            ->assertRedirect();
-        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Berlangsung);
+        // Status efektif otomatis dari waktu, tanpa aksi user
+        $this->travelTo('2026-07-01 07:00:00');
+        expect($kegiatan->fresh()->statusEfektif())->toBe(StatusKegiatan::Terbit);
+        $this->travelTo('2026-07-01 10:00:00');
+        expect($kegiatan->fresh()->statusEfektif())->toBe(StatusKegiatan::Berlangsung);
+        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Terbit);
 
-        // berlangsung -> selesai
+        // Status manual berlangsung/selesai tidak lagi diizinkan
         $this->actingAs($this->internal)
-            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'selesai'])
-            ->assertRedirect();
-        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Selesai);
+            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'terkunci'])
+            ->assertSessionHasErrors(['status']);
 
-        // selesai -> terkunci
+        // Setelah jam selesai -> efektif Selesai -> terkunci
+        $this->travelTo('2026-07-01 13:00:00');
+        expect($kegiatan->fresh()->statusEfektif())->toBe(StatusKegiatan::Selesai);
         $this->actingAs($this->internal)
             ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'terkunci'])
             ->assertRedirect();
         expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Terkunci);
+        expect($kegiatan->fresh()->statusEfektif())->toBe(StatusKegiatan::Terkunci);
         $this->assertDatabaseHas('audit_logs', [
             'aksi' => 'kegiatan.locked',
             'subject_id' => $kegiatan->id,

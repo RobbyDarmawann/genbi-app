@@ -58,9 +58,10 @@ class SubmitAttendanceAction
                 ]);
             }
 
-            if (! in_array($lockedActivity->status, [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung], true)) {
+            $statusEfektif = $lockedActivity->statusEfektif();
+            if (in_array($statusEfektif, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true)) {
                 throw ValidationException::withMessages([
-                    'absensi' => 'Kegiatan belum dibuka, telah selesai, terkunci, atau dibatalkan.',
+                    'absensi' => 'Kegiatan belum dibuka atau sudah ditutup.',
                 ]);
             }
 

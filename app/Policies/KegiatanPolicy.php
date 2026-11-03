@@ -40,7 +40,11 @@ class KegiatanPolicy
 
     public function viewAsMahasiswa(User $user, Kegiatan $kegiatan): bool
     {
-        return $user->hasRole('mahasiswa') && in_array($kegiatan->status, [
+        if (! $user->hasRole('mahasiswa') || $user->mahasiswa === null) {
+            return false;
+        }
+
+        return in_array($kegiatan->statusEfektif(), [
             StatusKegiatan::Terbit,
             StatusKegiatan::Berlangsung,
             StatusKegiatan::Selesai,

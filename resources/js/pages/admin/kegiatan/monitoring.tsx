@@ -339,36 +339,6 @@ export default function MonitoringKegiatanShow({
 
                     {/* Aksi Tutup & Kunci Kegiatan */}
                     <div className="flex flex-wrap items-center gap-2">
-                        {kegiatan.status !== 'selesai' &&
-                            kegiatan.status !== 'terkunci' &&
-                            kegiatan.status !== 'dibatalkan' && (
-                                <Form
-                                    {...MonitoringKegiatanController.complete.form(
-                                        kegiatan.id,
-                                    )}
-                                >
-                                    {({ processing }) => (
-                                        <Button
-                                            type="submit"
-                                            variant="outline"
-                                            className="h-11 md:h-9"
-                                            disabled={
-                                                processing ||
-                                                !kegiatan.dapat_ditandai_selesai
-                                            }
-                                            title={
-                                                !kegiatan.dapat_ditandai_selesai
-                                                    ? 'Hanya dapat ditandai selesai setelah kegiatan berlangsung dan melewati jam selesai'
-                                                    : undefined
-                                            }
-                                        >
-                                            {processing && <Spinner />}
-                                            Tandai Kegiatan Selesai
-                                        </Button>
-                                    )}
-                                </Form>
-                            )}
-
                         {kegiatan.status === 'selesai' && (
                             <Form
                                 {...MonitoringKegiatanController.lock.form(

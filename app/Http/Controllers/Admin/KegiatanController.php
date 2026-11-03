@@ -39,12 +39,31 @@ class KegiatanController extends Controller
                 'kehadiran as jumlah_hadir' => fn ($query) => $query->where('kehadiran.status', 'valid'),
             ])
             ->when($search !== '', fn ($query) => $query->where('judul', 'like', "%{$search}%"))
-            ->when($status !== null, fn ($query) => $query->where('status', $status))
+            ->when($status !== null, fn ($query) => $query->statusEfektif($status))
             ->when($komsatId !== null, fn ($query) => $query->where('komsat_id', $komsatId))
             ->when($tanggal !== '', fn ($query) => $query->whereDate('tanggal', $tanggal))
             ->orderByDesc('tanggal')
             ->paginate(15)
-            ->withQueryString();
+            ->withQueryString()
+            ->through(function (Kegiatan $k): array {
+                $statusEfektif = $k->statusEfektif();
+
+                return [
+                    'id' => $k->id,
+                    'judul' => $k->judul,
+                    'tanggal' => $k->tanggal->toDateString(),
+                    'jam_mulai' => substr($k->jam_mulai, 0, 5),
+                    'lokasi_nama' => $k->lokasi_nama,
+                    'status' => $statusEfektif->value,
+                    'status_label' => $statusEfektif->label(),
+                    'komsat' => $k->komsat !== null ? [
+                        'kode' => $k->komsat->kode,
+                        'nama' => $k->komsat->nama,
+                    ] : null,
+                    'pendaftaran_count' => (int) ($k->getAttribute('pendaftaran_count') ?? 0),
+                    'jumlah_hadir' => (int) ($k->getAttribute('jumlah_hadir') ?? 0),
+                ];
+            });
 
         return Inertia::render('admin/kegiatan/index', [
             'kegiatan' => $kegiatan,
@@ -144,9 +163,12 @@ class KegiatanController extends Controller
     private function serialize(Kegiatan $kegiatan): array
     {
         $jumlahTerdaftar = (int) ($kegiatan->getAttribute('pendaftaran_count') ?? 0);
+        $statusEfektif = $kegiatan->statusEfektif();
 
         return [
             ...$kegiatan->toArray(),
+            'status' => $statusEfektif->value,
+            'status_label' => $statusEfektif->label(),
             'sisa_kuota' => $kegiatan->kuota !== null ? max(0, $kegiatan->kuota - $jumlahTerdaftar) : null,
             'tanggal' => $kegiatan->tanggal->toDateString(),
             'absensi_buka_at' => $kegiatan->absensi_buka_at->format('Y-m-d\TH:i'),

@@ -42,10 +42,7 @@ class KegiatanController extends Controller
         $activeTab = $forMeOnly ? 'untuk_saya' : 'semua';
 
         $query = Kegiatan::query()
-            ->whereIn('status', [
-                StatusKegiatan::Terbit,
-                StatusKegiatan::Berlangsung,
-            ])
+            ->terbit()
             ->with([
                 'komsat:id,kode,nama',
                 'divisiTarget.komsat:id,kode,nama',
@@ -66,6 +63,7 @@ class KegiatanController extends Controller
             ->paginate(15)
             ->withQueryString()
             ->through(function (Kegiatan $item) use ($mahasiswa): array {
+                $statusEfektif = $item->statusEfektif();
                 $targeted = $item->divisiTarget->contains('id', $mahasiswa->divisi_id);
                 /** @var Pendaftaran|null $pendaftaran */
                 $pendaftaran = $item->pendaftaran->first();
@@ -91,8 +89,8 @@ class KegiatanController extends Controller
                         'kode' => $item->komsat->kode,
                         'nama' => $item->komsat->nama,
                     ] : null,
-                    'status' => $item->status->value,
-                    'status_label' => $item->status->label(),
+                    'status' => $statusEfektif->value,
+                    'status_label' => $statusEfektif->label(),
                     'kuota' => $item->kuota,
                     'jumlah_pendaftar' => $jumlahPendaftar,
                     'sisa_kuota' => $item->kuota !== null ? max(0, $item->kuota - $jumlahPendaftar) : null,
@@ -158,7 +156,8 @@ class KegiatanController extends Controller
 
         [$statusTampil, $statusLabel] = $this->resolveStudentRegistrationStatus($pendaftaran);
         $now = Carbon::now(config('app.timezone'));
-        $statusKegiatanBuka = in_array($kegiatan->status, [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung], true);
+        $statusEfektif = $kegiatan->statusEfektif();
+        $statusKegiatanBuka = ! in_array($statusEfektif, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true);
         $belumDibuka = $kegiatan->pendaftaran_dibuka_at !== null && $now->lt($kegiatan->pendaftaran_dibuka_at);
         $lewatBatasDaftar = $kegiatan->batas_daftar_at !== null && $now->gt($kegiatan->batas_daftar_at);
         $kuotaPenuh = $kegiatan->kuota !== null && $jumlahPendaftar >= $kegiatan->kuota;
@@ -214,8 +213,8 @@ class KegiatanController extends Controller
                     'kode' => $kegiatan->komsat->kode,
                     'nama' => $kegiatan->komsat->nama,
                 ] : null,
-                'status' => $kegiatan->status->value,
-                'status_label' => $kegiatan->status->label(),
+                'status' => $statusEfektif->value,
+                'status_label' => $statusEfektif->label(),
                 'kuota' => $kegiatan->kuota,
                 'jumlah_pendaftar' => $jumlahPendaftar,
                 'sisa_kuota' => $kegiatan->kuota !== null ? max(0, $kegiatan->kuota - $jumlahPendaftar) : null,

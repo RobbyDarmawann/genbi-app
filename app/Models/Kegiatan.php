@@ -183,4 +183,73 @@ class Kegiatan extends Model
     {
         return $query->whereNull('komsat_id');
     }
+
+    /**
+     * Filter berdasarkan status efektif (padanan SQL dari statusEfektif()).
+     *
+     * @param  Builder<Kegiatan>  $query
+     * @return Builder<Kegiatan>
+     */
+    public function scopeStatusEfektif(Builder $query, StatusKegiatan $status): Builder
+    {
+        if (in_array($status, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true)) {
+            return $query->where('status', $status);
+        }
+
+        $now = Carbon::now(config('app.timezone'));
+        $tanggal = $now->toDateString();
+        $jam = $now->format('H:i:s');
+
+        $query->whereIn('status', [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung, StatusKegiatan::Selesai]);
+
+        return match ($status) {
+            StatusKegiatan::Terbit => $query->where(fn (Builder $q) => $q
+                ->whereDate('tanggal', '>', $tanggal)
+                ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_mulai', '>', $jam))),
+            StatusKegiatan::Selesai => $query->where(fn (Builder $q) => $q
+                ->whereDate('tanggal', '<', $tanggal)
+                ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_selesai', '<', $jam))),
+            default => $query
+                ->where(fn (Builder $q) => $q
+                    ->whereDate('tanggal', '<', $tanggal)
+                    ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_mulai', '<=', $jam)))
+                ->where(fn (Builder $q) => $q
+                    ->whereDate('tanggal', '>', $tanggal)
+                    ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_selesai', '>=', $jam))),
+        };
+    }
+
+    /**
+     * Status efektif kegiatan berdasarkan waktu.
+     * Status tersimpan Draft/Dibatalkan/Terkunci tetap menang.
+     * Status Terbit dihitung ulang berdasarkan jam_mulai dan jam_selesai.
+     */
+    public function statusEfektif(): StatusKegiatan
+    {
+        if (in_array($this->status, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true)) {
+            return $this->status;
+        }
+
+        $now = Carbon::now(config('app.timezone'));
+        $mulai = Carbon::parse($this->tanggal->toDateString().' '.$this->jam_mulai, config('app.timezone'));
+        $selesai = Carbon::parse($this->tanggal->toDateString().' '.$this->jam_selesai, config('app.timezone'));
+
+        if ($now->lt($mulai)) {
+            return StatusKegiatan::Terbit;
+        }
+
+        if ($now->lte($selesai)) {
+            return StatusKegiatan::Berlangsung;
+        }
+
+        return StatusKegiatan::Selesai;
+    }
+
+    /**
+     * Label status efektif.
+     */
+    public function statusEfektifLabel(): string
+    {
+        return $this->statusEfektif()->label();
+    }
 }

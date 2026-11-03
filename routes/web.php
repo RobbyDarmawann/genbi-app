@@ -55,7 +55,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('kegiatan/{kegiatan}/monitoring', [MonitoringKegiatanController::class, 'show'])->name('kegiatan.monitoring');
         Route::post('kegiatan/{kegiatan}/kehadiran/{kehadiran}/review', [MonitoringKegiatanController::class, 'reviewAttendance'])
             ->name('kegiatan.kehadiran.review');
-        Route::post('kegiatan/{kegiatan}/selesai', [MonitoringKegiatanController::class, 'complete'])->name('kegiatan.complete');
         Route::post('kegiatan/{kegiatan}/kunci', [MonitoringKegiatanController::class, 'lock'])->name('kegiatan.lock');
 
         // Anggota (Mahasiswa)

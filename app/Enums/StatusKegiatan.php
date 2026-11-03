@@ -25,6 +25,7 @@ enum StatusKegiatan: string
 
     /**
      * Mengecek apakah transisi ke status target diperbolehkan.
+     * Berlangsung dan Selesai tidak lagi transisi manual, dihitung otomatis dari waktu.
      */
     public function canTransitionTo(self $target): bool
     {
@@ -34,8 +35,8 @@ enum StatusKegiatan: string
 
         return match ($this) {
             self::Draft => in_array($target, [self::Terbit, self::Dibatalkan], true),
-            self::Terbit => in_array($target, [self::Berlangsung, self::Selesai, self::Dibatalkan], true),
-            self::Berlangsung => in_array($target, [self::Selesai, self::Dibatalkan], true),
+            self::Terbit => in_array($target, [self::Dibatalkan], true),
+            self::Berlangsung => in_array($target, [self::Dibatalkan], true),
             self::Selesai => in_array($target, [self::Terkunci, self::Dibatalkan], true),
             self::Dibatalkan => in_array($target, [self::Draft], true),
             self::Terkunci => false,

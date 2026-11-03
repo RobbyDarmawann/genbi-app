@@ -1,6 +1,5 @@
 <?php
 
-use App\Actions\Kegiatan\LockActivityAction;
 use App\Actions\Kegiatan\ReviewAttendanceAction;
 use App\Enums\PeranKegiatan;
 use App\Enums\StatusKegiatan;
@@ -79,7 +78,7 @@ beforeEach(function () {
     $today = now(config('app.timezone'))->toDateString();
     $this->kegiatan = Kegiatan::factory()->create([
         'judul' => 'Seminar Kebanksentralan',
-        'status' => StatusKegiatan::Berlangsung,
+        'status' => StatusKegiatan::Terbit,
         'tanggal' => $today,
         'jam_mulai' => '08:00:00',
         'jam_selesai' => '12:00:00',
@@ -300,32 +299,20 @@ describe('Peninjauan Kehadiran Menunggu Tinjau (IM)', function () {
 });
 
 describe('Penutupan dan Penguncian Kegiatan', function () {
-    test('kegiatan hanya dapat ditandai selesai setelah jam kegiatan berakhir', function () {
-        $action = app(LockActivityAction::class);
-
-        // Skenario 1: Waktu saat ini masih sebelum jam selesai -> ditolak
+    test('status kegiatan berubah efektif mengikuti waktu tanpa aksi manual', function () {
         Carbon::setTestNow(Carbon::parse($this->kegiatan->tanggal->toDateString().' 10:00:00', config('app.timezone')));
+        expect($this->kegiatan->statusEfektif())->toBe(StatusKegiatan::Berlangsung);
 
-        expect(fn () => $action->complete($this->kegiatan, $this->internal))
-            ->toThrow(ValidationException::class);
-
-        // Skenario 2: Waktu saat ini sudah melewati jam selesai (12:00) -> berhasil
         Carbon::setTestNow(Carbon::parse($this->kegiatan->tanggal->toDateString().' 12:05:00', config('app.timezone')));
+        expect($this->kegiatan->statusEfektif())->toBe(StatusKegiatan::Selesai);
 
-        $this->actingAs($this->internal);
-        $this->post(route('admin.kegiatan.complete', $this->kegiatan))
-            ->assertSessionHasNoErrors()
-            ->assertRedirect();
-
-        $this->kegiatan->refresh();
-        expect($this->kegiatan->status)->toBe(StatusKegiatan::Selesai);
-        expect(AuditLog::query()->where('aksi', 'kegiatan.completed')->where('subject_id', $this->kegiatan->id)->exists())->toBeTrue();
-
-        Carbon::setTestNow(); // reset
+        Carbon::setTestNow();
     });
 
     test('kegiatan tidak dapat dikunci bila masih ada kehadiran menunggu tinjau atau koreksi menunggu', function () {
-        $this->kegiatan->update(['status' => StatusKegiatan::Selesai]);
+        // Travel ke waktu setelah kegiatan selesai agar status efektif = Selesai
+        $this->travelTo($this->kegiatan->tanggal->toDateString().' 13:00:00');
+        expect($this->kegiatan->statusEfektif())->toBe(StatusKegiatan::Selesai);
 
         $kehadiran = Kehadiran::factory()->create([
             'pendaftaran_id' => $this->pendaftaran->id,
@@ -339,7 +326,7 @@ describe('Penutupan dan Penguncian Kegiatan', function () {
             ->assertSessionHasErrors('status');
 
         $this->kegiatan->refresh();
-        expect($this->kegiatan->status)->toBe(StatusKegiatan::Selesai);
+        expect($this->kegiatan->status)->toBe(StatusKegiatan::Terbit);
 
         // Selesaikan kehadiran menunggu_tinjau
         $kehadiran->update(['status' => StatusKehadiran::Valid]);

@@ -29,9 +29,10 @@ class RegisterForActivityAction
                 ]);
             }
 
-            if (! in_array($lockedActivity->status, [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung], true)) {
+            $statusEfektif = $lockedActivity->statusEfektif();
+            if (in_array($statusEfektif, [StatusKegiatan::Draft, StatusKegiatan::Dibatalkan, StatusKegiatan::Terkunci], true)) {
                 throw ValidationException::withMessages([
-                    'pendaftaran' => 'Pendaftaran kegiatan ini tidak tersedia karena status kegiatan sudah ditutup atau belum diterbitkan.',
+                    'pendaftaran' => 'Pendaftaran kegiatan ini tidak tersedia karena status kegiatan belum diterbitkan atau sudah ditutup.',
                 ]);
             }
 

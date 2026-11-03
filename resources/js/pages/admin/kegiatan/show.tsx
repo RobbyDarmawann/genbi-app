@@ -91,26 +91,6 @@ export default function Show({ kegiatan, map }: Props) {
                                 Terbitkan
                             </Button>
                         )}
-                        {kegiatan.status === 'terbit' && (
-                            <Button
-                                type="button"
-                                onClick={() => changeStatus('berlangsung')}
-                                className="h-11 md:h-9"
-                            >
-                                Mulai Berlangsung
-                            </Button>
-                        )}
-                        {(kegiatan.status === 'terbit' ||
-                            kegiatan.status === 'berlangsung') && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => changeStatus('selesai')}
-                                className="h-11 md:h-9"
-                            >
-                                Tandai Selesai
-                            </Button>
-                        )}
                         {kegiatan.status === 'selesai' && (
                             <Button
                                 type="button"

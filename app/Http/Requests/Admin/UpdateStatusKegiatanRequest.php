@@ -52,12 +52,14 @@ class UpdateStatusKegiatanRequest extends FormRequest
 
                 $targetStatus = StatusKegiatan::from($this->string('status')->toString());
 
-                if (! $kegiatan->status->canTransitionTo($targetStatus)) {
+                $statusEfektif = $kegiatan->statusEfektif();
+
+                if (! $statusEfektif->canTransitionTo($targetStatus)) {
                     $validator->errors()->add(
                         'status',
                         sprintf(
                             'Perubahan status dari %s ke %s tidak diizinkan oleh alur kerja kegiatan.',
-                            $kegiatan->status->label(),
+                            $statusEfektif->label(),
                             $targetStatus->label(),
                         )
                     );

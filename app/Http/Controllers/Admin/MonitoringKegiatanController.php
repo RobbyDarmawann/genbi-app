@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Kegiatan\LockActivityAction;
 use App\Actions\Kegiatan\ReviewAttendanceAction;
+use App\Enums\StatusKegiatan;
 use App\Enums\StatusKehadiran;
 use App\Enums\StatusKoreksi;
 use App\Enums\StatusPendaftaran;
@@ -16,7 +17,6 @@ use App\Models\Pendaftaran;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,7 +38,7 @@ class MonitoringKegiatanController extends Controller
                 'kehadiran as jumlah_menunggu' => fn ($q) => $q->where('kehadiran.status', StatusKehadiran::MenungguTinjau),
             ])
             ->when($request->string('q')->trim()->toString(), fn ($q, $term) => $q->where('judul', 'like', "%{$term}%"))
-            ->when($request->string('status')->trim()->toString(), fn ($q, $s) => $q->where('status', $s))
+            ->when(StatusKegiatan::tryFrom($request->string('status')->trim()->toString()), fn ($q, StatusKegiatan $s) => $q->statusEfektif($s))
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->paginate(15)
@@ -46,8 +46,8 @@ class MonitoringKegiatanController extends Controller
             ->through(fn (Kegiatan $k): array => [
                 'id' => $k->id,
                 'judul' => $k->judul,
-                'status' => $k->status->value,
-                'status_label' => $k->status->label(),
+                'status' => $k->statusEfektif()->value,
+                'status_label' => $k->statusEfektifLabel(),
                 'tanggal' => $k->tanggal->toDateString(),
                 'lokasi_nama' => $k->lokasi_nama,
                 'komsat_kode' => $k->komsat?->kode,
@@ -133,20 +133,21 @@ class MonitoringKegiatanController extends Controller
             ])
             ->all();
 
-        $end = Carbon::parse($kegiatan->tanggal->toDateString().' '.$kegiatan->jam_selesai, config('app.timezone'));
-        $sudahLewatJamSelesai = now(config('app.timezone'))->greaterThan($end);
+        $statusEfektif = $kegiatan->statusEfektif();
+        $dapatDikunci = $statusEfektif === StatusKegiatan::Selesai
+            && count($kehadiranMenungguList) === 0
+            && count($koreksiMenungguList) === 0;
 
         return Inertia::render('admin/kegiatan/monitoring', [
             'kegiatan' => [
                 'id' => $kegiatan->id,
                 'judul' => $kegiatan->judul,
-                'status' => $kegiatan->status->value,
-                'status_label' => $kegiatan->status->label(),
+                'status' => $statusEfektif->value,
+                'status_label' => $statusEfektif->label(),
                 'tanggal' => $kegiatan->tanggal->toDateString(),
                 'jam_selesai' => $kegiatan->jam_selesai,
                 'kuota' => $kegiatan->kuota,
-                'dapat_ditandai_selesai' => $kegiatan->status->value === 'berlangsung' && $sudahLewatJamSelesai,
-                'dapat_dikunci' => $kegiatan->status->value === 'selesai' && count($kehadiranMenungguList) === 0 && count($koreksiMenungguList) === 0,
+                'dapat_dikunci' => $dapatDikunci,
             ],
             'ringkasan' => [
                 'divisi_target' => $kegiatan->divisiTarget->map(fn ($d): array => ['nama' => $d->nama, 'komsat_id' => $d->komsat_id])->all(),
@@ -190,22 +191,6 @@ class MonitoringKegiatanController extends Controller
             $action->reject($kehadiran, (string) $request->validated('alasan'), $actor, $request->ip());
             Inertia::flash('toast', ['type' => 'success', 'message' => 'Kehadiran ditolak.']);
         }
-
-        return back();
-    }
-
-    /**
-     * Tandai kegiatan selesai setelah jam berakhir.
-     */
-    public function complete(Request $request, Kegiatan $kegiatan, LockActivityAction $action): RedirectResponse
-    {
-        Gate::authorize('update', $kegiatan);
-
-        /** @var User $actor */
-        $actor = $request->user();
-        $action->complete($kegiatan, $actor, $request->ip());
-
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Kegiatan berhasil ditandai selesai.']);
 
         return back();
     }
