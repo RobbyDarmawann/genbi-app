@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatusKegiatan;
+use App\Enums\StatusKehadiran;
 use Database\Factories\KegiatanFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 /**
@@ -118,6 +120,19 @@ class Kegiatan extends Model
     public function pendaftaran(): HasMany
     {
         return $this->hasMany(Pendaftaran::class);
+    }
+
+    /**
+     * @return HasManyThrough<Kehadiran, Pendaftaran, $this>
+     */
+    public function kehadiran(): HasManyThrough
+    {
+        return $this->hasManyThrough(Kehadiran::class, Pendaftaran::class);
+    }
+
+    public function memilikiKehadiranValid(): bool
+    {
+        return $this->kehadiran()->where('kehadiran.status', StatusKehadiran::Valid)->exists();
     }
 
     /**

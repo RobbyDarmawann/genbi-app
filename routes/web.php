@@ -1,13 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\DivisiController;
+use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\KomsatController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\PeriodeController;
+use App\Http\Controllers\Admin\PesertaKegiatanController;
+use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanController;
+use App\Http\Controllers\Public\JadwalController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
-Route::inertia('jadwal', 'public/placeholder', ['module' => 'Aktivitas'])->name('public.jadwal');
+Route::get('jadwal', [JadwalController::class, 'index'])->name('public.jadwal');
+Route::get('jadwal/{kegiatan}', [JadwalController::class, 'show'])->name('public.jadwal.show');
 Route::inertia('statistik', 'public/placeholder', ['module' => 'Statistik'])->name('public.statistik');
 Route::inertia('kepengurusan', 'public/placeholder', ['module' => 'Kepengurusan'])->name('public.kepengurusan');
 
@@ -31,7 +36,17 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard & Modul Internal Manajemen
     Route::middleware(['role:internal_manajemen'])->prefix('admin')->name('admin.')->group(function () {
         Route::inertia('dashboard', 'admin/dashboard')->name('dashboard');
-        Route::inertia('kegiatan', 'admin/placeholder', ['module' => 'Kegiatan'])->name('kegiatan.index');
+        Route::resource('kegiatan', AdminKegiatanController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update'])
+            ->parameters(['kegiatan' => 'kegiatan']);
+        Route::patch('kegiatan/{kegiatan}/status', [AdminKegiatanController::class, 'updateStatus'])->name('kegiatan.update-status');
+        Route::get('kegiatan/{kegiatan}/peserta', [PesertaKegiatanController::class, 'index'])->name('kegiatan.peserta.index');
+        Route::patch('kegiatan/{kegiatan}/peserta/{pendaftaran}/peran', [PesertaKegiatanController::class, 'changeRole'])
+            ->scopeBindings()
+            ->name('kegiatan.peserta.ubah-peran');
+        Route::delete('kegiatan/{kegiatan}/peserta/{pendaftaran}', [PesertaKegiatanController::class, 'cancel'])
+            ->scopeBindings()
+            ->name('kegiatan.peserta.batal');
 
         // Anggota (Mahasiswa)
         Route::resource('mahasiswa', MahasiswaController::class)
@@ -65,7 +80,10 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard Mahasiswa
     Route::middleware(['mahasiswa.active'])->group(function () {
         Route::inertia('mahasiswa/dashboard', 'mahasiswa/dashboard')->name('mahasiswa.dashboard');
-        Route::inertia('kegiatan', 'mahasiswa/placeholder', ['module' => 'Kegiatan Saya'])->name('mahasiswa.kegiatan.index');
+        Route::get('kegiatan', [MahasiswaKegiatanController::class, 'index'])->name('mahasiswa.kegiatan.index');
+        Route::get('kegiatan/{kegiatan}', [MahasiswaKegiatanController::class, 'show'])->name('mahasiswa.kegiatan.show');
+        Route::post('kegiatan/{kegiatan}/daftar', [MahasiswaKegiatanController::class, 'daftar'])->name('mahasiswa.kegiatan.daftar');
+        Route::delete('kegiatan/{kegiatan}/batal', [MahasiswaKegiatanController::class, 'batal'])->name('mahasiswa.kegiatan.batal');
         Route::inertia('kehadiran', 'mahasiswa/placeholder', ['module' => 'Riwayat Kehadiran'])->name('mahasiswa.kehadiran.index');
         Route::inertia('poin/riwayat', 'mahasiswa/placeholder', ['module' => 'Poin Saya'])->name('mahasiswa.poin.riwayat');
         Route::inertia('koreksi', 'mahasiswa/placeholder', ['module' => 'Koreksi'])->name('mahasiswa.koreksi.index');
