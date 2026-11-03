@@ -1,0 +1,77 @@
+flowchart LR
+    %% ============ AKTOR ============
+    GST["Guest<br/>(pengunjung tanpa login)"]
+    MHS["Mahasiswa<br/>(Anggota GenBI)"]
+    IM["Divisi Internal<br/>Manajemen"]
+
+    %% ============ BATAS SISTEM ============
+    subgraph SISTEM["Sistem Informasi GenBI Gorontalo Terintegrasi"]
+        direction TB
+
+        %% --- Publik (Guest) ---
+        PUBLIK([Melihat Beranda, Jadwal & Statistik Publik])
+        LEADER([Melihat Leaderboard Publik])
+        DIREKTORI([Melihat Direktori Kepengurusan Aktif])
+
+        %% --- Mahasiswa ---
+        LOGIN([Login])
+        KATALOG([Melihat Kegiatan untuk Divisinya])
+        DAFTAR([Mengambil List Keikutsertaan Kegiatan])
+        ABSEN([Melakukan Absensi])
+        WAJAH([Foto Selfie sebagai Bukti Kehadiran])
+        GEO([Validasi Lokasi - Geofence Haversine])
+        KREDIT([Menghitung & Mengkredit Poin Otomatis])
+        POIN([Melihat Poin & Riwayat Kehadiran])
+        KOREKSI([Mengajukan Koreksi Kehadiran / Poin])
+
+        %% --- Internal Manajemen (satu-satunya pengelola) ---
+        AKUN([Mengelola Akun & Data Anggota])
+        MASTER([Mengelola Master Komsat & Divisi])
+        KEGIATAN([Mengelola Kegiatan & Divisi Target])
+        PARAM([Mengatur Parameter Absensi & Bobot Poin])
+        SESI([Membuka & Menutup Sesi Absensi])
+        PANTAU([Memantau Kehadiran Real-Time])
+        VKOREKSI([Memvalidasi Koreksi Kehadiran])
+        KUNCI([Menutup & Mengunci Kegiatan - Finalisasi Poin])
+        ATURAN([Mengelola Kategori & Aturan Poin])
+        PERIODE([Mengelola Periode & Direktori Kepengurusan])
+        REKAP([Melihat Rekap & Tren Kegiatan per Komsat])
+        EKSPOR([Mengekspor Laporan Periode])
+    end
+
+    %% ============ ASOSIASI GUEST ============
+    GST --- PUBLIK
+    GST --- LEADER
+    GST --- DIREKTORI
+
+    %% ============ ASOSIASI MAHASISWA ============
+    MHS --- LOGIN
+    MHS --- KATALOG
+    MHS --- DAFTAR
+    MHS --- ABSEN
+    MHS --- POIN
+    MHS --- LEADER
+    MHS --- KOREKSI
+    MHS --- DIREKTORI
+
+    %% ============ ASOSIASI INTERNAL MANAJEMEN ============
+    IM --- LOGIN
+    IM --- AKUN
+    IM --- MASTER
+    IM --- KEGIATAN
+    IM --- SESI
+    IM --- PANTAU
+    IM --- VKOREKSI
+    IM --- KUNCI
+    IM --- ATURAN
+    IM --- PERIODE
+    IM --- REKAP
+    IM --- EKSPOR
+
+    %% ============ RELASI INCLUDE / EXTEND ============
+    ABSEN -.->|"<<include>>"| WAJAH
+    ABSEN -.->|"<<include>>"| GEO
+    ABSEN -.->|"<<include>>"| KREDIT
+    KEGIATAN -.->|"<<include>>"| PARAM
+    VKOREKSI -.->|"<<include>>"| KREDIT
+    KOREKSI -.->|"<<extend>>"| ABSEN
