@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Http\Responses\LoginResponse as CustomLoginResponse;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
@@ -26,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureRateLimiting();
     }
 
     /**
@@ -48,5 +52,18 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    /**
+     * Configure application rate limiting.
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('absensi-submit', function (Request $request) {
+            $user = $request->user();
+            $userId = $user !== null ? (string) $user->id : 'guest';
+
+            return Limit::perMinute(10)->by($userId.'|'.$request->ip());
+        });
     }
 }

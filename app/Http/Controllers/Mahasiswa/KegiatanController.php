@@ -144,7 +144,7 @@ class KegiatanController extends Controller
 
         $targeted = $kegiatan->divisiTarget->contains('id', $mahasiswa->divisi_id);
         $pendaftaran = $kegiatan->pendaftaran()
-            ->with('kehadiran')
+            ->with('kehadiran.poinTransaksi')
             ->where('mahasiswa_id', $mahasiswa->id)
             ->first();
 
@@ -177,6 +177,12 @@ class KegiatanController extends Controller
             && ! $memilikiKehadiran
             && $statusKegiatanBuka
             && ! $lewatBatasDaftar
+            && $now->lte($kegiatan->absensi_tutup_at);
+
+        $dapatAbsen = $sudahTerdaftarAktif
+            && ! $memilikiKehadiran
+            && $statusKegiatanBuka
+            && $now->gte($kegiatan->absensi_buka_at)
             && $now->lte($kegiatan->absensi_tutup_at);
 
         $alasanTidakDapatMendaftar = null;
@@ -237,6 +243,7 @@ class KegiatanController extends Controller
             'status_pendaftaran_label' => $statusLabel,
             'dapat_mendaftar' => $dapatMendaftar,
             'dapat_membatalkan' => $dapatMembatalkan,
+            'dapat_absen' => $dapatAbsen,
             'alasan_tidak_dapat_mendaftar' => $alasanTidakDapatMendaftar,
             'pendaftaran' => $pendaftaran !== null ? [
                 'id' => $pendaftaran->id,
@@ -248,6 +255,14 @@ class KegiatanController extends Controller
                 'poin' => $bobotMap[$pendaftaran->peran->value] ?? 0,
                 'sudah_hadir' => $pendaftaran->kehadiran?->status === StatusKehadiran::Valid,
                 'memiliki_kehadiran' => $pendaftaran->kehadiran !== null,
+                'kehadiran' => $pendaftaran->kehadiran !== null ? [
+                    'status' => $pendaftaran->kehadiran->status->value,
+                    'status_label' => $pendaftaran->kehadiran->status->label(),
+                    'alasan' => $pendaftaran->kehadiran->alasan_penolakan,
+                    'poin_terkredit' => $pendaftaran->kehadiran->poinTransaksi !== null
+                        ? $pendaftaran->kehadiran->poinTransaksi->jumlah
+                        : 0,
+                ] : null,
                 'created_at' => $pendaftaran->created_at?->toIso8601String(),
             ] : null,
             'peran_efektif' => [

@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\KomsatController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\PeriodeController;
 use App\Http\Controllers\Admin\PesertaKegiatanController;
+use App\Http\Controllers\KehadiranFotoController;
+use App\Http\Controllers\Mahasiswa\AbsensiController;
 use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanController;
 use App\Http\Controllers\Public\JadwalController;
 use Illuminate\Support\Facades\Route;
@@ -82,11 +84,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('kegiatan/{kegiatan}', [MahasiswaKegiatanController::class, 'show'])->name('mahasiswa.kegiatan.show');
         Route::post('kegiatan/{kegiatan}/daftar', [MahasiswaKegiatanController::class, 'daftar'])->name('mahasiswa.kegiatan.daftar');
         Route::delete('kegiatan/{kegiatan}/batal', [MahasiswaKegiatanController::class, 'batal'])->name('mahasiswa.kegiatan.batal');
+        Route::get('kegiatan/{kegiatan}/absen', [AbsensiController::class, 'create'])->name('mahasiswa.absensi.form');
+        Route::post('kegiatan/{kegiatan}/absen', [AbsensiController::class, 'store'])
+            ->middleware('throttle:absensi-submit')
+            ->name('mahasiswa.absensi.submit');
         Route::inertia('kehadiran', 'mahasiswa/placeholder', ['module' => 'Riwayat Kehadiran'])->name('mahasiswa.kehadiran.index');
         Route::inertia('poin/riwayat', 'mahasiswa/placeholder', ['module' => 'Poin Saya'])->name('mahasiswa.poin.riwayat');
         Route::inertia('koreksi', 'mahasiswa/placeholder', ['module' => 'Koreksi'])->name('mahasiswa.koreksi.index');
         Route::inertia('mahasiswa/kepengurusan', 'mahasiswa/placeholder', ['module' => 'Kepengurusan'])->name('mahasiswa.kepengurusan.index');
     });
+
+    Route::get('kehadiran/{kehadiran}/foto', KehadiranFotoController::class)->name('kehadiran.foto');
 });
 
 require __DIR__.'/settings.php';

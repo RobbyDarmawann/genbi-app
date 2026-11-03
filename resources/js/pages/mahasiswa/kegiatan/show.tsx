@@ -1,6 +1,14 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Clock, Info, MapPin } from 'lucide-react';
+import {
+    ArrowLeft,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    Info,
+    MapPin,
+} from 'lucide-react';
 import { useState } from 'react';
+import AbsensiController from '@/actions/App/Http/Controllers/Mahasiswa/AbsensiController';
 import MahasiswaKegiatanController from '@/actions/App/Http/Controllers/Mahasiswa/KegiatanController';
 import InputError from '@/components/input-error';
 import { kegiatanStatusToSemantic } from '@/components/kegiatan/types';
@@ -45,6 +53,7 @@ type Props = {
     status_pendaftaran_label: string;
     dapat_mendaftar: boolean;
     dapat_membatalkan: boolean;
+    dapat_absen: boolean;
     alasan_tidak_dapat_mendaftar: string | null;
     pendaftaran: {
         id: number;
@@ -55,6 +64,12 @@ type Props = {
         poin: number;
         sudah_hadir: boolean;
         memiliki_kehadiran: boolean;
+        kehadiran: {
+            status: string;
+            status_label: string;
+            alasan: string | null;
+            poin_terkredit: number;
+        } | null;
     } | null;
     peran_efektif: { peran: string; label: string; poin: number };
 };
@@ -79,6 +94,7 @@ export default function Show({
     status_pendaftaran_label,
     dapat_mendaftar,
     dapat_membatalkan,
+    dapat_absen,
     alasan_tidak_dapat_mendaftar,
     pendaftaran,
     peran_efektif,
@@ -199,6 +215,22 @@ export default function Show({
                                 </Form>
                             )}
 
+                            {dapat_absen && (
+                                <Button
+                                    asChild
+                                    className="h-11 w-full sm:w-auto md:h-9"
+                                >
+                                    <Link
+                                        href={AbsensiController.create(
+                                            kegiatan.id,
+                                        )}
+                                    >
+                                        <CheckCircle2 className="size-4" />
+                                        <span>Absen Sekarang</span>
+                                    </Link>
+                                </Button>
+                            )}
+
                             {dapat_membatalkan && (
                                 <Dialog
                                     open={batalOpen}
@@ -290,6 +322,50 @@ export default function Show({
                                     {alasan_tidak_dapat_mendaftar}
                                 </p>
                             )}
+
+                        {pendaftaran?.memiliki_kehadiran && (
+                            <Card className="border-primary/30 bg-primary/5">
+                                <CardContent className="space-y-2 p-4">
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-medium">
+                                            Status Kehadiran
+                                        </p>
+                                        <StatusBadge
+                                            status={
+                                                pendaftaran.kehadiran
+                                                    ?.status === 'valid'
+                                                    ? 'valid'
+                                                    : pendaftaran.kehadiran
+                                                            ?.status ===
+                                                        'ditolak'
+                                                      ? 'ditolak'
+                                                      : 'diajukan'
+                                            }
+                                            label={
+                                                pendaftaran.kehadiran
+                                                    ?.status_label ?? 'Menunggu'
+                                            }
+                                        />
+                                    </div>
+                                    {pendaftaran.kehadiran?.status ===
+                                        'valid' && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Poin +
+                                            {
+                                                pendaftaran.kehadiran
+                                                    .poin_terkredit
+                                            }{' '}
+                                            telah ditambahkan ke akun Anda.
+                                        </p>
+                                    )}
+                                    {pendaftaran.kehadiran?.alasan && (
+                                        <p className="text-sm text-muted-foreground">
+                                            {pendaftaran.kehadiran.alasan}
+                                        </p>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {pendaftaran?.memiliki_kehadiran && (
                             <p className="text-sm text-muted-foreground">
