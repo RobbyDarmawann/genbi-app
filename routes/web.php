@@ -42,10 +42,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('kegiatan/{kegiatan}/status', [AdminKegiatanController::class, 'updateStatus'])->name('kegiatan.update-status');
         Route::get('kegiatan/{kegiatan}/peserta', [PesertaKegiatanController::class, 'index'])->name('kegiatan.peserta.index');
         Route::patch('kegiatan/{kegiatan}/peserta/{pendaftaran}/peran', [PesertaKegiatanController::class, 'changeRole'])
-            ->scopeBindings()
             ->name('kegiatan.peserta.ubah-peran');
         Route::delete('kegiatan/{kegiatan}/peserta/{pendaftaran}', [PesertaKegiatanController::class, 'cancel'])
-            ->scopeBindings()
             ->name('kegiatan.peserta.batal');
 
         // Anggota (Mahasiswa)

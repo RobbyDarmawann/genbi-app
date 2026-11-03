@@ -60,7 +60,9 @@ class RegisterForActivityAction
                 ->first();
 
             if ($registration?->status === StatusPendaftaran::Terdaftar) {
-                return $registration;
+                throw ValidationException::withMessages([
+                    'pendaftaran' => 'Anda sudah terdaftar pada kegiatan ini.',
+                ]);
             }
 
             $activeCount = Pendaftaran::query()
@@ -92,7 +94,7 @@ class RegisterForActivityAction
             }
 
             AuditLog::catat(
-                aksi: $isReactivated ? 'pendaftaran.reactivated' : 'pendaftaran.registered',
+                aksi: $isReactivated ? 'pendaftaran.re_registered' : 'pendaftaran.created',
                 userId: $actor->id,
                 subjectType: Pendaftaran::class,
                 subjectId: $registration->id,
@@ -111,4 +113,3 @@ class RegisterForActivityAction
         });
     }
 }
-

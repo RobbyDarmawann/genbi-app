@@ -111,14 +111,16 @@ class PesertaKegiatanController extends Controller
             ], StatusPendaftaran::cases()),
             'filters' => [
                 'q' => $search,
-                'status' => $statusFilter?->value ?? '',
-                'peran' => $peranFilter?->value ?? '',
+                'status' => $statusFilter !== null ? $statusFilter->value : '',
+                'peran' => $peranFilter !== null ? $peranFilter->value : '',
             ],
         ]);
     }
 
     public function changeRole(UbahPeranPendaftarRequest $request, Kegiatan $kegiatan, Pendaftaran $pendaftaran, ChangeParticipantRoleAction $action): RedirectResponse
     {
+        abort_unless($pendaftaran->kegiatan_id === $kegiatan->id, 404);
+
         /** @var User $actor */
         $actor = $request->user();
         $action->handle($kegiatan, $pendaftaran, PeranKegiatan::from($request->validated('peran')), $actor, $request->ip());
@@ -129,6 +131,8 @@ class PesertaKegiatanController extends Controller
 
     public function cancel(BatalkanPendaftaranRequest $request, Kegiatan $kegiatan, Pendaftaran $pendaftaran, AdminCancelRegistrationAction $action): RedirectResponse
     {
+        abort_unless($pendaftaran->kegiatan_id === $kegiatan->id, 404);
+
         /** @var User $actor */
         $actor = $request->user();
         $action->handle($kegiatan, $pendaftaran, $request->validated('alasan'), $actor, $request->ip());
@@ -137,4 +141,3 @@ class PesertaKegiatanController extends Controller
         return back();
     }
 }
-

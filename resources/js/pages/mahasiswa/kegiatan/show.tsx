@@ -129,7 +129,8 @@ export default function Show({
                             <Info className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
                             <div>
                                 <p className="text-sm font-medium">
-                                    Kegiatan ini ditujukan untuk divisi terpilih.
+                                    Kegiatan ini ditujukan untuk divisi
+                                    terpilih.
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     Anda dapat melihat rincian jadwal kegiatan
