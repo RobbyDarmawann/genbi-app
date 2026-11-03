@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DivisiController;
 use App\Http\Controllers\Admin\KomsatController;
+use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\PeriodeController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +32,13 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:internal_manajemen'])->prefix('admin')->name('admin.')->group(function () {
         Route::inertia('dashboard', 'admin/dashboard')->name('dashboard');
         Route::inertia('kegiatan', 'admin/placeholder', ['module' => 'Kegiatan'])->name('kegiatan.index');
-        Route::inertia('mahasiswa', 'admin/placeholder', ['module' => 'Anggota'])->name('mahasiswa.index');
+
+        // Anggota (Mahasiswa)
+        Route::resource('mahasiswa', MahasiswaController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
+            ->parameters(['mahasiswa' => 'mahasiswa']);
+        Route::post('mahasiswa/{mahasiswa}/reset-password', [MahasiswaController::class, 'resetPassword'])->name('mahasiswa.reset-password');
+        Route::patch('mahasiswa/{mahasiswa}/aktif', [MahasiswaController::class, 'toggleAktif'])->name('mahasiswa.toggle-aktif');
 
         // Master Data: Periode, Komsat, Divisi
         Route::resource('periode', PeriodeController::class)

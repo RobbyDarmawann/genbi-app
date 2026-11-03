@@ -55,7 +55,7 @@ class FortifyServiceProvider extends ServiceProvider
                 return null;
             }
 
-            if (! $user->is_active) {
+            if (! $user->is_active || ($user->hasRole('mahasiswa') && $user->mahasiswa !== null && ! $user->mahasiswa->aktif)) {
                 throw ValidationException::withMessages([
                     'username' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
                 ]);

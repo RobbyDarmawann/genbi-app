@@ -25,7 +25,7 @@ class EnsureMahasiswaAktif
 
         $mahasiswa = $request->user()->mahasiswa;
 
-        if (! $mahasiswa || ! $mahasiswa->aktif) {
+        if (! $request->user()->is_active || ! $mahasiswa || ! $mahasiswa->aktif) {
             abort(403, 'Akses ditolak. Anda tidak memiliki profil mahasiswa aktif.');
         }
 
