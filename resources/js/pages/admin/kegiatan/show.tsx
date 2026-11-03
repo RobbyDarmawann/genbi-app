@@ -223,7 +223,11 @@ export default function Show({ kegiatan, map }: Props) {
                                     asChild
                                     className="h-11 md:h-9"
                                 >
-                                    <Link href={admin.kehadiran.index()}>
+                                    <Link
+                                        href={admin.kegiatan.monitoring(
+                                            kegiatan.id,
+                                        )}
+                                    >
                                         Lihat Monitoring Kehadiran
                                     </Link>
                                 </Button>

@@ -21,6 +21,7 @@ class UpdateStatusKegiatanAction
 
             $actionName = match ($targetStatus) {
                 StatusKegiatan::Terbit => 'kegiatan.published',
+                StatusKegiatan::Selesai => 'kegiatan.completed',
                 StatusKegiatan::Dibatalkan => 'kegiatan.cancelled',
                 StatusKegiatan::Terkunci => 'kegiatan.locked',
                 default => 'kegiatan.status_changed',

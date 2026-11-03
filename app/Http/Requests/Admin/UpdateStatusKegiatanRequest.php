@@ -84,6 +84,20 @@ class UpdateStatusKegiatanRequest extends FormRequest
                         );
                     }
                 }
+
+                if ($targetStatus === StatusKegiatan::Terkunci) {
+                    $penghambat = $kegiatan->penghambatKunci();
+                    if ($penghambat['kehadiran_menunggu'] > 0 || $penghambat['koreksi_menunggu'] > 0) {
+                        $validator->errors()->add(
+                            'status',
+                            sprintf(
+                                'Kegiatan belum dapat dikunci: %d kehadiran menunggu tinjau dan %d koreksi menunggu.',
+                                $penghambat['kehadiran_menunggu'],
+                                $penghambat['koreksi_menunggu'],
+                            )
+                        );
+                    }
+                }
             },
         ];
     }

@@ -37,4 +37,9 @@ class KehadiranPolicy
 
         return $kehadiran->pendaftaran->mahasiswa_id === $mahasiswa->id;
     }
+
+    public function review(User $user, Kehadiran $kehadiran): bool
+    {
+        return $user->hasRole('internal_manajemen');
+    }
 }

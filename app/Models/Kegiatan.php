@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\StatusKegiatan;
 use App\Enums\StatusKehadiran;
+use App\Enums\StatusKoreksi;
 use Database\Factories\KegiatanFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -133,6 +134,27 @@ class Kegiatan extends Model
     public function memilikiKehadiranValid(): bool
     {
         return $this->kehadiran()->where('kehadiran.status', StatusKehadiran::Valid)->exists();
+    }
+
+    /**
+     * @return HasMany<Koreksi, $this>
+     */
+    public function koreksi(): HasMany
+    {
+        return $this->hasMany(Koreksi::class);
+    }
+
+    /**
+     * Penghambat penguncian: kehadiran menunggu tinjau dan koreksi menunggu.
+     *
+     * @return array{kehadiran_menunggu: int, koreksi_menunggu: int}
+     */
+    public function penghambatKunci(): array
+    {
+        return [
+            'kehadiran_menunggu' => $this->kehadiran()->where('kehadiran.status', StatusKehadiran::MenungguTinjau)->count(),
+            'koreksi_menunggu' => $this->koreksi()->where('status', StatusKoreksi::Menunggu)->count(),
+        ];
     }
 
     /**

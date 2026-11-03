@@ -117,6 +117,17 @@ class Mahasiswa extends Model
     }
 
     /**
+     * Scope untuk menambahkan total poin sebagai atribut agregat.
+     *
+     * @param  Builder<Mahasiswa>  $query
+     * @return Builder<Mahasiswa>
+     */
+    public function scopeWithTotalPoin(Builder $query): Builder
+    {
+        return $query->withSum('poinTransaksi as total_poin', 'jumlah');
+    }
+
+    /**
      * Memeriksa apakah divisi yang dipilih konsisten dengan komsat mahasiswa.
      */
     public function isDivisiValidForKomsat(): bool
