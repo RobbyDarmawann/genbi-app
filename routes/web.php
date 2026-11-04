@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\MonitoringKegiatanController;
 use App\Http\Controllers\Admin\PeriodeController;
 use App\Http\Controllers\Admin\PesertaKegiatanController;
+use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\KehadiranFotoController;
 use App\Http\Controllers\KoreksiBuktiController;
 use App\Http\Controllers\Mahasiswa\AbsensiController;
@@ -16,12 +17,13 @@ use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanContro
 use App\Http\Controllers\Mahasiswa\KoreksiController as MahasiswaKoreksiController;
 use App\Http\Controllers\Mahasiswa\RiwayatController;
 use App\Http\Controllers\Public\JadwalController;
+use App\Http\Controllers\Public\StatistikController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 Route::get('jadwal', [JadwalController::class, 'index'])->name('public.jadwal');
 Route::get('jadwal/{kegiatan}', [JadwalController::class, 'show'])->name('public.jadwal.show');
-Route::inertia('statistik', 'public/placeholder', ['module' => 'Statistik'])->name('public.statistik');
+Route::get('statistik', [StatistikController::class, 'index'])->name('public.statistik');
 Route::inertia('kepengurusan', 'public/placeholder', ['module' => 'Kepengurusan'])->name('public.kepengurusan');
 
 Route::middleware(['auth'])->group(function () {
@@ -87,7 +89,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('koreksi', [AdminKoreksiController::class, 'index'])->name('koreksi.index');
         Route::get('koreksi/{koreksi}', [AdminKoreksiController::class, 'show'])->name('koreksi.show');
         Route::post('koreksi/{koreksi}/keputusan', [AdminKoreksiController::class, 'decide'])->name('koreksi.decide');
-        Route::inertia('rekap', 'admin/placeholder', ['module' => 'Laporan'])->name('rekap.index');
+        Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
+        Route::get('rekap/export', [RekapController::class, 'export'])->name('rekap.export');
         Route::inertia('kepengurusan', 'admin/placeholder', ['module' => 'Kepengurusan'])->name('kepengurusan.index');
     });
 
