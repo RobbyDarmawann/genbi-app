@@ -6,6 +6,7 @@ import {
     ClipboardList,
     FileText,
     FolderTree,
+    Globe,
     LayoutGrid,
     Settings2,
     ShieldCheck,
@@ -22,8 +23,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
 import admin from '@/routes/admin';
 import mahasiswa from '@/routes/mahasiswa';
 import type { NavItem } from '@/types';
@@ -87,6 +89,17 @@ export function AppSidebar() {
                 <NavMain items={items} />
             </SidebarContent>
             <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild tooltip="Lihat Situs Publik">
+                            <Link href={home()}>
+                                <Globe />
+                                <span>Lihat Situs Publik</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+                <SidebarSeparator />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

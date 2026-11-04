@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DivisiController;
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
+use App\Http\Controllers\Admin\KepengurusanController as AdminKepengurusanController;
 use App\Http\Controllers\Admin\KomsatController;
 use App\Http\Controllers\Admin\KoreksiController as AdminKoreksiController;
 use App\Http\Controllers\Admin\MahasiswaController;
@@ -16,15 +17,17 @@ use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardCont
 use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanController;
 use App\Http\Controllers\Mahasiswa\KoreksiController as MahasiswaKoreksiController;
 use App\Http\Controllers\Mahasiswa\RiwayatController;
+use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\JadwalController;
+use App\Http\Controllers\Public\KepengurusanController as PublicKepengurusanController;
 use App\Http\Controllers\Public\StatistikController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::get('jadwal', [JadwalController::class, 'index'])->name('public.jadwal');
 Route::get('jadwal/{kegiatan}', [JadwalController::class, 'show'])->name('public.jadwal.show');
 Route::get('statistik', [StatistikController::class, 'index'])->name('public.statistik');
-Route::inertia('kepengurusan', 'public/placeholder', ['module' => 'Kepengurusan'])->name('public.kepengurusan');
+Route::get('kepengurusan', PublicKepengurusanController::class)->name('public.kepengurusan');
 
 Route::middleware(['auth'])->group(function () {
     // Generic dashboard redirector - delegates to role-specific dashboards
@@ -91,7 +94,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('koreksi/{koreksi}/keputusan', [AdminKoreksiController::class, 'decide'])->name('koreksi.decide');
         Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
         Route::get('rekap/export', [RekapController::class, 'export'])->name('rekap.export');
-        Route::inertia('kepengurusan', 'admin/placeholder', ['module' => 'Kepengurusan'])->name('kepengurusan.index');
+        Route::resource('kepengurusan', AdminKepengurusanController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['kepengurusan' => 'kepengurusan']);
     });
 
     // Dashboard Mahasiswa
@@ -109,7 +114,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('poin/riwayat', [RiwayatController::class, 'poin'])->name('mahasiswa.poin.riwayat');
         Route::get('koreksi', [MahasiswaKoreksiController::class, 'index'])->name('mahasiswa.koreksi.index');
         Route::post('koreksi', [MahasiswaKoreksiController::class, 'store'])->middleware('throttle:10,1')->name('mahasiswa.koreksi.store');
-        Route::inertia('mahasiswa/kepengurusan', 'mahasiswa/placeholder', ['module' => 'Kepengurusan'])->name('mahasiswa.kepengurusan.index');
+        Route::get('mahasiswa/kepengurusan', [PublicKepengurusanController::class, 'mahasiswa'])->name('mahasiswa.kepengurusan.index');
     });
 
     Route::get('kehadiran/{kehadiran}/foto', KehadiranFotoController::class)->name('kehadiran.foto');

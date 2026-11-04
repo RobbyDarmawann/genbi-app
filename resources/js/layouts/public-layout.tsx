@@ -1,8 +1,10 @@
-import { Link } from '@inertiajs/react';
-import { LogIn } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutDashboard, LogIn } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { home, login } from '@/routes';
+import { dashboard, home, login } from '@/routes';
+import admin from '@/routes/admin';
+import mahasiswa from '@/routes/mahasiswa';
 import { jadwal, kepengurusan, statistik } from '@/routes/public';
 
 const navigation = [
@@ -18,7 +20,14 @@ type PublicLayoutProps = {
 
 export default function PublicLayout({ children }: PublicLayoutProps) {
     const { isCurrentUrl } = useCurrentUrl();
+    const { auth } = usePage().props;
     const [logoError, setLogoError] = useState(false);
+
+    const dashboardHref = auth.user?.roles.includes('internal_manajemen')
+        ? admin.dashboard()
+        : auth.user?.roles.includes('mahasiswa')
+          ? mahasiswa.dashboard()
+          : dashboard();
 
     return (
         <div className="min-h-dvh bg-background text-foreground">
@@ -64,13 +73,23 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                             </Link>
                         ))}
                     </nav>
-                    <Link
-                        href={login()}
-                        className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 md:h-9"
-                    >
-                        <LogIn className="size-4" />
-                        <span>Login</span>
-                    </Link>
+                    {auth.user ? (
+                        <Link
+                            href={dashboardHref}
+                            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 md:h-9"
+                        >
+                            <LayoutDashboard className="size-4" />
+                            <span>Dashboard</span>
+                        </Link>
+                    ) : (
+                        <Link
+                            href={login()}
+                            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 md:h-9"
+                        >
+                            <LogIn className="size-4" />
+                            <span>Login</span>
+                        </Link>
+                    )}
                 </div>
                 <nav
                     className="flex gap-1 overflow-x-auto border-t px-4 py-2 md:hidden"
