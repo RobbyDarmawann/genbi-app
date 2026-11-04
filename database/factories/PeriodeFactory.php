@@ -14,7 +14,10 @@ class PeriodeFactory extends Factory
 
     public function definition(): array
     {
-        $year = fake()->numberBetween(2023, 2026);
+        static $counter = 0;
+        $counter++;
+
+        $year = 2023 + $counter;
 
         return [
             'nama' => $year.'-'.($year + 1),

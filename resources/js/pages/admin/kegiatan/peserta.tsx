@@ -31,6 +31,13 @@ import AppLayout from '@/layouts/app-layout';
 import { formatTanggalWita } from '@/lib/format';
 import admin from '@/routes/admin';
 
+function decodeLabel(label: string): string {
+    return label
+        .replace(/&laquo;/g, '«')
+        .replace(/&raquo;/g, '»')
+        .replace(/&amp;/g, '&');
+}
+
 type PesertaItem = {
     id: number;
     nama: string;
@@ -530,18 +537,10 @@ export default function PesertaIndex({
                                         preserveScroll
                                         preserveState
                                     >
-                                        <span
-                                            dangerouslySetInnerHTML={{
-                                                __html: link.label,
-                                            }}
-                                        />
+                                        {decodeLabel(link.label)}
                                     </Link>
                                 ) : (
-                                    <span
-                                        dangerouslySetInnerHTML={{
-                                            __html: link.label,
-                                        }}
-                                    />
+                                    decodeLabel(link.label)
                                 )}
                             </Button>
                         ))}

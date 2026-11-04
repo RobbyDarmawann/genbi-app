@@ -85,6 +85,9 @@ export default function KepengurusanIndex({
     const [selectedMahasiswaId, setSelectedMahasiswaId] = useState<string>('');
     const [namaTampil, setNamaTampil] = useState<string>('');
     const [selectedKomsatId, setSelectedKomsatId] = useState<string>('');
+    const [deleteTarget, setDeleteTarget] = useState<KepengurusanItem | null>(
+        null,
+    );
 
     const openCreate = () => {
         setEditing(null);
@@ -116,14 +119,11 @@ export default function KepengurusanIndex({
         }
     };
 
-    const handleDelete = (row: KepengurusanItem) => {
-        if (
-            confirm(
-                `Apakah Anda yakin ingin menghapus "${row.nama_tampil}" (${row.jabatan}) dari direktori?`,
-            )
-        ) {
-            router.delete(KepengurusanController.destroy(row.id), {
+    const confirmDelete = () => {
+        if (deleteTarget) {
+            router.delete(KepengurusanController.destroy(deleteTarget.id), {
                 preserveScroll: true,
+                onFinish: () => setDeleteTarget(null),
             });
         }
     };
@@ -232,7 +232,7 @@ export default function KepengurusanIndex({
                         size="icon"
                         variant="ghost"
                         className="size-8 text-destructive hover:bg-destructive/10"
-                        onClick={() => handleDelete(row)}
+                        onClick={() => setDeleteTarget(row)}
                         title="Hapus dari direktori"
                     >
                         <Trash2 className="size-4" />
@@ -420,7 +420,7 @@ export default function KepengurusanIndex({
                                     size="sm"
                                     variant="destructive"
                                     className="h-11 md:h-9"
-                                    onClick={() => handleDelete(row)}
+                                    onClick={() => setDeleteTarget(row)}
                                 >
                                     <Trash2 className="size-4" />
                                     Hapus
@@ -1040,6 +1040,37 @@ export default function KepengurusanIndex({
                                 )}
                             </Form>
                         )}
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog
+                    open={deleteTarget !== null}
+                    onOpenChange={(open) => !open && setDeleteTarget(null)}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                Hapus Pengurus dari Direktori?
+                            </DialogTitle>
+                            <DialogDescription>
+                                {deleteTarget &&
+                                    `Anda akan menghapus "${deleteTarget.nama_tampil}" (${deleteTarget.jabatan}) dari direktori kepengurusan. Tindakan ini tidak dapat dibatalkan.`}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline">
+                                    Batal
+                                </Button>
+                            </DialogClose>
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={confirmDelete}
+                            >
+                                Hapus
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
