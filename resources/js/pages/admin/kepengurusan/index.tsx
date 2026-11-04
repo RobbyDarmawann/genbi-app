@@ -37,6 +37,7 @@ type KepengurusanItem = {
     jabatan: string;
     urutan: number;
     kontak: string | null;
+    foto_url: string | null;
 };
 
 type PaginationLink = {
@@ -155,18 +156,36 @@ export default function KepengurusanIndex({
             key: 'nama',
             header: 'Nama & Jabatan',
             cell: (row) => (
-                <div>
-                    <p className="font-semibold text-foreground">
-                        {row.nama_tampil}
-                    </p>
-                    <p className="text-sm font-medium text-primary">
-                        {row.jabatan}
-                    </p>
-                    {row.mahasiswa_nama && (
-                        <p className="text-xs text-muted-foreground">
-                            Akun: {row.mahasiswa_nama}
-                        </p>
+                <div className="flex items-center gap-3">
+                    {row.foto_url ? (
+                        <img
+                            src={row.foto_url}
+                            alt=""
+                            className="size-10 rounded-full object-cover"
+                        />
+                    ) : (
+                        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                            {row.nama_tampil
+                                .split(/\s+/)
+                                .slice(0, 2)
+                                .map((part) => part[0])
+                                .join('')
+                                .toUpperCase()}
+                        </div>
                     )}
+                    <div>
+                        <p className="font-semibold text-foreground">
+                            {row.nama_tampil}
+                        </p>
+                        <p className="text-sm font-medium text-primary">
+                            {row.jabatan}
+                        </p>
+                        {row.mahasiswa_nama && (
+                            <p className="text-xs text-muted-foreground">
+                                Akun: {row.mahasiswa_nama}
+                            </p>
+                        )}
+                    </div>
                 </div>
             ),
         },
@@ -343,18 +362,36 @@ export default function KepengurusanIndex({
                     renderMobileCard={(row) => (
                         <div className="space-y-3">
                             <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <p className="font-semibold text-foreground">
-                                        {row.nama_tampil}
-                                    </p>
-                                    <p className="text-sm font-medium text-primary">
-                                        {row.jabatan}
-                                    </p>
-                                    {row.mahasiswa_nama && (
-                                        <p className="text-xs text-muted-foreground">
-                                            Akun: {row.mahasiswa_nama}
-                                        </p>
+                                <div className="flex items-start gap-3">
+                                    {row.foto_url ? (
+                                        <img
+                                            src={row.foto_url}
+                                            alt=""
+                                            className="size-10 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                                            {row.nama_tampil
+                                                .split(/\s+/)
+                                                .slice(0, 2)
+                                                .map((part) => part[0])
+                                                .join('')
+                                                .toUpperCase()}
+                                        </div>
                                     )}
+                                    <div>
+                                        <p className="font-semibold text-foreground">
+                                            {row.nama_tampil}
+                                        </p>
+                                        <p className="text-sm font-medium text-primary">
+                                            {row.jabatan}
+                                        </p>
+                                        {row.mahasiswa_nama && (
+                                            <p className="text-xs text-muted-foreground">
+                                                Akun: {row.mahasiswa_nama}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                                 <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground tabular-nums">
                                     #{row.urutan}
@@ -673,6 +710,38 @@ export default function KepengurusanIndex({
                                             </div>
                                         </div>
 
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="edit-foto">
+                                                Foto Pengurus (Opsional)
+                                            </Label>
+                                            {editing.foto_url && (
+                                                <div className="flex items-center gap-3 rounded-md border bg-muted/40 p-2">
+                                                    <img
+                                                        src={editing.foto_url}
+                                                        alt={`Foto ${editing.nama_tampil}`}
+                                                        className="size-12 rounded-full object-cover"
+                                                    />
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Foto saat ini. Pilih
+                                                        file baru untuk
+                                                        mengganti.
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <Input
+                                                id="edit-foto"
+                                                name="foto"
+                                                type="file"
+                                                accept="image/jpeg,image/png"
+                                                className="h-11 md:h-9"
+                                            />
+                                            <p className="text-xs text-muted-foreground">
+                                                Format JPG/JPEG/PNG, maksimal 2
+                                                MB.
+                                            </p>
+                                            <InputError message={errors.foto} />
+                                        </div>
+
                                         <DialogFooter className="gap-2 sm:gap-0">
                                             <DialogClose asChild>
                                                 <Button
@@ -929,6 +998,24 @@ export default function KepengurusanIndex({
                                                     message={errors.kontak}
                                                 />
                                             </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="create-foto">
+                                                Foto Pengurus (Opsional)
+                                            </Label>
+                                            <Input
+                                                id="create-foto"
+                                                name="foto"
+                                                type="file"
+                                                accept="image/jpeg,image/png"
+                                                className="h-11 md:h-9"
+                                            />
+                                            <p className="text-xs text-muted-foreground">
+                                                Format JPG/JPEG/PNG, maksimal 2
+                                                MB.
+                                            </p>
+                                            <InputError message={errors.foto} />
                                         </div>
 
                                         <DialogFooter className="gap-2 sm:gap-0">

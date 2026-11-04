@@ -13,6 +13,7 @@ export type KepengurusanEntry = {
     kontak: string | null;
     komsat_nama: string | null;
     komsat_kode: string | null;
+    foto_url: string | null;
 };
 
 export type KepengurusanPageProps = {
@@ -27,6 +28,15 @@ export type KepengurusanPageProps = {
         komsat: { id: number; kode: string; nama: string }[];
     };
 };
+
+function initials(name: string): string {
+    return name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('');
+}
 
 function renderSafeContact(kontak: string | null) {
     if (!kontak) {
@@ -195,18 +205,36 @@ export function DirektoriKepengurusanContent({
                                         key={entry.id}
                                         className="flex items-start justify-between gap-4 border-b pb-3 last:border-0 last:pb-0"
                                     >
-                                        <div>
-                                            <p className="font-medium">
-                                                {entry.nama_tampil}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {entry.jabatan}
-                                            </p>
-                                            {entry.komsat_nama && (
-                                                <p className="text-xs text-muted-foreground">
-                                                    {entry.komsat_nama}
-                                                </p>
+                                        <div className="flex min-w-0 items-start gap-3">
+                                            {entry.foto_url ? (
+                                                <img
+                                                    src={entry.foto_url}
+                                                    alt={`Foto ${entry.nama_tampil}`}
+                                                    className="size-12 shrink-0 rounded-full object-cover ring-2 ring-primary/15"
+                                                />
+                                            ) : (
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-sm font-semibold text-primary-foreground"
+                                                >
+                                                    {initials(
+                                                        entry.nama_tampil,
+                                                    )}
+                                                </div>
                                             )}
+                                            <div className="min-w-0">
+                                                <p className="font-medium">
+                                                    {entry.nama_tampil}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {entry.jabatan}
+                                                </p>
+                                                {entry.komsat_nama && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {entry.komsat_nama}
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
                                         {renderSafeContact(entry.kontak)}
                                     </div>

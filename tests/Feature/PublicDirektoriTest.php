@@ -8,6 +8,8 @@ use App\Models\Komsat;
 use App\Models\Mahasiswa;
 use App\Models\Periode;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
@@ -289,4 +291,124 @@ test('beranda menampilkan kegiatan publik dari database, empty state, dan tetap 
     $admin->assignRole('internal_manajemen');
     $this->actingAs($admin)->get(route('home'))->assertOk();
     $this->actingAs($admin)->get(route('public.kepengurusan'))->assertOk();
+});
+
+test('internal manajemen dapat mengunggah, mengganti, dan menghapus foto pengurus serta validasi dan direktori berjalan benar', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->create();
+    $admin->assignRole('internal_manajemen');
+    $mahasiswaUser = User::factory()->create();
+    $mahasiswaUser->assignRole('mahasiswa');
+    $periode = Periode::factory()->create(['aktif' => true, 'nama' => '2026/2027']);
+
+    // 1. IM dapat mengunggah foto dan path tersimpan di disk public folder kepengurusan/
+    $fotoPertama = UploadedFile::fake()->image('ketua.jpg', 400, 400)->size(500);
+
+    $this->actingAs($admin)->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'komsat_id' => 'wilayah',
+        'nama_tampil' => 'Nadia Putri',
+        'jabatan' => 'Ketua Wilayah',
+        'urutan' => 1,
+        'foto' => $fotoPertama,
+    ])->assertRedirect();
+
+    $pengurus = Kepengurusan::where('nama_tampil', 'Nadia Putri')->firstOrFail();
+    expect($pengurus->foto_path)->not->toBeNull()
+        ->and($pengurus->foto_path)->toStartWith('kepengurusan/');
+    Storage::disk('public')->assertExists($pengurus->foto_path);
+
+    $oldPath = $pengurus->foto_path;
+
+    // 2. Pengurus kedua tanpa foto (untuk menguji fallback avatar inisial)
+    Kepengurusan::factory()->create([
+        'periode_id' => $periode->id,
+        'komsat_id' => null,
+        'nama_tampil' => 'Rizky Pratama',
+        'jabatan' => 'Sekretaris Wilayah',
+        'urutan' => 2,
+        'foto_path' => null,
+    ]);
+
+    // 3. Direktori publik menampilkan foto_url bila foto_path ada dan null (avatar inisial) bila kosong
+    $pubResponse = $this->get(route('public.kepengurusan'));
+    $pubResponse->assertOk();
+    $pubResponse->assertInertia(fn ($page) => $page
+        ->component('public/kepengurusan')
+        ->has('direktori.wilayah', 2)
+        ->where('direktori.wilayah.0.nama_tampil', 'Nadia Putri')
+        ->where('direktori.wilayah.0.foto_url', asset('storage/'.$oldPath))
+        ->where('direktori.wilayah.1.nama_tampil', 'Rizky Pratama')
+        ->where('direktori.wilayah.1.foto_url', null));
+
+    // 4. Validasi: file non-gambar dan ukuran > 2 MB ditolak
+    $fileDokumen = UploadedFile::fake()->create('dokumen.pdf', 200, 'application/pdf');
+    $this->actingAs($admin)->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'komsat_id' => 'wilayah',
+        'nama_tampil' => 'Tes Dokumen',
+        'jabatan' => 'Bendahara',
+        'urutan' => 3,
+        'foto' => $fileDokumen,
+    ])->assertSessionHasErrors('foto');
+
+    $fileBesar = UploadedFile::fake()->image('besar.png')->size(2500);
+    $this->actingAs($admin)->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'komsat_id' => 'wilayah',
+        'nama_tampil' => 'Tes Besar',
+        'jabatan' => 'Bendahara',
+        'urutan' => 3,
+        'foto' => $fileBesar,
+    ])->assertSessionHasErrors('foto');
+
+    // 5. Guest dan mahasiswa ditolak mengunggah/mengganti foto
+    $fotoIlegal = UploadedFile::fake()->image('ilegal.jpg');
+    auth()->logout();
+    $this->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'nama_tampil' => 'Guest Upload',
+        'jabatan' => 'Anggota',
+        'urutan' => 5,
+        'foto' => $fotoIlegal,
+    ])->assertRedirect(route('login'));
+
+    $this->actingAs($mahasiswaUser)->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'nama_tampil' => 'Mhs Upload',
+        'jabatan' => 'Anggota',
+        'urutan' => 5,
+        'foto' => $fotoIlegal,
+    ])->assertForbidden();
+
+    $this->actingAs($mahasiswaUser)->put(route('admin.kepengurusan.update', $pengurus), [
+        'periode_id' => $periode->id,
+        'nama_tampil' => 'Nadia Putri',
+        'jabatan' => 'Ketua Wilayah',
+        'urutan' => 1,
+        'foto' => $fotoIlegal,
+    ])->assertForbidden();
+
+    // 6. Penggantian foto menghapus file lama dan menyimpan file baru
+    $fotoKedua = UploadedFile::fake()->image('ketua-baru.png', 400, 400)->size(600);
+    $this->actingAs($admin)->put(route('admin.kepengurusan.update', $pengurus), [
+        'periode_id' => $periode->id,
+        'komsat_id' => 'wilayah',
+        'nama_tampil' => 'Nadia Putri',
+        'jabatan' => 'Ketua Wilayah',
+        'urutan' => 1,
+        'foto' => $fotoKedua,
+    ])->assertRedirect();
+
+    $pengurus->refresh();
+    $newPath = $pengurus->foto_path;
+    expect($newPath)->not->toBeNull()
+        ->and($newPath)->not->toBe($oldPath);
+    Storage::disk('public')->assertMissing($oldPath);
+    Storage::disk('public')->assertExists($newPath);
+
+    // 7. Menghapus record pengurus menghapus file fotonya dari disk
+    $this->actingAs($admin)->delete(route('admin.kepengurusan.destroy', $pengurus))->assertRedirect();
+    Storage::disk('public')->assertMissing($newPath);
 });

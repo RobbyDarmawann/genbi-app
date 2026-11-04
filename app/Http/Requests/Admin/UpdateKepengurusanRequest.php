@@ -69,6 +69,7 @@ class UpdateKepengurusanRequest extends FormRequest
             'jabatan' => ['required', 'string', 'max:255'],
             'urutan' => ['required', 'integer', 'min:0', 'max:1000'],
             'kontak' => ['nullable', 'string', 'max:255'],
+            'foto' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 
@@ -125,6 +126,9 @@ class UpdateKepengurusanRequest extends FormRequest
             'urutan.min' => 'Urutan tampil tidak boleh bernilai negatif.',
             'urutan.max' => 'Urutan tampil maksimal 1000.',
             'kontak.max' => 'Kontak maksimal 255 karakter.',
+            'foto.image' => 'File foto harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2 MB.',
         ];
     }
 }

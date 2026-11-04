@@ -54,6 +54,7 @@ class KepengurusanController extends Controller
                     'jabatan' => $item->jabatan,
                     'urutan' => $item->urutan,
                     'kontak' => $item->kontak,
+                    'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
                 ]);
 
         return [

@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Kepengurusan;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DeleteKepengurusanAction
 {
@@ -19,6 +20,7 @@ class DeleteKepengurusanAction
                 'nama_tampil' => $kepengurusan->nama_tampil,
             ];
             $id = $kepengurusan->id;
+            $fotoPath = $kepengurusan->foto_path;
 
             $kepengurusan->delete();
 
@@ -30,6 +32,10 @@ class DeleteKepengurusanAction
                 metadata: $snapshot,
                 ipAddress: $ipAddress,
             );
+
+            if ($fotoPath !== null) {
+                Storage::disk('public')->delete($fotoPath);
+            }
         });
     }
 }

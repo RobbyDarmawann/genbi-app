@@ -67,6 +67,7 @@ class KepengurusanController extends Controller
             'jabatan' => $item->jabatan,
             'urutan' => $item->urutan,
             'kontak' => $item->kontak,
+            'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
         ]);
 
         $options = [
@@ -118,7 +119,7 @@ class KepengurusanController extends Controller
         /** @var array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak: string|null} $validated */
         $validated = $request->validated();
 
-        $action->handle($validated, null, $actor, $request->ip());
+        $action->handle($validated, null, $actor, $request->ip(), $request->file('foto'));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Pengurus berhasil ditambahkan ke direktori.']);
 
@@ -132,7 +133,7 @@ class KepengurusanController extends Controller
         /** @var array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak: string|null} $validated */
         $validated = $request->validated();
 
-        $action->handle($validated, $kepengurusan, $actor, $request->ip());
+        $action->handle($validated, $kepengurusan, $actor, $request->ip(), $request->file('foto'));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Data pengurus berhasil diperbarui.']);
 

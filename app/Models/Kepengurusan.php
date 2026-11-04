@@ -19,10 +19,11 @@ use Illuminate\Support\Carbon;
  * @property string $jabatan
  * @property int $urutan
  * @property string|null $kontak
+ * @property string|null $foto_path
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['periode_id', 'komsat_id', 'mahasiswa_id', 'nama_tampil', 'jabatan', 'urutan', 'kontak'])]
+#[Fillable(['periode_id', 'komsat_id', 'mahasiswa_id', 'nama_tampil', 'jabatan', 'urutan', 'kontak', 'foto_path'])]
 class Kepengurusan extends Model
 {
     /** @use HasFactory<KepengurusanFactory> */

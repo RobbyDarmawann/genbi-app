@@ -5,17 +5,19 @@ namespace App\Actions\Kepengurusan;
 use App\Models\AuditLog;
 use App\Models\Kepengurusan;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class SaveKepengurusanAction
 {
     /**
-     * @param  array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak: string|null}  $data
+     * @param  array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak: string|null, foto?: UploadedFile|null}  $data
      */
-    public function handle(array $data, ?Kepengurusan $kepengurusan, User $actor, ?string $ipAddress = null): Kepengurusan
+    public function handle(array $data, ?Kepengurusan $kepengurusan, User $actor, ?string $ipAddress = null, ?UploadedFile $foto = null): Kepengurusan
     {
-        return DB::transaction(function () use ($data, $kepengurusan, $actor, $ipAddress): Kepengurusan {
+        return DB::transaction(function () use ($data, $kepengurusan, $actor, $ipAddress, $foto): Kepengurusan {
             $duplicate = Kepengurusan::query()
                 ->where('periode_id', $data['periode_id'])
                 ->when(
@@ -37,22 +39,42 @@ class SaveKepengurusanAction
 
             $isCreate = $kepengurusan === null;
             $model = $kepengurusan ?? new Kepengurusan;
+            $oldFotoPath = $model->foto_path;
+            $newFotoPath = null;
+
+            if ($foto !== null) {
+                $newFotoPath = $foto->store('kepengurusan', 'public');
+                $data['foto_path'] = $newFotoPath;
+            }
+
+            unset($data['foto']);
             $model->fill($data);
             $model->save();
+
+            $metadata = [
+                'periode_id' => $model->periode_id,
+                'komsat_id' => $model->komsat_id,
+                'jabatan' => $model->jabatan,
+                'urutan' => $model->urutan,
+                'foto_path' => $model->foto_path,
+            ];
+
+            if ($newFotoPath !== null) {
+                $metadata['foto_diubah'] = true;
+            }
 
             AuditLog::catat(
                 aksi: $isCreate ? 'kepengurusan.created' : 'kepengurusan.updated',
                 userId: $actor->id,
                 subjectType: Kepengurusan::class,
                 subjectId: $model->id,
-                metadata: [
-                    'periode_id' => $model->periode_id,
-                    'komsat_id' => $model->komsat_id,
-                    'jabatan' => $model->jabatan,
-                    'urutan' => $model->urutan,
-                ],
+                metadata: $metadata,
                 ipAddress: $ipAddress,
             );
+
+            if ($newFotoPath !== null && $oldFotoPath !== null) {
+                Storage::disk('public')->delete($oldFotoPath);
+            }
 
             return $model;
         });
