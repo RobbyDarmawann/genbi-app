@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 class SaveKepengurusanAction
 {
     /**
-     * @param  array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak: string|null, foto?: UploadedFile|null}  $data
+     * @param  array{periode_id: int, komsat_id: int|null, mahasiswa_id: int|null, nama_tampil: string, jabatan: string, urutan: int, kontak?: string|null, no_hp?: string|null, instagram?: string|null, email?: string|null, foto?: UploadedFile|null}  $data
      */
     public function handle(array $data, ?Kepengurusan $kepengurusan, User $actor, ?string $ipAddress = null, ?UploadedFile $foto = null): Kepengurusan
     {
@@ -57,6 +57,10 @@ class SaveKepengurusanAction
                 'jabatan' => $model->jabatan,
                 'urutan' => $model->urutan,
                 'foto_path' => $model->foto_path,
+                'no_hp' => $model->no_hp,
+                'instagram' => $model->instagram,
+                'email' => $model->email,
+                'kontak' => $model->kontak,
             ];
 
             if ($newFotoPath !== null) {

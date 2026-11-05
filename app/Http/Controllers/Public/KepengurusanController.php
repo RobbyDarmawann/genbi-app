@@ -53,6 +53,9 @@ class KepengurusanController extends Controller
                     'nama_tampil' => $item->nama_tampil,
                     'jabatan' => $item->jabatan,
                     'urutan' => $item->urutan,
+                    'no_hp' => $item->no_hp,
+                    'instagram' => $item->instagram,
+                    'email' => $item->email,
                     'kontak' => $item->kontak,
                     'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
                 ]);

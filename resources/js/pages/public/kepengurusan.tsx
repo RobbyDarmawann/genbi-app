@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Search } from 'lucide-react';
+import { Instagram, Mail, Phone, Search } from 'lucide-react';
 import { FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,9 @@ export type KepengurusanEntry = {
     id: number;
     nama_tampil: string;
     jabatan: string;
+    no_hp: string | null;
+    instagram: string | null;
+    email: string | null;
     kontak: string | null;
     komsat_nama: string | null;
     komsat_kode: string | null;
@@ -38,35 +41,78 @@ function initials(name: string): string {
         .join('');
 }
 
-function renderSafeContact(kontak: string | null) {
-    if (!kontak) {
+export function formatWhatsAppNumber(phone: string): string {
+    const digits = phone.replace(/\D/g, '');
+    if (digits.startsWith('0')) {
+        return `62${digits.slice(1)}`;
+    }
+    return digits;
+}
+
+export function ContactsDisplay({
+    no_hp,
+    instagram,
+    email,
+    kontak,
+}: {
+    no_hp?: string | null;
+    instagram?: string | null;
+    email?: string | null;
+    kontak?: string | null;
+}) {
+    const cleanPhone = no_hp?.trim() || null;
+    const cleanIg = instagram?.trim() || null;
+    const cleanEmail = email?.trim() || null;
+    const cleanKontak = kontak?.trim() || null;
+
+    if (!cleanPhone && !cleanIg && !cleanEmail && !cleanKontak) {
         return null;
     }
 
-    const trimmed = kontak.trim();
-    const isSafeUrl = /^(https:\/\/|mailto:|tel:)/i.test(trimmed);
-
-    if (isSafeUrl) {
-        return (
-            <a
-                className="shrink-0 text-sm text-primary hover:underline"
-                href={trimmed}
-                target={trimmed.startsWith('https://') ? '_blank' : undefined}
-                rel={
-                    trimmed.startsWith('https://')
-                        ? 'noopener noreferrer'
-                        : undefined
-                }
-            >
-                {trimmed}
-            </a>
-        );
-    }
+    const waNumber = cleanPhone ? formatWhatsAppNumber(cleanPhone) : null;
 
     return (
-        <span className="shrink-0 text-sm text-muted-foreground">
-            {trimmed}
-        </span>
+        <div className="flex flex-wrap items-center justify-end gap-2 text-xs">
+            {cleanPhone && waNumber && (
+                <a
+                    className="inline-flex items-center gap-1 rounded-md border bg-muted/40 px-2 py-1 text-primary hover:bg-muted hover:underline"
+                    href={`https://wa.me/${waNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`WhatsApp ${cleanPhone}`}
+                >
+                    <Phone className="size-3.5 shrink-0" />
+                    <span>{cleanPhone}</span>
+                </a>
+            )}
+            {cleanIg && (
+                <a
+                    className="inline-flex items-center gap-1 rounded-md border bg-muted/40 px-2 py-1 text-primary hover:bg-muted hover:underline"
+                    href={`https://www.instagram.com/${cleanIg}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Instagram @${cleanIg}`}
+                >
+                    <Instagram className="size-3.5 shrink-0" />
+                    <span>@{cleanIg}</span>
+                </a>
+            )}
+            {cleanEmail && (
+                <a
+                    className="inline-flex items-center gap-1 rounded-md border bg-muted/40 px-2 py-1 text-primary hover:bg-muted hover:underline"
+                    href={`mailto:${cleanEmail}`}
+                    aria-label={`Email ${cleanEmail}`}
+                >
+                    <Mail className="size-3.5 shrink-0" />
+                    <span>{cleanEmail}</span>
+                </a>
+            )}
+            {cleanKontak && (
+                <span className="inline-flex items-center gap-1 rounded-md border bg-muted/30 px-2 py-1 text-muted-foreground">
+                    <span>{cleanKontak}</span>
+                </span>
+            )}
+        </div>
     );
 }
 
@@ -236,7 +282,12 @@ export function DirektoriKepengurusanContent({
                                                 )}
                                             </div>
                                         </div>
-                                        {renderSafeContact(entry.kontak)}
+                                        <ContactsDisplay
+                                            no_hp={entry.no_hp}
+                                            instagram={entry.instagram}
+                                            email={entry.email}
+                                            kontak={entry.kontak}
+                                        />
                                     </div>
                                 ))}
                             </CardContent>

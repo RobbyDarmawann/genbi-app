@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Kepengurusan\DeleteKepengurusanAction;
+use App\Actions\Kepengurusan\ReorderKepengurusanAction;
 use App\Actions\Kepengurusan\SaveKepengurusanAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ReorderKepengurusanRequest;
 use App\Http\Requests\Admin\StoreKepengurusanRequest;
 use App\Http\Requests\Admin\UpdateKepengurusanRequest;
 use App\Models\Kepengurusan;
@@ -52,23 +54,52 @@ class KepengurusanController extends Controller
             ->orderBy('urutan')
             ->orderBy('id');
 
-        $kepengurusan = $query->paginate(20)->withQueryString()->through(fn (Kepengurusan $item): array => [
-            'id' => $item->id,
-            'periode_id' => $item->periode_id,
-            'periode_nama' => $item->periode->nama ?? '-',
-            'periode_aktif' => (bool) ($item->periode->aktif ?? false),
-            'komsat_id' => $item->komsat_id,
-            'komsat_kode' => $item->komsat->kode ?? null,
-            'komsat_nama' => $item->komsat->nama ?? null,
-            'lingkup_label' => $item->komsat !== null ? "Komsat {$item->komsat->kode}" : 'Tingkat Wilayah',
-            'mahasiswa_id' => $item->mahasiswa_id,
-            'mahasiswa_nama' => $item->mahasiswa->user->name ?? null,
-            'nama_tampil' => $item->nama_tampil,
-            'jabatan' => $item->jabatan,
-            'urutan' => $item->urutan,
-            'kontak' => $item->kontak,
-            'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
-        ]);
+        $allKepengurusan = $query->get();
+
+        $grouped = [
+            'wilayah' => $allKepengurusan->where('komsat_id', null)->values()->map(fn (Kepengurusan $item): array => [
+                'id' => $item->id,
+                'periode_id' => $item->periode_id,
+                'komsat_id' => null,
+                'lingkup_label' => 'Tingkat Wilayah',
+                'mahasiswa_id' => $item->mahasiswa_id,
+                'mahasiswa_nama' => $item->mahasiswa->user->name ?? null,
+                'nama_tampil' => $item->nama_tampil,
+                'jabatan' => $item->jabatan,
+                'urutan' => $item->urutan,
+                'no_hp' => $item->no_hp,
+                'instagram' => $item->instagram,
+                'email' => $item->email,
+                'kontak' => $item->kontak,
+                'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
+            ])->all(),
+        ];
+
+        $komsatAktif = Komsat::query()->where('aktif', true)->orderBy('id')->get();
+        foreach ($komsatAktif as $komsat) {
+            $items = $allKepengurusan->where('komsat_id', $komsat->id)->values();
+            $grouped['komsat_'.$komsat->id] = [
+                'komsat_id' => $komsat->id,
+                'komsat_kode' => $komsat->kode,
+                'komsat_nama' => $komsat->nama,
+                'items' => $items->map(fn (Kepengurusan $item): array => [
+                    'id' => $item->id,
+                    'periode_id' => $item->periode_id,
+                    'komsat_id' => $item->komsat_id,
+                    'lingkup_label' => "Komsat {$item->komsat->kode}",
+                    'mahasiswa_id' => $item->mahasiswa_id,
+                    'mahasiswa_nama' => $item->mahasiswa->user->name ?? null,
+                    'nama_tampil' => $item->nama_tampil,
+                    'jabatan' => $item->jabatan,
+                    'urutan' => $item->urutan,
+                    'no_hp' => $item->no_hp,
+                    'instagram' => $item->instagram,
+                    'email' => $item->email,
+                    'kontak' => $item->kontak,
+                    'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
+                ])->all(),
+            ];
+        }
 
         $options = [
             'periode' => Periode::query()
@@ -101,7 +132,7 @@ class KepengurusanController extends Controller
         ];
 
         return Inertia::render('admin/kepengurusan/index', [
-            'kepengurusan' => $kepengurusan,
+            'kepengurusan_grouped' => $grouped,
             'filters' => [
                 'periode_id' => $periodeId !== null ? (string) $periodeId : '',
                 'komsat_id' => (string) ($komsatFilter ?? ''),
@@ -136,6 +167,20 @@ class KepengurusanController extends Controller
         $action->handle($validated, $kepengurusan, $actor, $request->ip(), $request->file('foto'));
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Data pengurus berhasil diperbarui.']);
+
+        return back(fallback: route('admin.kepengurusan.index'));
+    }
+
+    public function reorder(ReorderKepengurusanRequest $request, Kepengurusan $kepengurusan, ReorderKepengurusanAction $action): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        /** @var string $direction */
+        $direction = $request->validated('direction');
+
+        $action->handle($kepengurusan, $direction, $actor, $request->ip());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Urutan pengurus berhasil diperbarui.']);
 
         return back(fallback: route('admin.kepengurusan.index'));
     }

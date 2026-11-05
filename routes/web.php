@@ -94,6 +94,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('koreksi/{koreksi}/keputusan', [AdminKoreksiController::class, 'decide'])->name('koreksi.decide');
         Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');
         Route::get('rekap/export', [RekapController::class, 'export'])->name('rekap.export');
+        Route::patch('kepengurusan/{kepengurusan}/reorder', [AdminKepengurusanController::class, 'reorder'])->name('kepengurusan.reorder');
         Route::resource('kepengurusan', AdminKepengurusanController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['kepengurusan' => 'kepengurusan']);

@@ -47,8 +47,16 @@ class UpdateKepengurusanRequest extends FormRequest
             }
         }
 
-        if ($this->input('kontak') === '') {
-            $merges['kontak'] = null;
+        foreach (['kontak', 'no_hp', 'email'] as $field) {
+            if ($this->input($field) === '') {
+                $merges[$field] = null;
+            }
+        }
+
+        $instagram = trim((string) $this->input('instagram', ''));
+        if ($instagram !== '') {
+            $handle = preg_replace('#^https?://(?:www\\.)?instagram\\.com/#i', '', $instagram);
+            $merges['instagram'] = ltrim(explode('/', trim((string) $handle, '/'))[0], '@');
         }
 
         if (! empty($merges)) {
@@ -69,6 +77,14 @@ class UpdateKepengurusanRequest extends FormRequest
             'jabatan' => ['required', 'string', 'max:255'],
             'urutan' => ['required', 'integer', 'min:0', 'max:1000'],
             'kontak' => ['nullable', 'string', 'max:255'],
+            'no_hp' => ['nullable', 'string', 'regex:/^(?:\+62|62|08)[0-9\s\-]{7,15}$/', function (string $attribute, mixed $value, \Closure $fail): void {
+                $digits = preg_replace('/\D/', '', (string) $value);
+                if (strlen($digits) < 9 || strlen($digits) > 15) {
+                    $fail('Nomor HP/WhatsApp harus memiliki 9 hingga 15 digit angka.');
+                }
+            }],
+            'instagram' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9._]+$/', 'max:50'],
+            'email' => ['nullable', 'string', 'email', 'max:255'],
             'foto' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
@@ -126,6 +142,11 @@ class UpdateKepengurusanRequest extends FormRequest
             'urutan.min' => 'Urutan tampil tidak boleh bernilai negatif.',
             'urutan.max' => 'Urutan tampil maksimal 1000.',
             'kontak.max' => 'Kontak maksimal 255 karakter.',
+            'no_hp.regex' => 'Format nomor HP tidak valid. Gunakan awalan 08 atau +62.',
+            'instagram.regex' => 'Username Instagram hanya boleh berisi huruf, angka, titik, dan garis bawah.',
+            'instagram.max' => 'Username Instagram maksimal 50 karakter.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'email.max' => 'Alamat email maksimal 255 karakter.',
             'foto.image' => 'File foto harus berupa gambar.',
             'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
             'foto.max' => 'Ukuran foto maksimal 2 MB.',

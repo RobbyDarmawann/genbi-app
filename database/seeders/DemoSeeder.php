@@ -196,7 +196,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Aditia Pratama',
                 'jabatan' => 'Ketua Wilayah',
                 'urutan' => 1,
-                'kontak' => '081234567801',
+                'no_hp' => '081234567801',
             ],
             [
                 'periode_id' => $periodeId,
@@ -205,7 +205,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Bella Nurhaliza',
                 'jabatan' => 'Sekretaris Wilayah',
                 'urutan' => 2,
-                'kontak' => '081234567802',
+                'no_hp' => '081234567802',
             ],
             [
                 'periode_id' => $periodeId,
@@ -214,7 +214,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Candra Wijaya',
                 'jabatan' => 'Bendahara Wilayah',
                 'urutan' => 3,
-                'kontak' => '081234567803',
+                'no_hp' => '081234567803',
             ],
             // Pengurus Komsat UNG
             [
@@ -224,7 +224,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Dian Kusuma',
                 'jabatan' => 'Ketua Komsat UNG',
                 'urutan' => 1,
-                'kontak' => '081234567804',
+                'no_hp' => '081234567804',
             ],
             // Pengurus Komsat IAIN
             [
@@ -234,7 +234,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Eka Ramadhani',
                 'jabatan' => 'Ketua Komsat IAIN',
                 'urutan' => 1,
-                'kontak' => '081234567805',
+                'no_hp' => '081234567805',
             ],
             // Pengurus Komsat UG
             [
@@ -244,7 +244,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Hendra Saputra',
                 'jabatan' => 'Ketua Komsat UG',
                 'urutan' => 1,
-                'kontak' => '081234567808',
+                'no_hp' => '081234567808',
             ],
             // Pengurus Komsat UMGO
             [
@@ -254,7 +254,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Kartika Sari',
                 'jabatan' => 'Ketua Komsat UMGO',
                 'urutan' => 1,
-                'kontak' => '081234567811',
+                'no_hp' => '081234567811',
             ],
             // Pengurus Komsat UBM
             [
@@ -264,7 +264,7 @@ class DemoSeeder extends Seeder
                 'nama_tampil' => 'Naufal Rizky',
                 'jabatan' => 'Ketua Komsat UBM',
                 'urutan' => 1,
-                'kontak' => '081234567814',
+                'no_hp' => '081234567814',
             ],
         ];
 
@@ -279,7 +279,7 @@ class DemoSeeder extends Seeder
                     'mahasiswa_id' => $data['mahasiswa_id'],
                     'nama_tampil' => $data['nama_tampil'],
                     'urutan' => $data['urutan'],
-                    'kontak' => $data['kontak'],
+                    'no_hp' => $data['no_hp'],
                 ]
             );
         }

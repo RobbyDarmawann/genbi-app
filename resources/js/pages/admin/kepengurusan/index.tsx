@@ -1,5 +1,5 @@
-import { Form, Head, Link, router } from '@inertiajs/react';
-import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Form, Head, router } from '@inertiajs/react';
+import { ArrowDown, ArrowUp, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import KepengurusanController from '@/actions/App/Http/Controllers/Admin/KepengurusanController';
 import Heading from '@/components/heading';
@@ -20,36 +20,43 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ContactsDisplay } from '@/pages/public/kepengurusan';
 import admin from '@/routes/admin';
 
 type KepengurusanItem = {
     id: number;
     periode_id: number;
-    periode_nama: string;
-    periode_aktif: boolean;
     komsat_id: number | null;
-    komsat_kode: string | null;
-    komsat_nama: string | null;
     lingkup_label: string;
     mahasiswa_id: number | null;
     mahasiswa_nama: string | null;
     nama_tampil: string;
     jabatan: string;
     urutan: number;
+    no_hp: string | null;
+    instagram: string | null;
+    email: string | null;
     kontak: string | null;
     foto_url: string | null;
 };
 
-type PaginationLink = {
-    url: string | null;
-    label: string;
-    active: boolean;
+type KomsatGroup = {
+    komsat_id: number;
+    komsat_kode: string;
+    komsat_nama: string;
+    items: KepengurusanItem[];
+};
+
+type KepengurusanGroupRow = KepengurusanItem & {
+    display_no: number;
+    is_first: boolean;
+    is_last: boolean;
 };
 
 type PageProps = {
-    kepengurusan: {
-        data: KepengurusanItem[];
-        links: PaginationLink[];
+    kepengurusan_grouped: {
+        wilayah: KepengurusanItem[];
+        [key: string]: KepengurusanItem[] | KomsatGroup;
     };
     filters: {
         periode_id: string;
@@ -64,15 +71,8 @@ type PageProps = {
     periode_terpilih: { id: number; nama: string; aktif: boolean } | null;
 };
 
-function decodeLabel(label: string): string {
-    return label
-        .replace(/&laquo;/g, '«')
-        .replace(/&raquo;/g, '»')
-        .replace(/&amp;/g, '&');
-}
-
 export default function KepengurusanIndex({
-    kepengurusan,
+    kepengurusan_grouped,
     filters,
     options,
     periode_terpilih,
@@ -85,16 +85,68 @@ export default function KepengurusanIndex({
     const [selectedMahasiswaId, setSelectedMahasiswaId] = useState<string>('');
     const [namaTampil, setNamaTampil] = useState<string>('');
     const [selectedKomsatId, setSelectedKomsatId] = useState<string>('');
+    const [createUrutan, setCreateUrutan] = useState<number>(1);
     const [deleteTarget, setDeleteTarget] = useState<KepengurusanItem | null>(
         null,
     );
 
-    const openCreate = () => {
+    const komsatGroups = Object.entries(kepengurusan_grouped)
+        .filter(([key]) => key.startsWith('komsat_'))
+        .map(([key, value]) => {
+            const komsat = value as KomsatGroup;
+            return {
+                key,
+                komsat_id: komsat.komsat_id,
+                title: `Komsat ${komsat.komsat_kode}`,
+                subtitle: komsat.komsat_nama,
+                items: komsat.items,
+            };
+        });
+
+    const allGroups: Array<{
+        key: string;
+        komsat_id: number | null;
+        title: string;
+        subtitle: string;
+        items: KepengurusanItem[];
+    }> = [
+        {
+            key: 'wilayah',
+            komsat_id: null,
+            title: 'Tingkat Wilayah',
+            subtitle: 'Pengurus Wilayah GenBI Gorontalo',
+            items: kepengurusan_grouped.wilayah ?? [],
+        },
+        ...komsatGroups,
+    ];
+
+    const visibleGroups = allGroups.filter((group) => {
+        if (!filters.komsat_id || filters.komsat_id === 'all') {
+            return true;
+        }
+        if (filters.komsat_id === 'wilayah') {
+            return group.komsat_id === null;
+        }
+        return String(group.komsat_id) === String(filters.komsat_id);
+    });
+
+    const getNextUrutan = (items: KepengurusanItem[]): number => {
+        if (items.length === 0) {
+            return 1;
+        }
+        return Math.max(...items.map((item) => item.urutan)) + 1;
+    };
+
+    const openCreate = (group?: (typeof allGroups)[number]) => {
+        const targetGroup = group ?? allGroups[0];
         setEditing(null);
-        setLingkupType('wilayah');
+        setLingkupType(targetGroup.komsat_id === null ? 'wilayah' : 'komsat');
         setSelectedMahasiswaId('');
         setNamaTampil('');
-        setSelectedKomsatId('');
+        setSelectedKomsatId(
+            targetGroup.komsat_id !== null ? String(targetGroup.komsat_id) : '',
+        );
+        setCreateUrutan(getNextUrutan(targetGroup.items));
         setDialogOpen(true);
     };
 
@@ -142,14 +194,27 @@ export default function KepengurusanIndex({
         );
     };
 
-    const columns: ResponsiveColumn<KepengurusanItem>[] = [
+    const handleReorder = (id: number, direction: 'up' | 'down') => {
+        router.patch(
+            KepengurusanController.reorder(id).url,
+            { direction },
+            { preserveScroll: true, preserveState: true },
+        );
+    };
+
+    const columns: ResponsiveColumn<KepengurusanGroupRow>[] = [
         {
             key: 'urutan',
             header: 'No.',
             cell: (row) => (
-                <span className="font-mono text-xs text-muted-foreground tabular-nums">
-                    {row.urutan}
-                </span>
+                <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-xs font-semibold text-foreground tabular-nums">
+                        {row.display_no}
+                    </span>
+                    <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                        (#{row.urutan})
+                    </span>
+                </div>
             ),
         },
         {
@@ -190,27 +255,9 @@ export default function KepengurusanIndex({
             ),
         },
         {
-            key: 'lingkup',
-            header: 'Lingkup',
-            cell: (row) => (
-                <div className="space-y-1">
-                    <span className="inline-flex rounded-md bg-muted px-2 py-0.5 text-xs font-medium">
-                        {row.lingkup_label}
-                    </span>
-                    <p className="text-xs text-muted-foreground">
-                        {row.periode_nama} {row.periode_aktif && '· Aktif'}
-                    </p>
-                </div>
-            ),
-        },
-        {
             key: 'kontak',
             header: 'Kontak',
-            cell: (row) => (
-                <span className="text-sm text-muted-foreground">
-                    {row.kontak || '-'}
-                </span>
-            ),
+            cell: (row) => <ContactsDisplay {...row} />,
         },
         {
             key: 'aksi',
@@ -218,6 +265,28 @@ export default function KepengurusanIndex({
             align: 'right',
             cell: (row) => (
                 <div className="flex items-center justify-end gap-1">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-8"
+                        disabled={row.is_first}
+                        onClick={() => handleReorder(row.id, 'up')}
+                        title="Naikkan urutan"
+                    >
+                        <ArrowUp className="size-4" />
+                        <span className="sr-only">Naik</span>
+                    </Button>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-8"
+                        disabled={row.is_last}
+                        onClick={() => handleReorder(row.id, 'down')}
+                        title="Turunkan urutan"
+                    >
+                        <ArrowDown className="size-4" />
+                        <span className="sr-only">Turun</span>
+                    </Button>
                     <Button
                         size="icon"
                         variant="ghost"
@@ -270,7 +339,7 @@ export default function KepengurusanIndex({
                     </div>
                     <Button
                         className="h-11 shrink-0 md:h-9"
-                        onClick={openCreate}
+                        onClick={() => openCreate()}
                     >
                         <Plus className="size-4" />
                         <span>Tambah Pengurus</span>
@@ -355,101 +424,184 @@ export default function KepengurusanIndex({
                     </div>
                 </form>
 
-                <ResponsiveTable
-                    data={kepengurusan.data}
-                    columns={columns}
-                    keyExtractor={(row) => row.id}
-                    renderMobileCard={(row) => (
-                        <div className="space-y-3">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-start gap-3">
-                                    {row.foto_url ? (
-                                        <img
-                                            src={row.foto_url}
-                                            alt=""
-                                            className="size-10 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                                            {row.nama_tampil
-                                                .split(/\s+/)
-                                                .slice(0, 2)
-                                                .map((part) => part[0])
-                                                .join('')
-                                                .toUpperCase()}
-                                        </div>
-                                    )}
-                                    <div>
-                                        <p className="font-semibold text-foreground">
-                                            {row.nama_tampil}
-                                        </p>
-                                        <p className="text-sm font-medium text-primary">
-                                            {row.jabatan}
-                                        </p>
-                                        {row.mahasiswa_nama && (
-                                            <p className="text-xs text-muted-foreground">
-                                                Akun: {row.mahasiswa_nama}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                                <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground tabular-nums">
-                                    #{row.urutan}
-                                </span>
-                            </div>
-                            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-                                <span>
-                                    {row.lingkup_label} · {row.periode_nama}
-                                    {row.periode_aktif
-                                        ? ' (Periode Aktif)'
-                                        : ' (Arsip)'}
-                                </span>
-                                {row.kontak && <span>{row.kontak}</span>}
-                            </div>
-                            <div className="flex justify-end gap-2 border-t pt-2">
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="h-11 md:h-9"
-                                    onClick={() => openEdit(row)}
-                                >
-                                    <Pencil className="size-4" />
-                                    Edit
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    className="h-11 md:h-9"
-                                    onClick={() => setDeleteTarget(row)}
-                                >
-                                    <Trash2 className="size-4" />
-                                    Hapus
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-                    emptyState={
-                        <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">
-                            Belum ada data pengurus yang sesuai filter.
-                        </div>
-                    }
-                />
+                {visibleGroups.length === 0 ? (
+                    <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">
+                        Belum ada data pengurus yang sesuai filter.
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {visibleGroups.map((group) => {
+                            const groupRows = group.items.map(
+                                (item, idx, arr) => ({
+                                    ...item,
+                                    display_no: idx + 1,
+                                    is_first: idx === 0,
+                                    is_last: idx === arr.length - 1,
+                                }),
+                            );
 
-                {kepengurusan.links.length > 3 && (
-                    <div className="flex flex-wrap justify-center gap-1">
-                        {kepengurusan.links.map((link, idx) => (
-                            <Link
-                                key={idx}
-                                href={link.url ?? '#'}
-                                className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-                                    link.active
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'text-muted-foreground hover:bg-muted'
-                                } ${!link.url ? 'pointer-events-none opacity-50' : ''}`}
-                            >
-                                {decodeLabel(link.label)}
-                            </Link>
-                        ))}
+                            return (
+                                <section key={group.key}>
+                                    <header className="mb-3 flex items-center justify-between gap-3 rounded-lg border bg-muted/30 p-4">
+                                        <div>
+                                            <h3 className="font-semibold text-foreground">
+                                                {group.title}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                {group.subtitle} &middot;{' '}
+                                                <span className="font-medium">
+                                                    {group.items.length}{' '}
+                                                    pengurus
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="shrink-0"
+                                            onClick={() => openCreate(group)}
+                                        >
+                                            <Plus className="size-4" />
+                                            Tambah
+                                        </Button>
+                                    </header>
+
+                                    {groupRows.length === 0 ? (
+                                        <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
+                                            Belum ada pengurus di kelompok ini.
+                                        </div>
+                                    ) : (
+                                        <ResponsiveTable
+                                            data={groupRows}
+                                            columns={columns}
+                                            keyExtractor={(row) => row.id}
+                                            renderMobileCard={(row) => (
+                                                <div className="space-y-3">
+                                                    <div className="flex items-start justify-between gap-3">
+                                                        <div className="flex items-start gap-3">
+                                                            {row.foto_url ? (
+                                                                <img
+                                                                    src={
+                                                                        row.foto_url
+                                                                    }
+                                                                    alt=""
+                                                                    className="size-10 rounded-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                                                                    {row.nama_tampil
+                                                                        .split(
+                                                                            /\s+/,
+                                                                        )
+                                                                        .slice(
+                                                                            0,
+                                                                            2,
+                                                                        )
+                                                                        .map(
+                                                                            (
+                                                                                part,
+                                                                            ) =>
+                                                                                part[0],
+                                                                        )
+                                                                        .join(
+                                                                            '',
+                                                                        )
+                                                                        .toUpperCase()}
+                                                                </div>
+                                                            )}
+                                                            <div>
+                                                                <p className="font-semibold text-foreground">
+                                                                    {
+                                                                        row.nama_tampil
+                                                                    }
+                                                                </p>
+                                                                <p className="text-sm font-medium text-primary">
+                                                                    {
+                                                                        row.jabatan
+                                                                    }
+                                                                </p>
+                                                                {row.mahasiswa_nama && (
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        Akun:{' '}
+                                                                        {
+                                                                            row.mahasiswa_nama
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <span className="rounded bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-foreground tabular-nums">
+                                                            {row.display_no}
+                                                        </span>
+                                                    </div>
+                                                    <ContactsDisplay {...row} />
+                                                    <div className="flex justify-end gap-2 border-t pt-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            className="h-11 md:h-9"
+                                                            disabled={
+                                                                row.is_first
+                                                            }
+                                                            onClick={() =>
+                                                                handleReorder(
+                                                                    row.id,
+                                                                    'up',
+                                                                )
+                                                            }
+                                                        >
+                                                            <ArrowUp className="size-4" />{' '}
+                                                            Naik
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            className="h-11 md:h-9"
+                                                            disabled={
+                                                                row.is_last
+                                                            }
+                                                            onClick={() =>
+                                                                handleReorder(
+                                                                    row.id,
+                                                                    'down',
+                                                                )
+                                                            }
+                                                        >
+                                                            <ArrowDown className="size-4" />{' '}
+                                                            Turun
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="h-11 md:h-9"
+                                                            onClick={() =>
+                                                                openEdit(row)
+                                                            }
+                                                        >
+                                                            <Pencil className="size-4" />{' '}
+                                                            Edit
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-11 md:h-9"
+                                                            onClick={() =>
+                                                                setDeleteTarget(
+                                                                    row,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Trash2 className="size-4" />{' '}
+                                                            Hapus
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        />
+                                    )}
+                                </section>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -690,10 +842,65 @@ export default function KepengurusanIndex({
                                                     message={errors.urutan}
                                                 />
                                             </div>
+                                            <div />
+                                        </div>
 
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="edit-no-hp">
+                                                    Nomor HP/WhatsApp
+                                                </Label>
+                                                <Input
+                                                    id="edit-no-hp"
+                                                    name="no_hp"
+                                                    defaultValue={
+                                                        editing.no_hp ?? ''
+                                                    }
+                                                    placeholder="08..."
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.no_hp}
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="edit-instagram">
+                                                    Instagram
+                                                </Label>
+                                                <Input
+                                                    id="edit-instagram"
+                                                    name="instagram"
+                                                    defaultValue={
+                                                        editing.instagram ?? ''
+                                                    }
+                                                    placeholder="@username"
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.instagram}
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="edit-email">
+                                                    Email
+                                                </Label>
+                                                <Input
+                                                    id="edit-email"
+                                                    name="email"
+                                                    type="email"
+                                                    defaultValue={
+                                                        editing.email ?? ''
+                                                    }
+                                                    placeholder="nama@example.com"
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.email}
+                                                />
+                                            </div>
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="edit-kontak">
-                                                    Kontak Publik (Opsional)
+                                                    Kontak Lainnya
                                                 </Label>
                                                 <Input
                                                     id="edit-kontak"
@@ -701,7 +908,6 @@ export default function KepengurusanIndex({
                                                     defaultValue={
                                                         editing.kontak ?? ''
                                                     }
-                                                    placeholder="Email / IG / No. Telp"
                                                     className="h-11 md:h-9"
                                                 />
                                                 <InputError
@@ -975,7 +1181,7 @@ export default function KepengurusanIndex({
                                                     name="urutan"
                                                     type="number"
                                                     min="0"
-                                                    defaultValue={0}
+                                                    defaultValue={createUrutan}
                                                     className="h-11 md:h-9"
                                                     required
                                                 />
@@ -983,15 +1189,60 @@ export default function KepengurusanIndex({
                                                     message={errors.urutan}
                                                 />
                                             </div>
+                                            <div />
+                                        </div>
 
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="create-no-hp">
+                                                    Nomor HP/WhatsApp
+                                                </Label>
+                                                <Input
+                                                    id="create-no-hp"
+                                                    name="no_hp"
+                                                    placeholder="08..."
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.no_hp}
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="create-instagram">
+                                                    Instagram
+                                                </Label>
+                                                <Input
+                                                    id="create-instagram"
+                                                    name="instagram"
+                                                    placeholder="@username"
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.instagram}
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label htmlFor="create-email">
+                                                    Email
+                                                </Label>
+                                                <Input
+                                                    id="create-email"
+                                                    name="email"
+                                                    type="email"
+                                                    placeholder="nama@example.com"
+                                                    className="h-11 md:h-9"
+                                                />
+                                                <InputError
+                                                    message={errors.email}
+                                                />
+                                            </div>
                                             <div className="space-y-1.5">
                                                 <Label htmlFor="create-kontak">
-                                                    Kontak Publik (Opsional)
+                                                    Kontak Lainnya
                                                 </Label>
                                                 <Input
                                                     id="create-kontak"
                                                     name="kontak"
-                                                    placeholder="Email / IG / No. Telp"
                                                     className="h-11 md:h-9"
                                                 />
                                                 <InputError
