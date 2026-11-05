@@ -240,3 +240,29 @@ test('internal manajemen dapat mengekspor laporan excel dengan 5 sheet dan menca
 
     expect(AuditLog::query()->where('aksi', 'rekap.export')->where('user_id', $this->admin->id)->exists())->toBeTrue();
 });
+
+test('regresi linear memproyeksikan tren naik dengan benar', function () {
+    expect(app(GetEvaluationReportAction::class)->linearProjection([10, 12, 14, 16]))
+        ->toMatchArray(['n' => 4, 'projection' => 18, 'trend' => 'Naik'])
+        ->and(app(GetEvaluationReportAction::class)->linearProjection([20, 16, 12, 8]))
+        ->toMatchArray(['projection' => 4, 'trend' => 'Turun']);
+});
+
+test('regresi linear mempertahankan tren datar', function () {
+    expect(app(GetEvaluationReportAction::class)->linearProjection([7, 7, 7, 7]))
+        ->toMatchArray(['projection' => 7, 'trend' => 'Stabil']);
+});
+
+test('regresi linear menolak deret kurang dari empat titik', function () {
+    expect(app(GetEvaluationReportAction::class)->linearProjection([7, 7, 7]))
+        ->toMatchArray([
+            'n' => 3,
+            'projection' => null,
+            'message' => 'Data belum cukup untuk proyeksi (minimal 4 bulan).',
+        ]);
+});
+
+test('regresi linear meng-clamp proyeksi negatif menjadi nol', function () {
+    expect(app(GetEvaluationReportAction::class)->linearProjection([10, 5, 0, -5]))
+        ->toMatchArray(['projection' => 0, 'trend' => 'Turun']);
+});

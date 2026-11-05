@@ -84,11 +84,74 @@ class GetEvaluationReportAction
         }
 
         $trendMap = [];
-        foreach ((clone $query)->withCount(['pendaftaran' => fn ($q) => $q->where('status', StatusPendaftaran::Terdaftar)])->orderBy('tanggal')->get() as $activity) {
+        $trendActivities = (clone $query)->withCount(['pendaftaran' => fn ($q) => $q->where('status', StatusPendaftaran::Terdaftar)])->orderBy('tanggal')->get();
+        foreach ($trendActivities as $activity) {
             $key = Carbon::parse($activity->tanggal)->format('Y-m');
             $trendMap[$key] ??= ['bulan' => Carbon::parse($activity->tanggal)->translatedFormat('M Y'), 'kegiatan' => 0, 'partisipasi' => 0];
             $trendMap[$key]['kegiatan']++;
             $trendMap[$key]['partisipasi'] += (int) $activity->pendaftaran_count;
+        }
+
+        $trendRangeStart = $mulai ? Carbon::parse($mulai)->startOfMonth() : ($trendActivities->first() ? Carbon::parse($trendActivities->first()->tanggal)->startOfMonth() : null);
+        $trendRangeEnd = $akhir ? Carbon::parse($akhir)->startOfMonth() : ($trendActivities->last() ? Carbon::parse($trendActivities->last()->tanggal)->startOfMonth() : null);
+        $trendKeys = array_keys($trendMap);
+        if ($trendRangeStart !== null && $trendRangeEnd !== null && $trendRangeStart->lte($trendRangeEnd)) {
+            $filledTrend = [];
+            $trendKeys = [];
+            for ($month = $trendRangeStart->copy(); $month->lte($trendRangeEnd); $month->addMonth()) {
+                $key = $month->format('Y-m');
+                $trendKeys[] = $key;
+                $filledTrend[] = $trendMap[$key] ?? [
+                    'bulan' => $month->translatedFormat('M Y'),
+                    'kegiatan' => 0,
+                    'partisipasi' => 0,
+                ];
+            }
+            $trend = $filledTrend;
+        } else {
+            $trend = array_values($trendMap);
+        }
+        $aggregateProjection = $this->linearProjection(array_column($trend, 'partisipasi'));
+        $trendChart = $trend;
+        if ($aggregateProjection['projection'] !== null && $trend !== []) {
+            $lastMonth = $trendRangeEnd?->copy() ?? Carbon::now()->startOfMonth();
+            $trendChart[count($trendChart) - 1]['proyeksi'] = $trendChart[count($trendChart) - 1]['partisipasi'];
+            $trendChart[] = [
+                'bulan' => $lastMonth->addMonth()->translatedFormat('M Y'),
+                'kegiatan' => 0,
+                'partisipasi' => 0,
+                'proyeksi' => $aggregateProjection['projection'],
+            ];
+        }
+
+        $proyeksiPerKomsat = [];
+        foreach (Komsat::orderBy('id')->get() as $komsat) {
+            $monthlyParticipation = [];
+            foreach ($trend as $row) {
+                $monthlyParticipation[] = 0;
+            }
+            foreach (Pendaftaran::query()
+                ->whereIn('kegiatan_id', $ids)
+                ->where('status', StatusPendaftaran::Terdaftar)
+                ->whereHas('mahasiswa', fn ($q) => $q->where('komsat_id', $komsat->id))
+                ->with('kegiatan:id,tanggal')
+                ->get() as $registration) {
+                $key = Carbon::parse($registration->kegiatan->tanggal)->format('Y-m');
+                foreach ($trend as $index => $row) {
+                    if (($trendKeys[$index] ?? null) === $key) {
+                        $monthlyParticipation[$index]++;
+                        break;
+                    }
+                }
+            }
+            $projection = $this->linearProjection($monthlyParticipation);
+            $proyeksiPerKomsat[] = [
+                'komsat' => $komsat->kode,
+                'bulan_data' => $projection['n'],
+                'tren' => $projection['trend'],
+                'proyeksi_partisipasi' => $projection['projection'],
+                'pesan' => $projection['message'],
+            ];
         }
 
         $activities = (clone $query)->with(['komsat:id,kode'])->withCount([
@@ -138,10 +201,51 @@ class GetEvaluationReportAction
             'filters' => ['periode_id' => (string) ($filters['periode_id'] ?? ''), 'mulai' => (string) ($mulai ?? ''), 'akhir' => (string) ($akhir ?? ''), 'komsat_id' => (string) ($filters['komsat_id'] ?? ''), 'divisi_id' => (string) ($filters['divisi_id'] ?? ''), 'status' => (string) ($filters['status'] ?? '')],
             'ringkasan' => ['total_kegiatan' => count($ids), 'total_pendaftaran' => $registered, 'kehadiran_valid' => $valid, 'tingkat_kehadiran' => $registered ? round($valid * 100 / $registered, 1) : 0.0],
             'rekap_komsat' => $rekap,
-            'tren' => array_values($trendMap),
+            'tren' => $trend,
+            'tren_chart' => $trendChart,
+            'proyeksi_tren' => $proyeksiPerKomsat,
             'partisipasi' => $activities,
             'kehadiran' => $kehadiranData,
             'transaksi_poin' => $transaksiPoinData,
+        ];
+    }
+
+    /**
+     * @param  array<int, int|float>  $values
+     * @return array{n: int, slope: float|null, trend: string, projection: int|null, message: string|null}
+     */
+    public function linearProjection(array $values): array
+    {
+        $n = count($values);
+        if ($n < 4) {
+            return [
+                'n' => $n,
+                'slope' => null,
+                'trend' => 'Stabil',
+                'projection' => null,
+                'message' => 'Data belum cukup untuk proyeksi (minimal 4 bulan).',
+            ];
+        }
+
+        $xMean = ($n + 1) / 2;
+        $yMean = array_sum($values) / $n;
+        $numerator = 0.0;
+        $denominator = 0.0;
+        foreach ($values as $index => $value) {
+            $x = $index + 1;
+            $numerator += ($x - $xMean) * ($value - $yMean);
+            $denominator += ($x - $xMean) ** 2;
+        }
+        $slope = $denominator === 0.0 ? 0.0 : $numerator / $denominator;
+        $intercept = $yMean - ($slope * $xMean);
+        $projection = max(0, (int) round($intercept + ($slope * ($n + 1))));
+
+        return [
+            'n' => $n,
+            'slope' => $slope,
+            'trend' => $slope > 0.5 ? 'Naik' : ($slope < -0.5 ? 'Turun' : 'Stabil'),
+            'projection' => $projection,
+            'message' => null,
         ];
     }
 }

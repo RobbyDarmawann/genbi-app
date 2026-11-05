@@ -133,7 +133,14 @@ tercatat pada audit log.
 2. Pilih periode, rentang tanggal, Komsat, Divisi, atau status kegiatan.
 3. Pilih `Terapkan filter`.
 4. Tinjau kartu ringkasan, grafik tren, rekap Komsat, dan partisipasi kegiatan.
-5. Pilih `Export` untuk mengunduh hasil rekap sesuai filter.
+5. Tinjau panel `Proyeksi Tren per Komsat`. Panel menampilkan jumlah bulan
+   data, arah tren, dan estimasi partisipasi bulan berikutnya. Bila data belum
+   mencapai empat bulan, sistem menampilkan pesan bahwa data belum cukup.
+6. Proyeksi dihitung dengan regresi linear dari data partisipasi bulanan periode
+   aktif. Angka proyeksi adalah estimasi arah tren, bukan kepastian.
+7. Pilih `Export` untuk mengunduh hasil rekap sesuai filter. Setiap sheet
+   memiliki judul, konteks periode, header berwarna, garis tabel, dan freeze
+   panes di bawah header.
 
 ### Mengelola kepengurusan
 

@@ -4,6 +4,8 @@ import {
     Bar,
     BarChart,
     CartesianGrid,
+    Legend,
+    Line,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -64,6 +66,19 @@ type Props = {
     };
     rekap_komsat: KomsatRow[];
     tren: { bulan: string; kegiatan: number; partisipasi: number }[];
+    tren_chart: {
+        bulan: string;
+        kegiatan: number;
+        partisipasi: number;
+        proyeksi?: number;
+    }[];
+    proyeksi_tren: {
+        komsat: string;
+        bulan_data: number;
+        tren: 'Naik' | 'Turun' | 'Stabil';
+        proyeksi_partisipasi: number | null;
+        pesan: string | null;
+    }[];
     partisipasi: ActivityRow[];
 };
 
@@ -73,6 +88,8 @@ export default function Rekap({
     ringkasan,
     rekap_komsat,
     tren,
+    tren_chart,
+    proyeksi_tren,
     partisipasi,
 }: Props) {
     const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -368,7 +385,7 @@ export default function Rekap({
                         <CardContent className="h-72 pt-6">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
-                                    data={tren}
+                                    data={tren_chart}
                                     margin={{ left: -16, right: 8 }}
                                 >
                                     <CartesianGrid
@@ -388,20 +405,35 @@ export default function Rekap({
                                             formatAngka(Number(value)),
                                             name === 'kegiatan'
                                                 ? 'Kegiatan'
-                                                : 'Pendaftaran',
+                                                : name === 'partisipasi'
+                                                  ? 'Pendaftaran'
+                                                  : 'Proyeksi',
                                         ]}
                                     />
+                                    <Legend />
                                     <Bar
                                         dataKey="kegiatan"
                                         name="Kegiatan"
                                         fill="var(--primary)"
                                         radius={[3, 3, 0, 0]}
+                                        isAnimationActive={false}
                                     />
                                     <Bar
                                         dataKey="partisipasi"
                                         name="Pendaftaran"
                                         fill="var(--chart-2)"
                                         radius={[3, 3, 0, 0]}
+                                        isAnimationActive={false}
+                                    />
+                                    <Line
+                                        dataKey="proyeksi"
+                                        name="Proyeksi"
+                                        stroke="var(--primary)"
+                                        strokeDasharray="5 5"
+                                        strokeWidth={2}
+                                        dot
+                                        connectNulls
+                                        isAnimationActive={false}
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -447,6 +479,64 @@ export default function Rekap({
                             </table>
                         </div>
                     </details>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Proyeksi Tren per Komsat</CardTitle>
+                        </CardHeader>
+                        <CardContent className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead className="border-b bg-muted/50">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left font-medium">
+                                            Komsat
+                                        </th>
+                                        <th className="px-4 py-2 text-right font-medium">
+                                            Bulan data (n)
+                                        </th>
+                                        <th className="px-4 py-2 text-left font-medium">
+                                            Tren
+                                        </th>
+                                        <th className="px-4 py-2 text-right font-medium">
+                                            Proyeksi partisipasi bulan
+                                            berikutnya
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {proyeksi_tren.map((row) => (
+                                        <tr
+                                            key={row.komsat}
+                                            className="border-b last:border-0"
+                                        >
+                                            <td className="px-4 py-2 font-medium">
+                                                {row.komsat}
+                                            </td>
+                                            <td className="px-4 py-2 text-right tabular-nums">
+                                                {row.bulan_data}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                {row.tren}
+                                            </td>
+                                            <td className="px-4 py-2 text-right tabular-nums">
+                                                {row.proyeksi_partisipasi ===
+                                                null
+                                                    ? row.pesan
+                                                    : formatAngka(
+                                                          row.proyeksi_partisipasi,
+                                                      )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            <p className="mt-4 text-sm text-muted-foreground">
+                                Proyeksi dihitung dengan regresi linear dari
+                                data partisipasi bulanan periode aktif. Angka
+                                proyeksi adalah estimasi arah tren, bukan
+                                kepastian.
+                            </p>
+                        </CardContent>
+                    </Card>
                 </section>
                 <section className="space-y-3">
                     <h2 className="text-xl font-semibold">Rekap per Komsat</h2>

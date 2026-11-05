@@ -40,6 +40,8 @@ class RekapController
             'ringkasan' => $report['ringkasan'],
             'rekap_komsat' => $report['rekap_komsat'],
             'tren' => $report['tren'],
+            'tren_chart' => $report['tren_chart'],
+            'proyeksi_tren' => $report['proyeksi_tren'],
             'partisipasi' => $report['partisipasi'],
         ]);
     }
@@ -54,6 +56,10 @@ class RekapController
             : 'semua-data';
 
         $filename = "laporan-genbi-{$range}.xlsx";
+        $periodName = 'Semua periode';
+        if (! empty($filters['periode_id']) && $filters['periode_id'] !== 'all') {
+            $periodName = Periode::query()->whereKey($filters['periode_id'])->value('nama') ?? $periodName;
+        }
 
         AuditLog::catat(
             'rekap.export',
@@ -64,6 +70,6 @@ class RekapController
             request()->ip()
         );
 
-        return Excel::download(new LaporanGenbiExport($report), $filename);
+        return Excel::download(new LaporanGenbiExport($report, $periodName), $filename);
     }
 }
