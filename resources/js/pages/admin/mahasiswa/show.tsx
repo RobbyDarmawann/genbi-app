@@ -1,5 +1,13 @@
 import { Head, Link } from '@inertiajs/react';
-import { CalendarDays, Pencil, ShieldAlert, UserRound } from 'lucide-react';
+import {
+    CalendarDays,
+    IdCard,
+    Pencil,
+    Phone,
+    ShieldAlert,
+    UserRound,
+} from 'lucide-react';
+import type { ReactNode } from 'react';
 import Heading from '@/components/heading';
 import { DeleteMahasiswaDialog } from '@/components/mahasiswa/delete-mahasiswa-dialog';
 import {
@@ -87,15 +95,6 @@ export default function MahasiswaShow({ mahasiswa, riwayatPoin }: Props) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {mahasiswa.foto_url && (
-                                <div className="flex justify-center pb-2">
-                                    <img
-                                        src={mahasiswa.foto_url}
-                                        alt={mahasiswa.name}
-                                        className="size-24 rounded-full object-cover"
-                                    />
-                                </div>
-                            )}
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <Info
                                     label="Nama lengkap"
@@ -132,47 +131,6 @@ export default function MahasiswaShow({ mahasiswa, riwayatPoin }: Props) {
                                         mahasiswa.aktif ? 'Aktif' : 'Nonaktif'
                                     }
                                 />
-                                {mahasiswa.jenis_kelamin && (
-                                    <Info
-                                        label="Jenis kelamin"
-                                        value={mahasiswa.jenis_kelamin}
-                                    />
-                                )}
-                                {mahasiswa.agama && (
-                                    <Info
-                                        label="Agama"
-                                        value={mahasiswa.agama}
-                                    />
-                                )}
-                                {mahasiswa.golongan_darah && (
-                                    <Info
-                                        label="Golongan darah"
-                                        value={mahasiswa.golongan_darah}
-                                    />
-                                )}
-                                {mahasiswa.tanggal_lahir && (
-                                    <Info
-                                        label="Tanggal lahir"
-                                        value={new Intl.DateTimeFormat(
-                                            'id-ID',
-                                            { dateStyle: 'long' },
-                                        ).format(
-                                            new Date(mahasiswa.tanggal_lahir),
-                                        )}
-                                    />
-                                )}
-                                {mahasiswa.domisili && (
-                                    <Info
-                                        label="Domisili"
-                                        value={mahasiswa.domisili}
-                                    />
-                                )}
-                                {mahasiswa.no_hp && (
-                                    <Info
-                                        label="No. HP"
-                                        value={mahasiswa.no_hp}
-                                    />
-                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -212,6 +170,97 @@ export default function MahasiswaShow({ mahasiswa, riwayatPoin }: Props) {
                         </CardContent>
                     </Card>
                 </section>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <IdCard className="size-4 text-muted-foreground" />
+                            Data Diri
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {[
+                            mahasiswa.jenis_kelamin,
+                            mahasiswa.agama,
+                            mahasiswa.golongan_darah,
+                            mahasiswa.tanggal_lahir,
+                            mahasiswa.domisili,
+                            mahasiswa.no_hp,
+                            mahasiswa.foto_url,
+                        ].every((value) => !value) ? (
+                            <p className="text-sm text-muted-foreground">
+                                Mahasiswa belum melengkapi data diri.
+                            </p>
+                        ) : (
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                                <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted text-lg font-semibold">
+                                    {mahasiswa.foto_url ? (
+                                        <img
+                                            src={mahasiswa.foto_url}
+                                            alt={`Foto ${mahasiswa.name}`}
+                                            className="size-full object-cover"
+                                        />
+                                    ) : (
+                                        mahasiswa.name
+                                            .split(/\s+/)
+                                            .slice(0, 2)
+                                            .map((part) => part[0] ?? '')
+                                            .join('')
+                                            .toUpperCase()
+                                    )}
+                                </div>
+                                <div className="grid min-w-0 flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                    <Info
+                                        label="Jenis kelamin"
+                                        value={mahasiswa.jenis_kelamin ?? '—'}
+                                    />
+                                    <Info
+                                        label="Agama"
+                                        value={mahasiswa.agama ?? '—'}
+                                    />
+                                    <Info
+                                        label="Golongan darah"
+                                        value={mahasiswa.golongan_darah ?? '—'}
+                                    />
+                                    <Info
+                                        label="Tanggal lahir"
+                                        value={formatTanggalLahir(
+                                            mahasiswa.tanggal_lahir,
+                                        )}
+                                    />
+                                    <Info
+                                        label="Domisili"
+                                        value={mahasiswa.domisili ?? '—'}
+                                    />
+                                    <Info
+                                        label="Email akun"
+                                        value={mahasiswa.email ?? '—'}
+                                    />
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-medium text-muted-foreground">
+                                            Nomor HP
+                                        </p>
+                                        {mahasiswa.no_hp ? (
+                                            <a
+                                                href={`https://wa.me/${formatWhatsAppNumber(mahasiswa.no_hp)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="mt-1 inline-flex min-h-8 items-center gap-2 rounded-md border bg-muted/40 px-2 text-sm font-medium hover:bg-muted"
+                                            >
+                                                <Phone className="size-4" />
+                                                {mahasiswa.no_hp}
+                                            </a>
+                                        ) : (
+                                            <p className="mt-1 font-medium">
+                                                —
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 <Card>
                     <CardHeader>
@@ -358,7 +407,24 @@ MahasiswaShow.layout = {
     ],
 };
 
-function Info({ label, value }: { label: string; value: string }) {
+function formatTanggalLahir(value: string | null | undefined): string {
+    if (!value) {
+        return '—';
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+    return new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'long',
+        timeZone: 'UTC',
+    }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function formatWhatsAppNumber(value: string): string {
+    const digits = value.replace(/\D/g, '');
+    return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
+}
+
+function Info({ label, value }: { label: string; value: string | ReactNode }) {
     return (
         <div className="min-w-0">
             <p className="text-xs font-medium text-muted-foreground">{label}</p>

@@ -66,7 +66,14 @@ type PageProps = {
     options: {
         periode: { id: number; nama: string; aktif: boolean }[];
         komsat: { id: number; kode: string; nama: string }[];
-        mahasiswa: { id: number; nama: string; nim: string; komsat: string }[];
+        mahasiswa: {
+            id: number;
+            nama: string;
+            nim: string;
+            komsat: string;
+            no_hp?: string | null;
+            email?: string | null;
+        }[];
     };
     periode_terpilih: { id: number; nama: string; aktif: boolean } | null;
 };
@@ -84,6 +91,10 @@ export default function KepengurusanIndex({
     );
     const [selectedMahasiswaId, setSelectedMahasiswaId] = useState<string>('');
     const [namaTampil, setNamaTampil] = useState<string>('');
+    const [createNoHp, setCreateNoHp] = useState<string>('');
+    const [createEmail, setCreateEmail] = useState<string>('');
+    const [noHpTouched, setNoHpTouched] = useState(false);
+    const [emailTouched, setEmailTouched] = useState(false);
     const [selectedKomsatId, setSelectedKomsatId] = useState<string>('');
     const [createUrutan, setCreateUrutan] = useState<number>(1);
     const [deleteTarget, setDeleteTarget] = useState<KepengurusanItem | null>(
@@ -143,6 +154,10 @@ export default function KepengurusanIndex({
         setLingkupType(targetGroup.komsat_id === null ? 'wilayah' : 'komsat');
         setSelectedMahasiswaId('');
         setNamaTampil('');
+        setCreateNoHp('');
+        setCreateEmail('');
+        setNoHpTouched(false);
+        setEmailTouched(false);
         setSelectedKomsatId(
             targetGroup.komsat_id !== null ? String(targetGroup.komsat_id) : '',
         );
@@ -167,6 +182,12 @@ export default function KepengurusanIndex({
             const found = options.mahasiswa.find((m) => String(m.id) === val);
             if (found && !editing) {
                 setNamaTampil(found.nama);
+                if (!noHpTouched) {
+                    setCreateNoHp(found.no_hp ?? '');
+                }
+                if (!emailTouched) {
+                    setCreateEmail(found.email ?? '');
+                }
             }
         }
     };
@@ -1200,6 +1221,13 @@ export default function KepengurusanIndex({
                                                 <Input
                                                     id="create-no-hp"
                                                     name="no_hp"
+                                                    value={createNoHp}
+                                                    onChange={(e) => {
+                                                        setCreateNoHp(
+                                                            e.target.value,
+                                                        );
+                                                        setNoHpTouched(true);
+                                                    }}
                                                     placeholder="08..."
                                                     className="h-11 md:h-9"
                                                 />
@@ -1229,6 +1257,13 @@ export default function KepengurusanIndex({
                                                     id="create-email"
                                                     name="email"
                                                     type="email"
+                                                    value={createEmail}
+                                                    onChange={(e) => {
+                                                        setCreateEmail(
+                                                            e.target.value,
+                                                        );
+                                                        setEmailTouched(true);
+                                                    }}
                                                     placeholder="nama@example.com"
                                                     className="h-11 md:h-9"
                                                 />

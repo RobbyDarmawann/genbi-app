@@ -24,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $jenis_kelamin
  * @property string|null $agama
  * @property string|null $golongan_darah
- * @property string|null $tanggal_lahir
+ * @property Carbon|null $tanggal_lahir
  * @property string|null $domisili
  * @property string|null $no_hp
  * @property string|null $foto_path

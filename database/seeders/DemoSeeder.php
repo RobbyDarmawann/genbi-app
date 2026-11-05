@@ -165,12 +165,12 @@ class DemoSeeder extends Seeder
                     'angkatan' => $data['angkatan'],
                     'status_penerima' => $data['status'],
                     'aktif' => true,
-                    'jenis_kelamin' => $data['jenis_kelamin'] ?? null,
-                    'agama' => $data['agama'] ?? null,
-                    'golongan_darah' => $data['golongan_darah'] ?? null,
-                    'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
-                    'domisili' => $data['domisili'] ?? null,
-                    'no_hp' => $data['no_hp'] ?? null,
+                    'jenis_kelamin' => $data['jenis_kelamin'],
+                    'agama' => $data['agama'],
+                    'golongan_darah' => $data['golongan_darah'],
+                    'tanggal_lahir' => $data['tanggal_lahir'],
+                    'domisili' => $data['domisili'],
+                    'no_hp' => $data['no_hp'],
                 ]
             );
 

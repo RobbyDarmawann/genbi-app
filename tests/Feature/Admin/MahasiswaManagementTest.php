@@ -12,6 +12,7 @@ use Database\Seeders\KomsatSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -304,6 +305,34 @@ describe('Ledger Points, Filtering, and History Protection', function () {
                 ->component('admin/mahasiswa/show')
                 ->where('mahasiswa.total_poin', 35)
                 ->has('riwayatPoin', 2)
+            );
+    });
+
+    test('internal manajemen sees student biodata and account email on student detail page', function () {
+        $this->mahasiswaUser->update(['email' => 'kartika.sari@genbi.id']);
+        $this->mahasiswa->update([
+            'jenis_kelamin' => 'Perempuan',
+            'agama' => 'Islam',
+            'golongan_darah' => 'O',
+            'tanggal_lahir' => '2004-11-04',
+            'domisili' => 'Kota Gorontalo, Kec. Kota Selatan',
+            'no_hp' => '082198761011',
+            'foto_path' => 'profil/kartika.jpg',
+        ]);
+
+        $this->actingAs($this->internal)
+            ->get(route('admin.mahasiswa.show', $this->mahasiswa))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('admin/mahasiswa/show')
+                ->where('mahasiswa.email', 'kartika.sari@genbi.id')
+                ->where('mahasiswa.no_hp', '082198761011')
+                ->where('mahasiswa.jenis_kelamin', 'Perempuan')
+                ->where('mahasiswa.agama', 'Islam')
+                ->where('mahasiswa.golongan_darah', 'O')
+                ->where('mahasiswa.tanggal_lahir', '2004-11-04')
+                ->where('mahasiswa.domisili', 'Kota Gorontalo, Kec. Kota Selatan')
+                ->where('mahasiswa.foto_url', Storage::disk('public')->url('profil/kartika.jpg'))
             );
     });
 

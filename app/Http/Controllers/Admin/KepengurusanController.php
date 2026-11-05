@@ -119,7 +119,7 @@ class KepengurusanController extends Controller
                 ->all(),
             'mahasiswa' => Mahasiswa::query()
                 ->where('aktif', true)
-                ->with(['user:id,name', 'komsat:id,kode'])
+                ->with(['user:id,name,email', 'komsat:id,kode'])
                 ->orderBy('id')
                 ->get()
                 ->map(fn (Mahasiswa $m): array => [
@@ -127,6 +127,8 @@ class KepengurusanController extends Controller
                     'nama' => $m->user->name ?? 'Mahasiswa',
                     'nim' => $m->nim,
                     'komsat' => $m->komsat->kode ?? '-',
+                    'no_hp' => $m->no_hp,
+                    'email' => $m->user?->email,
                 ])
                 ->all(),
         ];

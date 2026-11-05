@@ -31,6 +31,7 @@ export type MahasiswaRow = {
     user_id: number;
     name: string;
     username: string;
+    email?: string | null;
     nim: string;
     angkatan: string;
     status_penerima: StatusPenerimaValue;

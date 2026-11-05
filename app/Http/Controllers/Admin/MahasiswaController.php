@@ -38,7 +38,7 @@ class MahasiswaController extends Controller
         $aktifFilter = in_array($aktifParam, ['1', '0'], true) ? $aktifParam === '1' : null;
 
         $mahasiswa = Mahasiswa::query()
-            ->with(['user:id,name,username,is_active', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
+            ->with(['user:id,name,username,email,is_active', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
             ->withSum('poinTransaksi as total_poin', 'jumlah')
             ->withCount(['pendaftaran', 'poinTransaksi', 'koreksi', 'kepengurusan'])
             ->when($search !== '', function ($query) use ($search): void {
@@ -97,7 +97,7 @@ class MahasiswaController extends Controller
     {
         Gate::authorize('view', $mahasiswa);
 
-        $mahasiswa->load(['user:id,name,username,is_active,created_at', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
+        $mahasiswa->load(['user:id,name,username,email,is_active,created_at', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
             ->loadSum('poinTransaksi as total_poin', 'jumlah')
             ->loadCount(['pendaftaran', 'poinTransaksi', 'koreksi', 'kepengurusan']);
 
@@ -125,7 +125,7 @@ class MahasiswaController extends Controller
     {
         Gate::authorize('update', $mahasiswa);
 
-        $mahasiswa->load(['user:id,name,username,is_active', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
+        $mahasiswa->load(['user:id,name,username,email,is_active', 'komsat:id,kode,nama', 'divisi:id,komsat_id,nama,aktif'])
             ->loadSum('poinTransaksi as total_poin', 'jumlah')
             ->loadCount(['pendaftaran', 'poinTransaksi', 'koreksi', 'kepengurusan']);
 
@@ -211,11 +211,19 @@ class MahasiswaController extends Controller
             'user_id' => $item->user_id,
             'name' => $item->user !== null ? $item->user->name : '',
             'username' => $item->user !== null ? $item->user->username : '',
+            'email' => $item->user?->email,
             'nim' => $item->nim,
             'angkatan' => $item->angkatan,
             'status_penerima' => $item->status_penerima->value,
             'status_penerima_label' => $item->status_penerima->label(),
             'aktif' => $item->aktif,
+            'jenis_kelamin' => $item->jenis_kelamin,
+            'agama' => $item->agama,
+            'golongan_darah' => $item->golongan_darah,
+            'tanggal_lahir' => $item->tanggal_lahir?->format('Y-m-d'),
+            'domisili' => $item->domisili,
+            'no_hp' => $item->no_hp,
+            'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
             'total_poin' => (int) ($item->getAttribute('total_poin') ?? 0),
             'komsat_id' => $item->komsat_id,
             'divisi_id' => $item->divisi_id,

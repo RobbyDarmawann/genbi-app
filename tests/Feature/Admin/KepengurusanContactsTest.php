@@ -2,6 +2,7 @@
 
 use App\Models\Kepengurusan;
 use App\Models\Komsat;
+use App\Models\Mahasiswa;
 use App\Models\Periode;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -321,4 +322,59 @@ test('guest and mahasiswa cannot reorder kepengurusan', function () {
     $this->actingAs($mahasiswa)
         ->patch(route('admin.kepengurusan.reorder', $item), ['direction' => 'up'])
         ->assertForbidden();
+});
+
+test('admin kepengurusan options include student phone and email for prefill', function () {
+    $periode = Periode::factory()->create(['aktif' => true]);
+    $komsat = Komsat::factory()->create(['kode' => 'UNG', 'aktif' => true]);
+    $user = User::factory()->create(['email' => 'mhs.demo@genbi.id']);
+    $user->assignRole('mahasiswa');
+
+    $mahasiswa = Mahasiswa::factory()->create([
+        'user_id' => $user->id,
+        'komsat_id' => $komsat->id,
+        'no_hp' => '081234567899',
+        'aktif' => true,
+    ]);
+
+    $response = $this->actingAs($this->admin)->get(route('admin.kepengurusan.index'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('admin/kepengurusan/index')
+        ->where('options.mahasiswa', function ($items) use ($mahasiswa) {
+            return collect($items)->contains(fn ($item) => $item['id'] === $mahasiswa->id &&
+                $item['no_hp'] === '081234567899' &&
+                $item['email'] === 'mhs.demo@genbi.id'
+            );
+        })
+    );
+});
+
+test('saving board member with manually modified contact values persists the manual input without altering student biodata', function () {
+    $periode = Periode::factory()->create(['aktif' => true]);
+    $user = User::factory()->create(['email' => 'asli@genbi.id']);
+    $user->assignRole('mahasiswa');
+    $mahasiswa = Mahasiswa::factory()->create([
+        'user_id' => $user->id,
+        'no_hp' => '081111111111',
+        'aktif' => true,
+    ]);
+
+    $this->actingAs($this->admin)->post(route('admin.kepengurusan.store'), [
+        'periode_id' => $periode->id,
+        'mahasiswa_id' => $mahasiswa->id,
+        'nama_tampil' => 'Nama Khusus Pengurus',
+        'jabatan' => 'Koordinator Divisi',
+        'urutan' => 1,
+        'no_hp' => '082222222222',
+        'email' => 'pengurus.resmi@genbi.id',
+    ])->assertRedirect();
+
+    $saved = Kepengurusan::query()->where('mahasiswa_id', $mahasiswa->id)->firstOrFail();
+    expect($saved->no_hp)->toBe('082222222222')
+        ->and($saved->email)->toBe('pengurus.resmi@genbi.id');
+
+    expect($mahasiswa->fresh()->no_hp)->toBe('081111111111')
+        ->and($user->fresh()->email)->toBe('asli@genbi.id');
 });
