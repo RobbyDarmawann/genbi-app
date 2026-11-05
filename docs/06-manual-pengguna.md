@@ -157,6 +157,21 @@ absensi sebagai foto direktori.
 
 ## 3. Mahasiswa
 
+### Pengaturan dan data diri
+
+1. Buka menu `Pengaturan` lalu tab `Profil`.
+2. Mahasiswa melihat halaman `Data diri` dengan identitas terkunci: username,
+   NIM, email, Komsat, Divisi, angkatan, dan status penerima.
+3. Lengkapi atau ubah jenis kelamin, agama, golongan darah, tanggal lahir,
+   domisili, dan nomor HP, lalu pilih `Simpan`.
+4. Unggah foto profil JPG, JPEG, atau PNG maksimal 2 MB. Foto baru menggantikan
+   foto lama; foto dapat dihapus dari form.
+5. Tab `Keamanan` dan `Tampilan` tetap tersedia sesuai hak akses.
+
+Mahasiswa tidak dapat mengubah identitas terkunci dan tidak dapat menghapus
+akun sendiri. Penghapusan atau penonaktifan akun hanya dilakukan Internal
+Manajemen melalui menu `Mahasiswa`.
+
 ### Login dan dashboard
 
 1. Buka halaman `Login`.
