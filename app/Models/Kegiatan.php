@@ -185,6 +185,47 @@ class Kegiatan extends Model
     }
 
     /**
+     * Scope urutan jadwal kronologis: kegiatan berlangsung/mendatang (tanggal ASC, jam_mulai ASC)
+     * ditampilkan lebih dulu, disusul kegiatan selesai/terkunci (tanggal DESC, jam_selesai DESC).
+     *
+     * @param  Builder<Kegiatan>  $query
+     * @return Builder<Kegiatan>
+     */
+    public function scopeUrutJadwal(Builder $query): Builder
+    {
+        $now = Carbon::now(config('app.timezone'));
+        $tanggal = $now->toDateString();
+        $jam = $now->format('H:i:s');
+
+        $query->orderByRaw(
+            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN 0 ELSE 1 END ASC",
+            [$tanggal, $tanggal, $jam]
+        );
+
+        $query->orderByRaw(
+            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN DATE(tanggal) END ASC",
+            [$tanggal, $tanggal, $jam]
+        );
+
+        $query->orderByRaw(
+            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN TIME(jam_mulai) END ASC",
+            [$tanggal, $tanggal, $jam]
+        );
+
+        $query->orderByRaw(
+            "CASE WHEN NOT (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN DATE(tanggal) END DESC",
+            [$tanggal, $tanggal, $jam]
+        );
+
+        $query->orderByRaw(
+            "CASE WHEN NOT (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN TIME(jam_selesai) END DESC",
+            [$tanggal, $tanggal, $jam]
+        );
+
+        return $query->orderBy('id');
+    }
+
+    /**
      * Filter berdasarkan status efektif (padanan SQL dari statusEfektif()).
      *
      * @param  Builder<Kegiatan>  $query

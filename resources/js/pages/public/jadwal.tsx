@@ -3,6 +3,10 @@ import { Calendar, Clock, MapPin, Search } from 'lucide-react';
 import { FormEvent } from 'react';
 import JadwalController from '@/actions/App/Http/Controllers/Public/JadwalController';
 import { kegiatanStatusToSemantic } from '@/components/kegiatan/types';
+import {
+    PaginationControls,
+    type PaginationMeta,
+} from '@/components/pagination-controls';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +27,10 @@ type Item = {
     status: string;
     status_label: string;
 };
-type Props = { kegiatan: { data: Item[] }; filters: { q: string } };
+type Props = {
+    kegiatan: { data: Item[] } & PaginationMeta;
+    filters: { q: string };
+};
 export default function Jadwal({ kegiatan, filters }: Props) {
     const submit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -103,6 +110,7 @@ export default function Jadwal({ kegiatan, filters }: Props) {
                         </Card>
                     ))}
                 </div>
+                <PaginationControls meta={kegiatan} itemLabel="kegiatan" />
             </div>
         </>
     );

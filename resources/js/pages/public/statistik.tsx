@@ -15,7 +15,154 @@ type Person = {
     nama: string;
     komsat: string;
     total_poin: number;
+    foto_url?: string | null;
+    jenis_kelamin?: string | null;
+    karakter?: string | null;
 };
+
+function getInitials(nama: string): string {
+    return nama
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase();
+}
+
+function PodiumStep({
+    person,
+    stepHeight,
+}: {
+    person: Person;
+    stepHeight: string;
+}) {
+    const isFirst = person.peringkat === 1;
+    const isSecond = person.peringkat === 2;
+
+    return (
+        <div className="flex min-w-0 flex-1 flex-col items-center justify-end">
+            <div className="mb-2 flex flex-col items-center sm:mb-3">
+                <div
+                    className={`flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-muted text-base font-bold shadow-md transition-transform sm:size-20 sm:text-xl md:size-24 ${
+                        isFirst
+                            ? 'border-amber-300 ring-4 ring-amber-400 dark:border-amber-400 dark:ring-amber-500'
+                            : 'border-background text-primary ring-2 ring-primary/30'
+                    }`}
+                >
+                    {person.foto_url ? (
+                        <img
+                            src={person.foto_url}
+                            alt={`Foto ${person.nama}`}
+                            className="size-full object-cover"
+                            loading="lazy"
+                        />
+                    ) : person.karakter ? (
+                        <img
+                            src={`/ilustrasi/${person.karakter}`}
+                            alt={`Ilustrasi ${person.nama}`}
+                            className="size-full object-cover"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <span
+                            className={
+                                isFirst
+                                    ? 'text-amber-600 dark:text-amber-400'
+                                    : 'text-primary'
+                            }
+                        >
+                            {getInitials(person.nama)}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div
+                className={`flex w-full flex-col items-center justify-between rounded-t-xl p-2 text-center shadow-sm sm:p-4 ${stepHeight} ${
+                    isFirst
+                        ? 'border-t-2 border-amber-400 bg-gradient-to-t from-primary to-primary/95 text-primary-foreground'
+                        : isSecond
+                          ? 'bg-gradient-to-t from-primary/90 to-primary/80 text-primary-foreground'
+                          : 'bg-gradient-to-t from-primary/80 to-primary/70 text-primary-foreground'
+                }`}
+            >
+                <span
+                    className={`leading-none font-black tracking-tight ${
+                        isFirst
+                            ? 'text-4xl text-amber-300 sm:text-5xl md:text-6xl'
+                            : isSecond
+                              ? 'text-3xl text-primary-foreground/90 sm:text-4xl md:text-5xl'
+                              : 'text-2xl text-primary-foreground/80 sm:text-3xl md:text-4xl'
+                    }`}
+                >
+                    {person.peringkat}
+                </span>
+
+                <div className="w-full min-w-0 space-y-0.5 sm:space-y-1">
+                    <p
+                        className="line-clamp-2 text-xs font-bold text-primary-foreground sm:text-sm"
+                        title={person.nama}
+                    >
+                        {person.nama}
+                    </p>
+                    <div className="flex items-center justify-center">
+                        <span className="inline-block rounded bg-primary-foreground/20 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground sm:text-xs">
+                            {person.komsat}
+                        </span>
+                    </div>
+                    <p
+                        className={`text-[11px] font-extrabold tabular-nums sm:text-xs md:text-sm ${
+                            isFirst
+                                ? 'text-amber-200'
+                                : 'text-primary-foreground'
+                        }`}
+                    >
+                        {formatAngka(person.total_poin)} poin
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function Podium({ items }: { items: Person[] }) {
+    if (items.length === 0) {
+        return null;
+    }
+
+    if (items.length === 1) {
+        return (
+            <div className="mx-auto flex w-full max-w-xs items-end justify-center rounded-xl border border-border/80 bg-muted/20 px-4 pt-6 pb-2 sm:pt-8 sm:pb-4">
+                <PodiumStep person={items[0]} stepHeight="h-44 sm:h-56" />
+            </div>
+        );
+    }
+
+    if (items.length === 2) {
+        const first = items.find((p) => p.peringkat === 1) ?? items[0];
+        const second = items.find((p) => p.peringkat === 2) ?? items[1];
+
+        return (
+            <div className="mx-auto grid w-full max-w-md grid-cols-2 items-end gap-2 rounded-xl border border-border/80 bg-muted/20 px-3 pt-6 pb-2 sm:gap-4 sm:px-6 sm:pt-8 sm:pb-4">
+                <PodiumStep person={second} stepHeight="h-36 sm:h-44" />
+                <PodiumStep person={first} stepHeight="h-44 sm:h-56" />
+            </div>
+        );
+    }
+
+    const first = items.find((p) => p.peringkat === 1) ?? items[0];
+    const second = items.find((p) => p.peringkat === 2) ?? items[1];
+    const third = items.find((p) => p.peringkat === 3) ?? items[2];
+
+    return (
+        <div className="mx-auto grid w-full max-w-3xl grid-cols-3 items-end gap-2 rounded-xl border border-border/80 bg-muted/20 px-2 pt-6 pb-2 sm:gap-4 sm:px-6 sm:pt-8 sm:pb-4">
+            <PodiumStep person={second} stepHeight="h-36 sm:h-44" />
+            <PodiumStep person={first} stepHeight="h-44 sm:h-56" />
+            <PodiumStep person={third} stepHeight="h-28 sm:h-36" />
+        </div>
+    );
+}
 type Props = {
     ringkasan: {
         penerima_aktif: number;
@@ -188,6 +335,7 @@ export default function Statistik({
                             Cari
                         </Button>
                     </form>
+                    <Podium items={tertinggi} />
                     <ResponsiveTable<Person>
                         columns={columns}
                         data={leaderboard}

@@ -14,13 +14,13 @@ class JadwalController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->string('q')->trim()->toString();
+
         $kegiatan = Kegiatan::query()
             ->terbit()
             ->with('komsat:id,kode,nama')
             ->when($search !== '', fn ($query) => $query->where('judul', 'like', "%{$search}%"))
-            ->orderBy('tanggal')
-            ->orderBy('jam_mulai')
-            ->paginate(15)
+            ->urutJadwal()
+            ->paginate(9)
             ->withQueryString()
             ->through(function (Kegiatan $item): array {
                 $statusEfektif = $item->statusEfektif();

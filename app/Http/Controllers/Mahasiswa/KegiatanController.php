@@ -58,9 +58,10 @@ class KegiatanController extends Controller
             $query->whereHas('divisiTarget', fn ($q) => $q->where('divisi.id', $mahasiswa->divisi_id));
         }
 
-        $kegiatan = $query->orderBy('tanggal')
-            ->orderBy('jam_mulai')
-            ->paginate(15)
+        $pageName = $forMeOnly ? 'halaman_untuk_saya' : 'halaman_semua';
+        $kegiatan = $query
+            ->urutJadwal()
+            ->paginate(9, ['*'], $pageName)
             ->withQueryString()
             ->through(function (Kegiatan $item) use ($mahasiswa): array {
                 $statusEfektif = $item->statusEfektif();

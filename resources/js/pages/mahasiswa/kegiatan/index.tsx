@@ -6,6 +6,10 @@ import {
     kegiatanStatusLabel,
     kegiatanStatusToSemantic,
 } from '@/components/kegiatan/types';
+import {
+    PaginationControls,
+    type PaginationMeta,
+} from '@/components/pagination-controls';
 import { StatusBadge } from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +39,7 @@ type Activity = {
     poin_peran_saya: number;
 };
 type Props = {
-    kegiatan: { data: Activity[] };
+    kegiatan: { data: Activity[] } & PaginationMeta;
     mahasiswaInfo: { nama: string; komsat_kode: string; divisi_nama: string };
     filters: { q: string; tab: string; untuk_saya: boolean };
 };
@@ -170,6 +174,7 @@ export default function Index({ kegiatan, filters }: Props) {
                         </Card>
                     ))}
                 </div>
+                <PaginationControls meta={kegiatan} itemLabel="kegiatan" />
             </div>
         </>
     );

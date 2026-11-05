@@ -149,14 +149,14 @@ test('guest melihat statistik agregat dan leaderboard tanpa data sensitif', func
         ->where('ringkasan.alumni', 1)
         ->where('ringkasan.total_kegiatan', 2)
         ->where('ringkasan.komsat_aktif', 5)
-        ->has('leaderboard', 2)
-        ->where('leaderboard.0.nama', 'Andi Pratama')
-        ->where('leaderboard.0.komsat', 'UNG')
-        ->where('leaderboard.0.total_poin', 25)
-        ->where('leaderboard.1.nama', 'Budi Santoso')
-        ->where('leaderboard.1.total_poin', 10)
+        ->has('tertinggi', 2)
         ->where('tertinggi.0.nama', 'Andi Pratama')
+        ->where('tertinggi.0.komsat', 'UNG')
+        ->where('tertinggi.0.total_poin', 25)
+        ->where('tertinggi.1.nama', 'Budi Santoso')
+        ->where('tertinggi.1.total_poin', 10)
         ->where('terendah.0.nama', 'Budi Santoso')
+        ->has('leaderboard', 0)
     );
 
     $content = $response->getContent();
@@ -165,6 +165,130 @@ test('guest melihat statistik agregat dan leaderboard tanpa data sensitif', func
         ->not->toContain('991422088')
         ->not->toContain('secret-ung.jpg')
         ->not->toContain('0.5561234');
+});
+
+test('podium tiga teratas memuat foto_url, jenis_kelamin, dan karakter deterministik', function () {
+    $this->mhsUng->update([
+        'jenis_kelamin' => 'Laki-laki',
+        'foto_path' => null,
+    ]);
+    $this->mhsIain->update([
+        'jenis_kelamin' => 'Perempuan',
+        'foto_path' => null,
+    ]);
+
+    $response = $this->get(route('public.statistik'));
+
+    $response->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->has('tertinggi', 2)
+        ->where('tertinggi.0.peringkat', 1)
+        ->where('tertinggi.0.nama', 'Andi Pratama')
+        ->where('tertinggi.0.jenis_kelamin', 'Laki-laki')
+        ->where('tertinggi.0.foto_url', null)
+        ->where('tertinggi.1.peringkat', 2)
+        ->where('tertinggi.1.nama', 'Budi Santoso')
+        ->where('tertinggi.1.jenis_kelamin', 'Perempuan')
+        ->where('tertinggi.1.foto_url', null)
+    );
+
+    $tertinggi = $response->viewData('page')['props']['tertinggi'];
+
+    // Karakter deterministik: Laki-laki: id % 3 dari varian 1-3
+    $expectedLaki = ['karakter-laki-1.svg', 'karakter-laki-2.svg', 'karakter-laki-3.svg'][$this->mhsUng->id % 3];
+    expect($tertinggi[0]['karakter'])->toBe($expectedLaki);
+
+    // Karakter deterministik: Perempuan: id % 3 dari varian 4-6
+    $expectedPerempuan = ['karakter-perempuan-4.svg', 'karakter-perempuan-5.svg', 'karakter-perempuan-6.svg'][$this->mhsIain->id % 3];
+    expect($tertinggi[1]['karakter'])->toBe($expectedPerempuan);
+
+    // NIM dan username tidak boleh bocor di props tertinggi
+    expect($tertinggi[0])->not->toHaveKey('nim')
+        ->and($tertinggi[0])->not->toHaveKey('username')
+        ->and($tertinggi[1])->not->toHaveKey('nim')
+        ->and($tertinggi[1])->not->toHaveKey('username');
+});
+
+test('foto didahulukan pada podium sehingga karakter bernilai null', function () {
+    $this->mhsUng->update([
+        'jenis_kelamin' => 'Laki-laki',
+        'foto_path' => 'biodata/foto-andi.jpg',
+    ]);
+
+    $response = $this->get(route('public.statistik'));
+    $response->assertOk();
+
+    $tertinggi = $response->viewData('page')['props']['tertinggi'];
+    expect($tertinggi[0]['foto_url'])->toContain('foto-andi.jpg')
+        ->and($tertinggi[0]['karakter'])->toBeNull();
+});
+
+test('leaderboard publik mulai dari peringkat ke-4 dan tidak mengandung peringkat 1-3 secara dobel', function () {
+    // Tambah 3 mahasiswa lagi agar total mahasiswa dengan poin menjadi 5 orang
+    $names = ['Cindy Claudia', 'Doni Salman', 'Eko Prasetyo'];
+    $genders = ['Perempuan', 'Laki-laki', 'Laki-laki'];
+
+    foreach ($names as $idx => $name) {
+        $user = User::factory()->create(['name' => $name, 'is_active' => true]);
+        $user->assignRole('mahasiswa');
+        $mhs = Mahasiswa::factory()->create([
+            'user_id' => $user->id,
+            'komsat_id' => $this->ung->id,
+            'divisi_id' => $this->divisiUng->id,
+            'nim' => '77142200'.$idx,
+            'status_penerima' => StatusPenerima::Penerima,
+            'aktif' => true,
+            'jenis_kelamin' => $genders[$idx],
+        ]);
+
+        $pend = Pendaftaran::factory()->create([
+            'kegiatan_id' => $this->kegiatanUng->id,
+            'mahasiswa_id' => $mhs->id,
+            'peran' => PeranKegiatan::Peserta,
+            'status' => StatusPendaftaran::Terdaftar,
+        ]);
+        $hadir = Kehadiran::factory()->create([
+            'pendaftaran_id' => $pend->id,
+            'status' => StatusKehadiran::Valid,
+        ]);
+        // Jumlah poin: Andi (25), Cindy (20), Doni (15), Budi (10), Eko (5)
+        $poin = match ($idx) {
+            0 => 20,
+            1 => 15,
+            2 => 5,
+        };
+        PoinTransaksi::factory()->create([
+            'mahasiswa_id' => $mhs->id,
+            'kegiatan_id' => $this->kegiatanUng->id,
+            'kehadiran_id' => $hadir->id,
+            'tipe' => TipePoin::Kredit,
+            'jumlah' => $poin,
+            'dibuat_oleh' => $this->admin->id,
+        ]);
+    }
+
+    $response = $this->get(route('public.statistik'));
+
+    $response->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->has('tertinggi', 3)
+        ->where('tertinggi.0.peringkat', 1)
+        ->where('tertinggi.0.nama', 'Andi Pratama')
+        ->where('tertinggi.1.peringkat', 2)
+        ->where('tertinggi.1.nama', 'Cindy Claudia')
+        ->where('tertinggi.2.peringkat', 3)
+        ->where('tertinggi.2.nama', 'Doni Salman')
+        ->has('leaderboard', 2)
+        ->where('leaderboard.0.peringkat', 4)
+        ->where('leaderboard.0.nama', 'Budi Santoso')
+        ->where('leaderboard.1.peringkat', 5)
+        ->where('leaderboard.1.nama', 'Eko Prasetyo')
+    );
+
+    $leaderboard = $response->viewData('page')['props']['leaderboard'];
+    $peringkatDiLeaderboard = array_column($leaderboard, 'peringkat');
+
+    expect($peringkatDiLeaderboard)->not->toContain(1)
+        ->and($peringkatDiLeaderboard)->not->toContain(2)
+        ->and($peringkatDiLeaderboard)->not->toContain(3);
 });
 
 test('pencarian leaderboard publik menyaring nama mahasiswa secara benar', function () {
