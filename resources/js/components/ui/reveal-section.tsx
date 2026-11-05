@@ -13,15 +13,7 @@ export function RevealSection({
     ...props
 }: RevealSectionProps) {
     const ref = useRef<HTMLDivElement | null>(null);
-    const [visible, setVisible] = useState<boolean>(() => {
-        if (typeof window === 'undefined') {
-            return true;
-        }
-        return (
-            window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-            typeof IntersectionObserver === 'undefined'
-        );
-    });
+    const [visible, setVisible] = useState(true);
 
     useEffect(() => {
         const node = ref.current;
@@ -36,6 +28,8 @@ export function RevealSection({
             setVisible(true);
             return;
         }
+
+        setVisible(false);
 
         const observer = new IntersectionObserver(
             (entries) => {

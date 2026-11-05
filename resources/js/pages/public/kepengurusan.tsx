@@ -626,13 +626,13 @@ export function DirektoriKepengurusanContent({
 
             <form
                 onSubmit={submit}
-                className="grid gap-3 rounded-xl border bg-card p-4 shadow-2xs sm:grid-cols-[1fr_1fr_auto]"
+                className="grid gap-3 rounded-xl border bg-card p-4 shadow-2xs sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
             >
                 <select
                     name="periode_id"
                     defaultValue={filters.periode_id}
                     aria-label="Pilih periode kepengurusan"
-                    className="h-11 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
+                    className="h-11 w-full min-w-0 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
                 >
                     {options.periode.length === 0 ? (
                         <option value="">Belum ada periode</option>
@@ -649,7 +649,7 @@ export function DirektoriKepengurusanContent({
                     name="komsat_id"
                     defaultValue={filters.komsat_id}
                     aria-label="Pilih lingkup atau komisariat"
-                    className="h-11 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
+                    className="h-11 w-full min-w-0 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
                 >
                     <option value="">Semua lingkup</option>
                     <option value="wilayah">Tingkat Wilayah</option>
