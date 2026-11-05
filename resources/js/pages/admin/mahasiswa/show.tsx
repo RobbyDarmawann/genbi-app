@@ -86,34 +86,94 @@ export default function MahasiswaShow({ mahasiswa, riwayatPoin }: Props) {
                                 Profil Keanggotaan
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="grid gap-4 sm:grid-cols-2">
-                            <Info label="Nama lengkap" value={mahasiswa.name} />
-                            <Info
-                                label="Username"
-                                value={`@${mahasiswa.username}`}
-                            />
-                            <Info label="NIM" value={mahasiswa.nim} />
-                            <Info label="Angkatan" value={mahasiswa.angkatan} />
-                            <Info
-                                label="Komisariat"
-                                value={
-                                    mahasiswa.komsat
-                                        ? `${mahasiswa.komsat.kode} — ${mahasiswa.komsat.nama}`
-                                        : '—'
-                                }
-                            />
-                            <Info
-                                label="Divisi"
-                                value={mahasiswa.divisi?.nama ?? '—'}
-                            />
-                            <Info
-                                label="Status penerima"
-                                value={mahasiswa.status_penerima_label}
-                            />
-                            <Info
-                                label="Status akun"
-                                value={mahasiswa.aktif ? 'Aktif' : 'Nonaktif'}
-                            />
+                        <CardContent className="space-y-4">
+                            {mahasiswa.foto_url && (
+                                <div className="flex justify-center pb-2">
+                                    <img
+                                        src={mahasiswa.foto_url}
+                                        alt={mahasiswa.name}
+                                        className="size-24 rounded-full object-cover"
+                                    />
+                                </div>
+                            )}
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <Info
+                                    label="Nama lengkap"
+                                    value={mahasiswa.name}
+                                />
+                                <Info
+                                    label="Username"
+                                    value={`@${mahasiswa.username}`}
+                                />
+                                <Info label="NIM" value={mahasiswa.nim} />
+                                <Info
+                                    label="Angkatan"
+                                    value={mahasiswa.angkatan}
+                                />
+                                <Info
+                                    label="Komisariat"
+                                    value={
+                                        mahasiswa.komsat
+                                            ? `${mahasiswa.komsat.kode} — ${mahasiswa.komsat.nama}`
+                                            : '—'
+                                    }
+                                />
+                                <Info
+                                    label="Divisi"
+                                    value={mahasiswa.divisi?.nama ?? '—'}
+                                />
+                                <Info
+                                    label="Status penerima"
+                                    value={mahasiswa.status_penerima_label}
+                                />
+                                <Info
+                                    label="Status akun"
+                                    value={
+                                        mahasiswa.aktif ? 'Aktif' : 'Nonaktif'
+                                    }
+                                />
+                                {mahasiswa.jenis_kelamin && (
+                                    <Info
+                                        label="Jenis kelamin"
+                                        value={mahasiswa.jenis_kelamin}
+                                    />
+                                )}
+                                {mahasiswa.agama && (
+                                    <Info
+                                        label="Agama"
+                                        value={mahasiswa.agama}
+                                    />
+                                )}
+                                {mahasiswa.golongan_darah && (
+                                    <Info
+                                        label="Golongan darah"
+                                        value={mahasiswa.golongan_darah}
+                                    />
+                                )}
+                                {mahasiswa.tanggal_lahir && (
+                                    <Info
+                                        label="Tanggal lahir"
+                                        value={new Intl.DateTimeFormat(
+                                            'id-ID',
+                                            { dateStyle: 'long' },
+                                        ).format(
+                                            new Date(mahasiswa.tanggal_lahir),
+                                        )}
+                                    />
+                                )}
+                                {mahasiswa.domisili && (
+                                    <Info
+                                        label="Domisili"
+                                        value={mahasiswa.domisili}
+                                    />
+                                )}
+                                {mahasiswa.no_hp && (
+                                    <Info
+                                        label="No. HP"
+                                        value={mahasiswa.no_hp}
+                                    />
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
 

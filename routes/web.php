@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\RekapController;
 use App\Http\Controllers\KehadiranFotoController;
 use App\Http\Controllers\KoreksiBuktiController;
 use App\Http\Controllers\Mahasiswa\AbsensiController;
+use App\Http\Controllers\Mahasiswa\BiodataController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboardController;
 use App\Http\Controllers\Mahasiswa\KegiatanController as MahasiswaKegiatanController;
 use App\Http\Controllers\Mahasiswa\KoreksiController as MahasiswaKoreksiController;
@@ -104,6 +105,10 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard Mahasiswa
     Route::middleware(['mahasiswa.active'])->group(function () {
         Route::get('mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])->name('mahasiswa.dashboard');
+
+        Route::get('settings/biodata', [BiodataController::class, 'edit'])->name('mahasiswa.biodata.edit');
+        Route::patch('settings/biodata', [BiodataController::class, 'update'])->name('mahasiswa.biodata.update');
+
         Route::get('kegiatan', [MahasiswaKegiatanController::class, 'index'])->name('mahasiswa.kegiatan.index');
         Route::get('kegiatan/{kegiatan}', [MahasiswaKegiatanController::class, 'show'])->name('mahasiswa.kegiatan.show');
         Route::post('kegiatan/{kegiatan}/daftar', [MahasiswaKegiatanController::class, 'daftar'])->name('mahasiswa.kegiatan.daftar');

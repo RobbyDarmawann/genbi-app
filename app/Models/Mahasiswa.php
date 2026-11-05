@@ -21,11 +21,18 @@ use Illuminate\Support\Carbon;
  * @property string $angkatan
  * @property StatusPenerima $status_penerima
  * @property bool $aktif
+ * @property string|null $jenis_kelamin
+ * @property string|null $agama
+ * @property string|null $golongan_darah
+ * @property string|null $tanggal_lahir
+ * @property string|null $domisili
+ * @property string|null $no_hp
+ * @property string|null $foto_path
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read string|null $nama
  */
-#[Fillable(['user_id', 'komsat_id', 'divisi_id', 'nim', 'angkatan', 'status_penerima', 'aktif'])]
+#[Fillable(['user_id', 'komsat_id', 'divisi_id', 'nim', 'angkatan', 'status_penerima', 'aktif', 'jenis_kelamin', 'agama', 'golongan_darah', 'tanggal_lahir', 'domisili', 'no_hp', 'foto_path'])]
 class Mahasiswa extends Model
 {
     /** @use HasFactory<MahasiswaFactory> */
@@ -41,6 +48,7 @@ class Mahasiswa extends Model
         return [
             'status_penerima' => StatusPenerima::class,
             'aktif' => 'boolean',
+            'tanggal_lahir' => 'date',
         ];
     }
 

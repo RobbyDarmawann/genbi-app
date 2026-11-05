@@ -47,6 +47,9 @@ class HandleInertiaRequests extends Middleware
                     'username' => $user->username,
                     'email' => $user->email,
                     'roles' => $user->getRoleNames()->toArray(),
+                    'avatar' => $user->mahasiswa?->foto_path
+                        ? asset('storage/'.$user->mahasiswa->foto_path)
+                        : '',
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

@@ -16,12 +16,42 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+const DELETE_BLOCKED_REASON =
+    'Tidak dapat dihapus karena memiliki riwayat kegiatan';
 
 export function DeleteMahasiswaDialog({ row }: { row: MahasiswaRow }) {
     const [open, setOpen] = useState(false);
 
     if (row.terikat) {
-        return null;
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span
+                        tabIndex={0}
+                        title={DELETE_BLOCKED_REASON}
+                        aria-label={`Hapus (${DELETE_BLOCKED_REASON})`}
+                        className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    >
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled
+                            className="pointer-events-none h-11 md:h-8"
+                        >
+                            <Trash2 className="size-3.5" />
+                            <span>Hapus</span>
+                        </Button>
+                    </span>
+                </TooltipTrigger>
+                <TooltipContent>{DELETE_BLOCKED_REASON}</TooltipContent>
+            </Tooltip>
+        );
     }
 
     return (

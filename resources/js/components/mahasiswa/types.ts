@@ -36,6 +36,13 @@ export type MahasiswaRow = {
     status_penerima: StatusPenerimaValue;
     status_penerima_label: string;
     aktif: boolean;
+    jenis_kelamin?: string | null;
+    agama?: string | null;
+    golongan_darah?: string | null;
+    tanggal_lahir?: string | null;
+    domisili?: string | null;
+    no_hp?: string | null;
+    foto_url?: string | null;
     total_poin: number;
     komsat_id: number;
     divisi_id: number;

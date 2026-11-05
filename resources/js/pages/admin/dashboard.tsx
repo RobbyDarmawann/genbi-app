@@ -224,7 +224,7 @@ export default function AdminDashboard({
                             ) : (
                                 <ul className="grid gap-2">
                                     {kegiatan_terdekat.map((item) => (
-                                        <li key={item.id}>
+                                        <li key={item.id} className="min-w-0">
                                             <Link
                                                 href={admin.kegiatan.show(
                                                     item.id,
