@@ -403,9 +403,11 @@ export default function Rekap({
                                     <Tooltip
                                         formatter={(value, name) => [
                                             formatAngka(Number(value)),
-                                            name === 'kegiatan'
+                                            name === 'kegiatan' ||
+                                            name === 'Kegiatan'
                                                 ? 'Kegiatan'
-                                                : name === 'partisipasi'
+                                                : name === 'partisipasi' ||
+                                                    name === 'Pendaftaran'
                                                   ? 'Pendaftaran'
                                                   : 'Proyeksi',
                                         ]}
