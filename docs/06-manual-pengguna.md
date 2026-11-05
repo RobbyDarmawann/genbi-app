@@ -39,6 +39,31 @@ ditampilkan sebagai agenda publik.
 Login menggunakan username yang dibuat oleh Internal Manajemen. Semua menu
 berikut berada di area dashboard internal.
 
+### Dashboard Internal Manajemen
+
+Dashboard menampilkan data operasional aktual:
+
+- `Kegiatan Aktif`: jumlah kegiatan dengan tanggal di antara tanggal mulai dan
+  tanggal selesai `Periode` terbaru yang berstatus aktif.
+- `Anggota Aktif`: jumlah seluruh baris `mahasiswa` dengan `aktif = true`.
+  Definisi ini sama dengan perhitungan aktif pada laporan per Komsat.
+- `Kehadiran Bulan Ini`: jumlah `kehadiran` berstatus `Valid` dengan waktu
+  check-in pada bulan kalender berjalan menurut timezone server
+  `Asia/Makassar` (WITA).
+- `Koreksi Menunggu`: jumlah pengajuan `koreksi` berstatus `Menunggu`.
+
+Bagian `Ringkasan Sistem` berisi tiga daftar kerja terbaru:
+
+1. `Koreksi menunggu`, maksimal lima pengajuan terbaru dan tautan ke detail
+   `Koreksi`.
+2. `Kehadiran menunggu`, maksimal lima check-in berstatus `Menunggu tinjau`
+   dan tautan ke `Monitoring` kegiatan terkait.
+3. `Kegiatan terdekat`, maksimal tiga kegiatan yang sedang berlangsung atau
+   paling dekat berikutnya dan tautan ke detail `Kegiatan`.
+
+Jika daftar kosong, dashboard menampilkan empty state yang menjelaskan bahwa
+tidak ada pekerjaan menunggu atau agenda terdekat.
+
 ### Menyiapkan master data
 
 1. Buka `Periode`, buat periode dengan tanggal mulai dan selesai, lalu aktifkan
@@ -189,4 +214,3 @@ Dokumentasi ini tidak menjanjikan fitur berikut sebagai fitur aktif:
 - Aplikasi mobile native.
 - API publik pihak ketiga dan WebSocket.
 - Deteksi mock location yang andal.
-

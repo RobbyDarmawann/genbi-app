@@ -170,13 +170,35 @@ function KepengurusanPlayingCard({
             event.preventDefault();
             setIsFlipped(false);
             setIsHovered(false);
+            return;
+        }
+
+        if (
+            event.target === event.currentTarget &&
+            (event.key === 'Enter' || event.key === ' ')
+        ) {
+            event.preventDefault();
+            toggleFlipped();
         }
     };
 
     return (
         <div
+            role="button"
+            tabIndex={0}
+            aria-pressed={isFlipped}
+            aria-label={`Buka kontak ${entry.nama_tampil}`}
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
+            onClick={(event) => {
+                if (
+                    !(event.target as HTMLElement).closest(
+                        'a, button, input, select, textarea',
+                    )
+                ) {
+                    toggleFlipped();
+                }
+            }}
             onKeyDown={handleKeyDown}
             className={cn(
                 'perspective-1000 relative z-10 w-full select-none',
@@ -192,7 +214,10 @@ function KepengurusanPlayingCard({
                 {/* SISI DEPAN */}
                 <div
                     aria-hidden={showBack}
-                    onClick={toggleFlipped}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        toggleFlipped();
+                    }}
                     className="flip-face-front absolute inset-0 flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs transition-shadow backface-hidden hover:shadow-md"
                 >
                     {entry.foto_url ? (
@@ -283,7 +308,10 @@ function KepengurusanPlayingCard({
                             <button
                                 type="button"
                                 tabIndex={showBack ? 0 : -1}
-                                onClick={toggleFlipped}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    toggleFlipped();
+                                }}
                                 aria-label="Tutup kontak dan balik kartu ke depan"
                                 className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/20 hover:text-white focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
                             >

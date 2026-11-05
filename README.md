@@ -82,32 +82,33 @@ tidak ada client-side store seperti Redux, Zustand, atau TanStack Query.
 3. Salin `.env.example` menjadi `.env`.
 4. Sesuaikan koneksi database tanpa menuliskan secret ke repository:
 
-   ```dotenv
-   APP_NAME="Sistem Informasi GenBI Gorontalo Terintegrasi"
-   APP_ENV=local
-   APP_DEBUG=true
-   APP_URL=http://genbigto-app.test
+    ```dotenv
+    APP_NAME="Sistem Informasi GenBI Gorontalo Terintegrasi"
+    APP_ENV=local
+    APP_DEBUG=true
+    APP_URL=http://genbigto-app.test
 
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=genbi_app
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=genbi_app
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
 
-   Untuk instalasi lokal standar Laragon, password MySQL sering kosong.
-   Gunakan password lokal Anda sendiri bila konfigurasi Laragon berbeda.
+    Untuk instalasi lokal standar Laragon, password MySQL sering kosong.
+    Gunakan password lokal Anda sendiri bila konfigurasi Laragon berbeda.
+
 5. Jalankan:
 
-   ```powershell
-   composer install
-   php artisan key:generate
-   npm install
-   php artisan migrate
-   php artisan db:seed
-   php artisan db:seed --class=DemoSeeder
-   ```
+    ```powershell
+    composer install
+    php artisan key:generate
+    npm install
+    php artisan migrate
+    php artisan db:seed
+    php artisan db:seed --class=DemoSeeder
+    ```
 
 `php artisan db:seed` menjalankan `DatabaseSeeder`, yaitu role, lima Komsat,
 contoh divisi UNG, periode contoh, serta satu akun internal dan satu akun

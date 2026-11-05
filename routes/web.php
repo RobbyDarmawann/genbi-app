@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DivisiController;
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\KepengurusanController as AdminKepengurusanController;
@@ -48,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Dashboard & Modul Internal Manajemen
     Route::middleware(['role:internal_manajemen'])->prefix('admin')->name('admin.')->group(function () {
-        Route::inertia('dashboard', 'admin/dashboard')->name('dashboard');
+        Route::get('dashboard', AdminDashboardController::class)->name('dashboard');
         Route::resource('kegiatan', AdminKegiatanController::class)
             ->only(['index', 'create', 'store', 'show', 'edit', 'update'])
             ->parameters(['kegiatan' => 'kegiatan']);

@@ -8,24 +8,24 @@ Durasi yang disarankan: **10–15 menit**. Demo memakai data lokal dari
 1. Pastikan `.env` menunjuk ke database lokal.
 2. Jalankan migration dan master seeder:
 
-   ```powershell
-   php artisan migrate
-   php artisan db:seed
-   php artisan db:seed --class=DemoSeeder
-   ```
+    ```powershell
+    php artisan migrate
+    php artisan db:seed
+    php artisan db:seed --class=DemoSeeder
+    ```
 
 3. Jalankan server:
 
-   ```powershell
-   php artisan serve --host=127.0.0.1 --port=8000
-   npm run dev
-   ```
+    ```powershell
+    php artisan serve --host=127.0.0.1 --port=8000
+    npm run dev
+    ```
 
 4. Siapkan dua profil browser atau satu jendela incognito:
-   - Internal Manajemen: `internal` / `password`.
-   - Mahasiswa: `mhs001` / `password`.
+    - Internal Manajemen: `internal` / `password`.
+    - Mahasiswa: `mhs001` / `password`.
 
-   Kredensial ini khusus demo lokal dan tidak boleh digunakan di production.
+    Kredensial ini khusus demo lokal dan tidak boleh digunakan di production.
 
 ## Data demo yang tersedia
 
@@ -162,4 +162,3 @@ demo.
 - Jangan membagikan file foto absensi atau path disk private.
 - Jangan mengubah database secara manual untuk membuat hasil absensi,
   poin, atau koreksi terlihat berhasil.
-
