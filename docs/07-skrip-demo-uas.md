@@ -110,6 +110,33 @@ ledger berhasil dicatat dalam alur aplikasi.
 4. Terapkan filter periode atau Komsat.
 5. Tunjukkan kartu ringkasan, grafik, tabel rekap, lalu pilih `Export`.
 
+### Mode proyeksi tren opsional
+
+Secara bawaan, `DemoSeeder` hanya menyediakan riwayat dua bulan, sehingga
+panel Proyeksi Tren per Komsat memang menampilkan pesan bahwa data belum cukup.
+Untuk menambah riwayat Juni–September 2026, jalankan seeder opsional:
+
+```powershell
+php artisan db:seed --class=TrenDemoSeeder
+```
+
+Mode ini menambah empat kegiatan Wilayah berstatus tersimpan `Terbit` beserta
+pendaftaran peserta yang tidak memiliki kehadiran. Total kegiatan dan
+pendaftaran naik, sehingga tingkat kehadiran dapat turun. Tidak ada kehadiran
+atau transaksi poin baru; total poin, leaderboard, dan dashboard mahasiswa
+tidak berubah. Seeder tidak dipanggil oleh `DatabaseSeeder` dan aman dijalankan
+berulang kali.
+
+Untuk kembali ke data demo bawaan, jalankan perintah berikut pada database
+lokal yang aman di-reset. `DatabaseSeeder` memanggil seeder master saja dan
+tidak memanggil `DemoSeeder` atau `TrenDemoSeeder`; jalankan kembali `DemoSeeder`
+setelah reset untuk memulihkan seluruh dataset demo:
+
+```powershell
+php artisan migrate:fresh --seed
+php artisan db:seed --class=DemoSeeder
+```
+
 ### Menit 11–13: koreksi
 
 1. Buka `Koreksi` sebagai mahasiswa dan tunjukkan contoh pengajuan demo yang
