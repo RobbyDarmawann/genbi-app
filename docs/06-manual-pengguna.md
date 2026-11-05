@@ -156,7 +156,8 @@ absensi sebagai foto direktori.
 2. Isi `Username` dan `Password`.
 3. Setelah berhasil, buka `Dashboard`.
 4. Gunakan kartu ringkasan untuk melihat total poin, kegiatan diikuti,
-   kehadiran valid, dan koreksi menunggu.
+   kehadiran valid, dan koreksi menunggu. Kartu `Total Poin` juga merinci
+   `Kredit Peserta`, `Kredit Panitia`, `Kredit Pemateri`, dan `Koreksi`.
 
 Akun nonaktif tidak dapat login.
 
@@ -192,7 +193,9 @@ berdasarkan `pendaftaran_id`.
 1. Buka `Riwayat Kehadiran` untuk melihat check-in dan statusnya.
 2. Buka `Riwayat Poin` untuk melihat transaksi ledger.
 3. Total poin berasal dari penjumlahan transaksi yang tercatat, termasuk
-   transaksi `kredit` dan `koreksi`.
+   transaksi `kredit` dan `koreksi`. Rincian peran pada dashboard memakai
+   transaksi kredit dari kehadiran valid dan selalu direkonsiliasi dengan total
+   ledger.
 
 ### Mengajukan koreksi
 

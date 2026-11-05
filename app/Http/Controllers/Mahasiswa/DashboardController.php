@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Mahasiswa;
 
+use App\Enums\PeranKegiatan;
 use App\Enums\StatusKegiatan;
 use App\Enums\StatusKehadiran;
 use App\Enums\StatusKoreksi;
 use App\Enums\StatusPendaftaran;
+use App\Enums\TipePoin;
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
 use App\Models\Mahasiswa;
+use App\Models\PoinTransaksi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use LogicException;
 
 class DashboardController extends Controller
 {
@@ -23,7 +27,59 @@ class DashboardController extends Controller
         /** @var Mahasiswa $mahasiswa */
         $mahasiswa = $user->mahasiswa;
 
-        $totalPoin = $mahasiswa->totalPoin();
+        $transaksiPoin = PoinTransaksi::query()
+            ->whereBelongsTo($mahasiswa)
+            ->with(['kehadiran.pendaftaran'])
+            ->get();
+        $poinRincian = [
+            'peserta' => 0,
+            'panitia' => 0,
+            'pemateri' => 0,
+            'koreksi' => 0,
+        ];
+        $transaksiTidakTerpetakan = [];
+
+        foreach ($transaksiPoin as $transaksi) {
+            if ($transaksi->tipe === TipePoin::Koreksi) {
+                $poinRincian['koreksi'] += $transaksi->jumlah;
+
+                continue;
+            }
+
+            $pendaftaran = $transaksi->kehadiran?->pendaftaran;
+            if (
+                $transaksi->kehadiran?->status !== StatusKehadiran::Valid
+                || $pendaftaran === null
+            ) {
+                $transaksiTidakTerpetakan[] = $transaksi->id;
+
+                continue;
+            }
+
+            $komponen = match ($pendaftaran->peran) {
+                PeranKegiatan::Peserta => 'peserta',
+                PeranKegiatan::Panitia => 'panitia',
+                PeranKegiatan::Pemateri => 'pemateri',
+            };
+            $poinRincian[$komponen] += $transaksi->jumlah;
+        }
+
+        $totalPoin = $transaksiPoin->sum('jumlah');
+        if ($transaksiTidakTerpetakan !== []) {
+            throw new LogicException(sprintf(
+                'Transaksi poin mahasiswa #%d tidak dapat dipetakan: %s.',
+                $mahasiswa->id,
+                implode(', ', $transaksiTidakTerpetakan),
+            ));
+        }
+
+        if (array_sum($poinRincian) !== $totalPoin) {
+            throw new LogicException(sprintf(
+                'Rincian poin mahasiswa #%d tidak sama dengan total ledger.',
+                $mahasiswa->id,
+            ));
+        }
+
         $jumlahKegiatanDiikuti = $mahasiswa->pendaftaran()
             ->where('status', StatusPendaftaran::Terdaftar)
             ->count();
@@ -87,6 +143,7 @@ class DashboardController extends Controller
         return Inertia::render('mahasiswa/dashboard', [
             'ringkasan' => [
                 'total_poin' => $totalPoin,
+                'poin_rincian' => $poinRincian,
                 'jumlah_kegiatan' => $jumlahKegiatanDiikuti,
                 'jumlah_hadir_valid' => $jumlahKehadiranValid,
                 'jumlah_koreksi_menunggu' => $jumlahKoreksiMenunggu,

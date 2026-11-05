@@ -1,8 +1,10 @@
 <?php
 
+use App\Enums\PeranKegiatan;
 use App\Enums\StatusKegiatan;
 use App\Enums\StatusKehadiran;
 use App\Enums\StatusKoreksi;
+use App\Enums\TipePoin;
 use App\Models\Divisi;
 use App\Models\Kegiatan;
 use App\Models\Kehadiran;
@@ -11,6 +13,7 @@ use App\Models\Koreksi;
 use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
 use App\Models\Periode;
+use App\Models\PoinTransaksi;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -42,6 +45,66 @@ test('mahasiswa redirected to mahasiswa dashboard', function () {
     $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertRedirect(route('mahasiswa.dashboard'));
+});
+
+test('mahasiswa dashboard displays and reconciles points breakdown by role', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('internal_manajemen');
+    $studentUser = User::factory()->create();
+    $studentUser->assignRole('mahasiswa');
+    $student = Mahasiswa::factory()->create([
+        'user_id' => $studentUser->id,
+    ]);
+
+    $pointsByRole = [
+        PeranKegiatan::Peserta->value => 10,
+        PeranKegiatan::Panitia->value => 20,
+        PeranKegiatan::Pemateri->value => 30,
+    ];
+
+    foreach ($pointsByRole as $role => $points) {
+        $activity = Kegiatan::factory()->create();
+        $registration = Pendaftaran::factory()->create([
+            'kegiatan_id' => $activity->id,
+            'mahasiswa_id' => $student->id,
+            'peran' => $role,
+        ]);
+        $attendance = Kehadiran::factory()->create([
+            'pendaftaran_id' => $registration->id,
+            'status' => StatusKehadiran::Valid,
+        ]);
+        PoinTransaksi::factory()->create([
+            'mahasiswa_id' => $student->id,
+            'kegiatan_id' => $activity->id,
+            'kehadiran_id' => $attendance->id,
+            'tipe' => TipePoin::Kredit,
+            'jumlah' => $points,
+            'dibuat_oleh' => $admin->id,
+        ]);
+    }
+
+    PoinTransaksi::factory()->create([
+        'mahasiswa_id' => $student->id,
+        'kegiatan_id' => null,
+        'kehadiran_id' => null,
+        'tipe' => TipePoin::Koreksi,
+        'jumlah' => 5,
+        'dibuat_oleh' => $admin->id,
+    ]);
+
+    $response = $this->actingAs($studentUser)->get(route('mahasiswa.dashboard'));
+
+    $response->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('mahasiswa/dashboard')
+            ->where('ringkasan.total_poin', 65)
+            ->where('ringkasan.poin_rincian.peserta', 10)
+            ->where('ringkasan.poin_rincian.panitia', 20)
+            ->where('ringkasan.poin_rincian.pemateri', 30)
+            ->where('ringkasan.poin_rincian.koreksi', 5)
+        );
+
+    expect(10 + 20 + 30 + 5)->toBe(65);
 });
 
 test('user without role cannot access the dashboard', function () {

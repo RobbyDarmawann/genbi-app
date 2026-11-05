@@ -136,10 +136,17 @@ describe('Layanan Poin & Ledger Scope', function () {
     });
 
     test('mahasiswa hanya melihat riwayat transaksi dan kehadiran miliknya', function () {
+        $kehadiranAndi = Kehadiran::factory()->create([
+            'pendaftaran_id' => $this->pendaftaran->id,
+            'status' => StatusKehadiran::Valid,
+            'jarak_m' => 12.5,
+        ]);
+
         // Transaksi milik mahasiswa utama
         PoinTransaksi::factory()->create([
             'mahasiswa_id' => $this->mahasiswa->id,
             'kegiatan_id' => $this->kegiatan->id,
+            'kehadiran_id' => $kehadiranAndi->id,
             'tipe' => TipePoin::Kredit,
             'jumlah' => 15,
             'keterangan' => 'Poin milik Andi',
@@ -152,13 +159,6 @@ describe('Layanan Poin & Ledger Scope', function () {
             'tipe' => TipePoin::Kredit,
             'jumlah' => 25,
             'keterangan' => 'Poin rahasia Budi',
-        ]);
-
-        // Kehadiran milik mahasiswa utama
-        Kehadiran::factory()->create([
-            'pendaftaran_id' => $this->pendaftaran->id,
-            'status' => StatusKehadiran::Valid,
-            'jarak_m' => 12.5,
         ]);
 
         // Kehadiran milik mahasiswa lain

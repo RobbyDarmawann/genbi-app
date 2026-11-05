@@ -48,6 +48,12 @@ type LeaderboardItem = {
 type Props = {
     ringkasan: {
         total_poin: number;
+        poin_rincian: {
+            peserta: number;
+            panitia: number;
+            pemateri: number;
+            koreksi: number;
+        };
         jumlah_kegiatan: number;
         jumlah_hadir_valid: number;
         jumlah_koreksi_menunggu: number;
@@ -143,6 +149,40 @@ export default function MahasiswaDashboard({
                                 Peringkat #{ringkasan.peringkat_saya} di
                                 internal
                             </p>
+                            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-xs">
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-muted-foreground">
+                                        Kredit Peserta
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {ringkasan.poin_rincian.peserta}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-muted-foreground">
+                                        Kredit Panitia
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {ringkasan.poin_rincian.panitia}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-muted-foreground">
+                                        Kredit Pemateri
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {ringkasan.poin_rincian.pemateri}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="text-muted-foreground">
+                                        Koreksi
+                                    </span>
+                                    <span className="font-medium tabular-nums">
+                                        {ringkasan.poin_rincian.koreksi}
+                                    </span>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
 
