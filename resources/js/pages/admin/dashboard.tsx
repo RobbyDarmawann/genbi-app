@@ -13,7 +13,7 @@ export default function AdminDashboard() {
     return (
         <>
             <Head title="Dashboard Internal Manajemen" />
-            <div className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 <header>
                     <p className="text-sm font-medium text-primary">
                         Internal Manajemen

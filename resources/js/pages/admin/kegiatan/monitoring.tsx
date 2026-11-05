@@ -297,7 +297,7 @@ export default function MonitoringKegiatanShow({
     return (
         <>
             <Head title={`Monitoring — ${kegiatan.judul}`} />
-            <div className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Button asChild variant="ghost" size="sm">
                         <Link href={admin.kegiatan.show(kegiatan.id)}>

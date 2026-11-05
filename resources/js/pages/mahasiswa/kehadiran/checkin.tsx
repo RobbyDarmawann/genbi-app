@@ -418,7 +418,7 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
         <>
             <Head title={`Absensi Check-in - ${kegiatan.judul}`} />
 
-            <div className="mx-auto max-w-3xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto max-w-3xl space-y-6">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <Button asChild variant="ghost" size="sm">
                         <Link

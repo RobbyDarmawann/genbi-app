@@ -104,7 +104,7 @@ export default function KoreksiPage({
     return (
         <>
             <Head title="Koreksi Saya" />
-            <div className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 <header>
                     <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
                         Pengajuan Koreksi

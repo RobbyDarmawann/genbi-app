@@ -75,7 +75,7 @@ export default function AdminKoreksiShow({ koreksi, riwayat_poin }: Props) {
     return (
         <>
             <Head title={`Koreksi #${koreksi.id}`} />
-            <div className="mx-auto w-full max-w-5xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-5xl space-y-6">
                 <div className="flex items-center gap-3">
                     <Button asChild variant="outline" size="sm">
                         <Link href={admin.koreksi.index()}>

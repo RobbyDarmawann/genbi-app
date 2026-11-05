@@ -179,7 +179,7 @@ export default function Rekap({
     return (
         <>
             <Head title="Laporan dan evaluasi" />
-            <div className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-7xl space-y-6">
                 <header>
                     <p className="text-sm font-medium text-primary">
                         Internal Manajemen

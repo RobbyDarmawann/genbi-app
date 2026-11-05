@@ -39,7 +39,7 @@ export default function MahasiswaEdit({
     return (
         <>
             <Head title={`Ubah Anggota - ${mahasiswa.name}`} />
-            <div className="mx-auto w-full max-w-4xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-4xl space-y-6">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <Heading

@@ -23,7 +23,7 @@ export default function MahasiswaCreate({
     return (
         <>
             <Head title="Tambah Anggota Mahasiswa" />
-            <div className="mx-auto w-full max-w-4xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-4xl space-y-6">
                 <Heading
                     title="Tambah Anggota Mahasiswa"
                     description="Buat akun login dan daftarkan profil mahasiswa GenBI baru secara bersamaan."

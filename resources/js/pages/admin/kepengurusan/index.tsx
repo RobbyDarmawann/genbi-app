@@ -316,7 +316,7 @@ export default function KepengurusanIndex({
         <>
             <Head title="Direktori Kepengurusan" />
 
-            <div className="mx-auto w-full max-w-7xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-7xl space-y-6">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                         <Heading

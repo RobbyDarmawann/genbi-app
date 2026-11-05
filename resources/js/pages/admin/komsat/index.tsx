@@ -102,7 +102,7 @@ export default function KomsatIndex({ komsat, filters }: Props) {
     return (
         <>
             <Head title="Master Data Komisariat" />
-            <div className="mx-auto w-full max-w-6xl space-y-6 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <Heading
                         title="Komisariat"
