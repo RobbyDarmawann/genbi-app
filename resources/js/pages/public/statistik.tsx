@@ -43,28 +43,44 @@ function PodiumStep({
     return (
         <div className="flex min-w-0 flex-1 flex-col items-center justify-end">
             <div className="mb-2 flex flex-col items-center sm:mb-3">
-                <div
-                    className={`flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-muted text-base font-bold shadow-md transition-transform sm:size-20 sm:text-xl md:size-24 ${
-                        isFirst
-                            ? 'border-amber-300 ring-4 ring-amber-400 dark:border-amber-400 dark:ring-amber-500'
-                            : 'border-background text-primary ring-2 ring-primary/30'
-                    }`}
-                >
-                    {person.foto_url ? (
+                {person.foto_url ? (
+                    <div
+                        className={`flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-muted shadow-md transition-transform sm:size-20 md:size-24 ${
+                            isFirst
+                                ? 'border-amber-300 ring-4 ring-amber-400 dark:border-amber-400 dark:ring-amber-500'
+                                : 'border-background ring-2 ring-primary/30'
+                        }`}
+                    >
                         <img
                             src={person.foto_url}
                             alt={`Foto ${person.nama}`}
                             className="size-full object-cover"
                             loading="lazy"
                         />
-                    ) : person.karakter ? (
+                    </div>
+                ) : person.karakter ? (
+                    <div
+                        className={`flex items-end justify-center ${
+                            isFirst
+                                ? 'h-28 drop-shadow-[0_0_10px_rgba(251,191,36,0.45)] sm:h-36 md:h-40'
+                                : 'h-24 sm:h-28 md:h-32'
+                        }`}
+                    >
                         <img
                             src={`/ilustrasi/${person.karakter}`}
                             alt={`Ilustrasi ${person.nama}`}
-                            className="size-full object-cover"
+                            className="h-full w-auto object-contain"
                             loading="lazy"
                         />
-                    ) : (
+                    </div>
+                ) : (
+                    <div
+                        className={`flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-muted text-base font-bold shadow-md transition-transform sm:size-20 sm:text-xl md:size-24 ${
+                            isFirst
+                                ? 'border-amber-300 ring-4 ring-amber-400 dark:border-amber-400 dark:ring-amber-500'
+                                : 'border-background text-primary ring-2 ring-primary/30'
+                        }`}
+                    >
                         <span
                             className={
                                 isFirst
@@ -74,8 +90,8 @@ function PodiumStep({
                         >
                             {getInitials(person.nama)}
                         </span>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             <div
