@@ -61,6 +61,21 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
+test('invalid login displays the Indonesian translated authentication message', function () {
+    User::factory()->create([
+        'username' => 'testuser',
+        'is_active' => true,
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'username' => 'testuser',
+        'password' => 'wrong-password',
+    ]);
+
+    $response->assertSessionHasErrors(['username' => 'Username atau password salah. Silakan coba lagi.']);
+    expect(session('errors')->get('username')[0])->not->toBe('auth.failed');
+});
+
 test('inactive users cannot authenticate', function () {
     $user = User::factory()->create([
         'username' => 'testuser',
