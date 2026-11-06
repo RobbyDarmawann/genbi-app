@@ -117,12 +117,19 @@ class DashboardController extends Controller
             ]);
 
         // Leaderboard: hanya nama, komsat, dan total poin (tanpa mengekspos NIM atau data pribadi)
+        // Menggunakan pola agregat eksplisit (terbukti benar di PostgreSQL produksi, sama dengan StatistikController)
+        $poinSubquery = PoinTransaksi::query()
+            ->selectRaw('mahasiswa_id, COALESCE(SUM(jumlah), 0) as total_poin')
+            ->groupBy('mahasiswa_id');
+
         $allRanked = Mahasiswa::query()
-            ->where('aktif', true)
+            ->select(['mahasiswa.id', 'mahasiswa.user_id', 'mahasiswa.komsat_id'])
+            ->where('mahasiswa.aktif', true)
+            ->leftJoinSub($poinSubquery, 'poin_agg', 'poin_agg.mahasiswa_id', '=', 'mahasiswa.id')
             ->with(['user:id,name', 'komsat:id,kode'])
-            ->withSum('poinTransaksi as total_poin', 'jumlah')
-            ->orderByDesc('total_poin')
-            ->orderBy('id')
+            ->selectRaw('COALESCE(poin_agg.total_poin, 0) as total_poin')
+            ->orderByRaw('COALESCE(poin_agg.total_poin, 0) DESC')
+            ->orderBy('mahasiswa.id')
             ->get();
 
         $userRank = null;
@@ -137,7 +144,7 @@ class DashboardController extends Controller
             'peringkat' => $index + 1,
             'nama' => $m->user->name ?? 'Anggota GenBI',
             'komsat_kode' => $m->komsat->kode,
-            'total_poin' => (int) ($m->total_poin ?? 0),
+            'total_poin' => (int) ($m->getAttribute('total_poin') ?? 0),
             'is_current_user' => $m->id === $mahasiswa->id,
         ])->all();
 
