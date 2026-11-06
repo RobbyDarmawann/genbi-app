@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\JadwalController::show
  * @see app/Http/Controllers/Public/JadwalController.php:54
@@ -65,6 +65,42 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     url: show.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Public\JadwalController::show
+ * @see app/Http/Controllers/Public/JadwalController.php:54
+ * @route '/jadwal/{kegiatan}'
+ */
+    const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: show.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Public\JadwalController::show
+ * @see app/Http/Controllers/Public/JadwalController.php:54
+ * @route '/jadwal/{kegiatan}'
+ */
+        showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Public\JadwalController::show
+ * @see app/Http/Controllers/Public/JadwalController.php:54
+ * @route '/jadwal/{kegiatan}'
+ */
+        showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    show.form = showForm
 const jadwal = {
     show: Object.assign(show, show),
 }

@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
 import jadwalE4a04c from './jadwal'
 /**
 * @see \App\Http\Controllers\Public\JadwalController::jadwal
@@ -43,6 +43,41 @@ jadwal.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Public\JadwalController::jadwal
+ * @see app/Http/Controllers/Public/JadwalController.php:14
+ * @route '/jadwal'
+ */
+    const jadwalForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: jadwal.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Public\JadwalController::jadwal
+ * @see app/Http/Controllers/Public/JadwalController.php:14
+ * @route '/jadwal'
+ */
+        jadwalForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: jadwal.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Public\JadwalController::jadwal
+ * @see app/Http/Controllers/Public/JadwalController.php:14
+ * @route '/jadwal'
+ */
+        jadwalForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: jadwal.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    jadwal.form = jadwalForm
 /**
 * @see \App\Http\Controllers\Public\StatistikController::statistik
  * @see app/Http/Controllers/Public/StatistikController.php:18
@@ -86,6 +121,41 @@ statistik.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Public\StatistikController::statistik
+ * @see app/Http/Controllers/Public/StatistikController.php:18
+ * @route '/statistik'
+ */
+    const statistikForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: statistik.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Public\StatistikController::statistik
+ * @see app/Http/Controllers/Public/StatistikController.php:18
+ * @route '/statistik'
+ */
+        statistikForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: statistik.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Public\StatistikController::statistik
+ * @see app/Http/Controllers/Public/StatistikController.php:18
+ * @route '/statistik'
+ */
+        statistikForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: statistik.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    statistik.form = statistikForm
 /**
 * @see \App\Http\Controllers\Public\KepengurusanController::__invoke
  * @see app/Http/Controllers/Public/KepengurusanController.php:15
@@ -128,6 +198,42 @@ kepengurusan.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: kepengurusan.url(options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
+ * @see app/Http/Controllers/Public/KepengurusanController.php:15
+ * @route '/kepengurusan'
+ */
+    const kepengurusanForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: kepengurusan.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
+ * @see app/Http/Controllers/Public/KepengurusanController.php:15
+ * @route '/kepengurusan'
+ */
+        kepengurusanForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: kepengurusan.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
+ * @see app/Http/Controllers/Public/KepengurusanController.php:15
+ * @route '/kepengurusan'
+ */
+        kepengurusanForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: kepengurusan.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    kepengurusan.form = kepengurusanForm
 const publicMethod = {
     jadwal: Object.assign(jadwal, jadwalE4a04c),
 statistik: Object.assign(statistik, statistik),

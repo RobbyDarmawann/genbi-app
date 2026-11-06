@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\KoreksiBuktiController::__invoke
  * @see app/Http/Controllers/KoreksiBuktiController.php:12
@@ -65,6 +65,42 @@ bukti.head = (args: { koreksi: number | { id: number } } | [koreksi: number | { 
     url: bukti.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
+ * @see app/Http/Controllers/KoreksiBuktiController.php:12
+ * @route '/koreksi/{koreksi}/bukti'
+ */
+    const buktiForm = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: bukti.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
+ * @see app/Http/Controllers/KoreksiBuktiController.php:12
+ * @route '/koreksi/{koreksi}/bukti'
+ */
+        buktiForm.get = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: bukti.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
+ * @see app/Http/Controllers/KoreksiBuktiController.php:12
+ * @route '/koreksi/{koreksi}/bukti'
+ */
+        buktiForm.head = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: bukti.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    bukti.form = buktiForm
 const koreksi = {
     bukti: Object.assign(bukti, bukti),
 }

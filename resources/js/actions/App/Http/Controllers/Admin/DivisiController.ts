@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\DivisiController::index
  * @see app/Http/Controllers/Admin/DivisiController.php:23
@@ -42,6 +42,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\DivisiController::index
+ * @see app/Http/Controllers/Admin/DivisiController.php:23
+ * @route '/admin/divisi'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::index
+ * @see app/Http/Controllers/Admin/DivisiController.php:23
+ * @route '/admin/divisi'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::index
+ * @see app/Http/Controllers/Admin/DivisiController.php:23
+ * @route '/admin/divisi'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\DivisiController::store
  * @see app/Http/Controllers/Admin/DivisiController.php:76
@@ -76,6 +111,27 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\DivisiController::store
+ * @see app/Http/Controllers/Admin/DivisiController.php:76
+ * @route '/admin/divisi'
+ */
+    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::store
+ * @see app/Http/Controllers/Admin/DivisiController.php:76
+ * @route '/admin/divisi'
+ */
+        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\DivisiController::update
  * @see app/Http/Controllers/Admin/DivisiController.php:90
@@ -143,6 +199,51 @@ update.patch = (args: { divisi: number | { id: number } } | [divisi: number | { 
     method: 'patch',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\DivisiController::update
+ * @see app/Http/Controllers/Admin/DivisiController.php:90
+ * @route '/admin/divisi/{divisi}'
+ */
+    const updateForm = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::update
+ * @see app/Http/Controllers/Admin/DivisiController.php:90
+ * @route '/admin/divisi/{divisi}'
+ */
+        updateForm.put = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::update
+ * @see app/Http/Controllers/Admin/DivisiController.php:90
+ * @route '/admin/divisi/{divisi}'
+ */
+        updateForm.patch = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\DivisiController::destroy
  * @see app/Http/Controllers/Admin/DivisiController.php:122
@@ -201,6 +302,37 @@ destroy.delete = (args: { divisi: number | { id: number } } | [divisi: number | 
     method: 'delete',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\DivisiController::destroy
+ * @see app/Http/Controllers/Admin/DivisiController.php:122
+ * @route '/admin/divisi/{divisi}'
+ */
+    const destroyForm = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::destroy
+ * @see app/Http/Controllers/Admin/DivisiController.php:122
+ * @route '/admin/divisi/{divisi}'
+ */
+        destroyForm.delete = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 /**
 * @see \App\Http\Controllers\Admin\DivisiController::toggleAktif
  * @see app/Http/Controllers/Admin/DivisiController.php:104
@@ -258,6 +390,38 @@ toggleAktif.patch = (args: { divisi: number | { id: number } } | [divisi: number
     url: toggleAktif.url(args, options),
     method: 'patch',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\DivisiController::toggleAktif
+ * @see app/Http/Controllers/Admin/DivisiController.php:104
+ * @route '/admin/divisi/{divisi}/aktif'
+ */
+    const toggleAktifForm = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: toggleAktif.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\DivisiController::toggleAktif
+ * @see app/Http/Controllers/Admin/DivisiController.php:104
+ * @route '/admin/divisi/{divisi}/aktif'
+ */
+        toggleAktifForm.patch = (args: { divisi: number | { id: number } } | [divisi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: toggleAktif.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    toggleAktif.form = toggleAktifForm
 const DivisiController = { index, store, update, destroy, toggleAktif }
 
 export default DivisiController

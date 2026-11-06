@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::index
  * @see app/Http/Controllers/Admin/MahasiswaController.php:29
@@ -42,6 +42,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::index
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:29
+ * @route '/admin/mahasiswa'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::index
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:29
+ * @route '/admin/mahasiswa'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::index
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:29
+ * @route '/admin/mahasiswa'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::create
  * @see app/Http/Controllers/Admin/MahasiswaController.php:75
@@ -85,6 +120,41 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::create
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:75
+ * @route '/admin/mahasiswa/create'
+ */
+    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: create.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::create
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:75
+ * @route '/admin/mahasiswa/create'
+ */
+        createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::create
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:75
+ * @route '/admin/mahasiswa/create'
+ */
+        createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: create.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::store
  * @see app/Http/Controllers/Admin/MahasiswaController.php:82
@@ -119,6 +189,27 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::store
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:82
+ * @route '/admin/mahasiswa'
+ */
+    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::store
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:82
+ * @route '/admin/mahasiswa'
+ */
+        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::show
  * @see app/Http/Controllers/Admin/MahasiswaController.php:96
@@ -186,6 +277,41 @@ show.head = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number |
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::show
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:96
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+    const showForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: show.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::show
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:96
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+        showForm.get = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::show
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:96
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+        showForm.head = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    show.form = showForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::edit
  * @see app/Http/Controllers/Admin/MahasiswaController.php:124
@@ -253,6 +379,41 @@ edit.head = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number |
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::edit
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:124
+ * @route '/admin/mahasiswa/{mahasiswa}/edit'
+ */
+    const editForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: edit.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::edit
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:124
+ * @route '/admin/mahasiswa/{mahasiswa}/edit'
+ */
+        editForm.get = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: edit.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::edit
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:124
+ * @route '/admin/mahasiswa/{mahasiswa}/edit'
+ */
+        editForm.head = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: edit.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    edit.form = editForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::update
  * @see app/Http/Controllers/Admin/MahasiswaController.php:138
@@ -320,6 +481,51 @@ update.patch = (args: { mahasiswa: number | { id: number } } | [mahasiswa: numbe
     method: 'patch',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::update
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:138
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+    const updateForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::update
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:138
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+        updateForm.put = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::update
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:138
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+        updateForm.patch = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::destroy
  * @see app/Http/Controllers/Admin/MahasiswaController.php:184
@@ -378,6 +584,37 @@ destroy.delete = (args: { mahasiswa: number | { id: number } } | [mahasiswa: num
     method: 'delete',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::destroy
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:184
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+    const destroyForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::destroy
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:184
+ * @route '/admin/mahasiswa/{mahasiswa}'
+ */
+        destroyForm.delete = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::resetPassword
  * @see app/Http/Controllers/Admin/MahasiswaController.php:152
@@ -436,6 +673,27 @@ resetPassword.post = (args: { mahasiswa: number | { id: number } } | [mahasiswa:
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::resetPassword
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:152
+ * @route '/admin/mahasiswa/{mahasiswa}/reset-password'
+ */
+    const resetPasswordForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: resetPassword.url(args, options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::resetPassword
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:152
+ * @route '/admin/mahasiswa/{mahasiswa}/reset-password'
+ */
+        resetPasswordForm.post = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: resetPassword.url(args, options),
+            method: 'post',
+        })
+    
+    resetPassword.form = resetPasswordForm
 /**
 * @see \App\Http\Controllers\Admin\MahasiswaController::toggleAktif
  * @see app/Http/Controllers/Admin/MahasiswaController.php:166
@@ -493,6 +751,38 @@ toggleAktif.patch = (args: { mahasiswa: number | { id: number } } | [mahasiswa: 
     url: toggleAktif.url(args, options),
     method: 'patch',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::toggleAktif
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:166
+ * @route '/admin/mahasiswa/{mahasiswa}/aktif'
+ */
+    const toggleAktifForm = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: toggleAktif.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\MahasiswaController::toggleAktif
+ * @see app/Http/Controllers/Admin/MahasiswaController.php:166
+ * @route '/admin/mahasiswa/{mahasiswa}/aktif'
+ */
+        toggleAktifForm.patch = (args: { mahasiswa: number | { id: number } } | [mahasiswa: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: toggleAktif.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    toggleAktif.form = toggleAktifForm
 const MahasiswaController = { index, create, store, show, edit, update, destroy, resetPassword, toggleAktif }
 
 export default MahasiswaController

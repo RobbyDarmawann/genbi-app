@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\KomsatController::index
  * @see app/Http/Controllers/Admin/KomsatController.php:22
@@ -42,6 +42,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KomsatController::index
+ * @see app/Http/Controllers/Admin/KomsatController.php:22
+ * @route '/admin/komsat'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::index
+ * @see app/Http/Controllers/Admin/KomsatController.php:22
+ * @route '/admin/komsat'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::index
+ * @see app/Http/Controllers/Admin/KomsatController.php:22
+ * @route '/admin/komsat'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\KomsatController::store
  * @see app/Http/Controllers/Admin/KomsatController.php:66
@@ -76,6 +111,27 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KomsatController::store
+ * @see app/Http/Controllers/Admin/KomsatController.php:66
+ * @route '/admin/komsat'
+ */
+    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::store
+ * @see app/Http/Controllers/Admin/KomsatController.php:66
+ * @route '/admin/komsat'
+ */
+        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\KomsatController::update
  * @see app/Http/Controllers/Admin/KomsatController.php:80
@@ -143,6 +199,51 @@ update.patch = (args: { komsat: number | { id: number } } | [komsat: number | { 
     method: 'patch',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KomsatController::update
+ * @see app/Http/Controllers/Admin/KomsatController.php:80
+ * @route '/admin/komsat/{komsat}'
+ */
+    const updateForm = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::update
+ * @see app/Http/Controllers/Admin/KomsatController.php:80
+ * @route '/admin/komsat/{komsat}'
+ */
+        updateForm.put = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::update
+ * @see app/Http/Controllers/Admin/KomsatController.php:80
+ * @route '/admin/komsat/{komsat}'
+ */
+        updateForm.patch = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\KomsatController::destroy
  * @see app/Http/Controllers/Admin/KomsatController.php:112
@@ -201,6 +302,37 @@ destroy.delete = (args: { komsat: number | { id: number } } | [komsat: number | 
     method: 'delete',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KomsatController::destroy
+ * @see app/Http/Controllers/Admin/KomsatController.php:112
+ * @route '/admin/komsat/{komsat}'
+ */
+    const destroyForm = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::destroy
+ * @see app/Http/Controllers/Admin/KomsatController.php:112
+ * @route '/admin/komsat/{komsat}'
+ */
+        destroyForm.delete = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 /**
 * @see \App\Http\Controllers\Admin\KomsatController::toggleAktif
  * @see app/Http/Controllers/Admin/KomsatController.php:94
@@ -258,6 +390,38 @@ toggleAktif.patch = (args: { komsat: number | { id: number } } | [komsat: number
     url: toggleAktif.url(args, options),
     method: 'patch',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\KomsatController::toggleAktif
+ * @see app/Http/Controllers/Admin/KomsatController.php:94
+ * @route '/admin/komsat/{komsat}/aktif'
+ */
+    const toggleAktifForm = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: toggleAktif.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KomsatController::toggleAktif
+ * @see app/Http/Controllers/Admin/KomsatController.php:94
+ * @route '/admin/komsat/{komsat}/aktif'
+ */
+        toggleAktifForm.patch = (args: { komsat: number | { id: number } } | [komsat: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: toggleAktif.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    toggleAktif.form = toggleAktifForm
 const KomsatController = { index, store, update, destroy, toggleAktif }
 
 export default KomsatController

@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::kehadiran
  * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:16
@@ -42,6 +42,41 @@ kehadiran.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::kehadiran
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:16
+ * @route '/kehadiran'
+ */
+    const kehadiranForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: kehadiran.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::kehadiran
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:16
+ * @route '/kehadiran'
+ */
+        kehadiranForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: kehadiran.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::kehadiran
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:16
+ * @route '/kehadiran'
+ */
+        kehadiranForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: kehadiran.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    kehadiran.form = kehadiranForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
  * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
@@ -84,6 +119,42 @@ poin.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: poin.url(options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
+ * @route '/poin/riwayat'
+ */
+    const poinForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: poin.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
+ * @route '/poin/riwayat'
+ */
+        poinForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: poin.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
+ * @route '/poin/riwayat'
+ */
+        poinForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: poin.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    poin.form = poinForm
 const RiwayatController = { kehadiran, poin }
 
 export default RiwayatController

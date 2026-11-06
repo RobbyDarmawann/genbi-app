@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
  * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
@@ -42,6 +42,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
+ * @route '/kegiatan'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
+ * @route '/kegiatan'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
+ * @route '/kegiatan'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
  * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
@@ -109,6 +144,41 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
+ * @route '/kegiatan/{kegiatan}'
+ */
+    const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: show.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
+ * @route '/kegiatan/{kegiatan}'
+ */
+        showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
+ * @route '/kegiatan/{kegiatan}'
+ */
+        showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    show.form = showForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
  * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
@@ -167,6 +237,27 @@ daftar.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
+ * @route '/kegiatan/{kegiatan}/daftar'
+ */
+    const daftarForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: daftar.url(args, options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
+ * @route '/kegiatan/{kegiatan}/daftar'
+ */
+        daftarForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: daftar.url(args, options),
+            method: 'post',
+        })
+    
+    daftar.form = daftarForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
  * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
@@ -224,6 +315,38 @@ batal.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
     url: batal.url(args, options),
     method: 'delete',
 })
+
+    /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
+ * @route '/kegiatan/{kegiatan}/batal'
+ */
+    const batalForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: batal.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
+ * @route '/kegiatan/{kegiatan}/batal'
+ */
+        batalForm.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: batal.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    batal.form = batalForm
 const kegiatan = {
     index: Object.assign(index, index),
 show: Object.assign(show, show),

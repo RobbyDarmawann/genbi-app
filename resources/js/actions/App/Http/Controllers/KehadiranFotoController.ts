@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\KehadiranFotoController::__invoke
  * @see app/Http/Controllers/KehadiranFotoController.php:12
@@ -65,4 +65,40 @@ KehadiranFotoController.head = (args: { kehadiran: number | { id: number } } | [
     url: KehadiranFotoController.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\KehadiranFotoController::__invoke
+ * @see app/Http/Controllers/KehadiranFotoController.php:12
+ * @route '/kehadiran/{kehadiran}/foto'
+ */
+    const KehadiranFotoControllerForm = (args: { kehadiran: number | { id: number } } | [kehadiran: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: KehadiranFotoController.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\KehadiranFotoController::__invoke
+ * @see app/Http/Controllers/KehadiranFotoController.php:12
+ * @route '/kehadiran/{kehadiran}/foto'
+ */
+        KehadiranFotoControllerForm.get = (args: { kehadiran: number | { id: number } } | [kehadiran: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: KehadiranFotoController.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\KehadiranFotoController::__invoke
+ * @see app/Http/Controllers/KehadiranFotoController.php:12
+ * @route '/kehadiran/{kehadiran}/foto'
+ */
+        KehadiranFotoControllerForm.head = (args: { kehadiran: number | { id: number } } | [kehadiran: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: KehadiranFotoController.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    KehadiranFotoController.form = KehadiranFotoControllerForm
 export default KehadiranFotoController

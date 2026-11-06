@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\KepengurusanController::reorder
  * @see app/Http/Controllers/Admin/KepengurusanController.php:176
@@ -57,6 +57,37 @@ reorder.patch = (args: { kepengurusan: number | { id: number } } | [kepengurusan
     method: 'patch',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::reorder
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:176
+ * @route '/admin/kepengurusan/{kepengurusan}/reorder'
+ */
+    const reorderForm = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: reorder.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PATCH',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::reorder
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:176
+ * @route '/admin/kepengurusan/{kepengurusan}/reorder'
+ */
+        reorderForm.patch = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: reorder.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    reorder.form = reorderForm
 /**
 * @see \App\Http\Controllers\Admin\KepengurusanController::index
  * @see app/Http/Controllers/Admin/KepengurusanController.php:25
@@ -100,6 +131,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::index
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:25
+ * @route '/admin/kepengurusan'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::index
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:25
+ * @route '/admin/kepengurusan'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::index
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:25
+ * @route '/admin/kepengurusan'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\KepengurusanController::store
  * @see app/Http/Controllers/Admin/KepengurusanController.php:148
@@ -134,6 +200,27 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::store
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:148
+ * @route '/admin/kepengurusan'
+ */
+    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: store.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::store
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:148
+ * @route '/admin/kepengurusan'
+ */
+        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: store.url(options),
+            method: 'post',
+        })
+    
+    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\KepengurusanController::update
  * @see app/Http/Controllers/Admin/KepengurusanController.php:162
@@ -201,6 +288,51 @@ update.patch = (args: { kepengurusan: number | { id: number } } | [kepengurusan:
     method: 'patch',
 })
 
+    /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::update
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:162
+ * @route '/admin/kepengurusan/{kepengurusan}'
+ */
+    const updateForm = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: update.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'PUT',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::update
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:162
+ * @route '/admin/kepengurusan/{kepengurusan}'
+ */
+        updateForm.put = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PUT',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::update
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:162
+ * @route '/admin/kepengurusan/{kepengurusan}'
+ */
+        updateForm.patch = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: update.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'PATCH',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\KepengurusanController::destroy
  * @see app/Http/Controllers/Admin/KepengurusanController.php:190
@@ -258,6 +390,38 @@ destroy.delete = (args: { kepengurusan: number | { id: number } } | [kepengurusa
     url: destroy.url(args, options),
     method: 'delete',
 })
+
+    /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::destroy
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:190
+ * @route '/admin/kepengurusan/{kepengurusan}'
+ */
+    const destroyForm = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: destroy.url(args, {
+                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                        _method: 'DELETE',
+                        ...(options?.query ?? options?.mergeQuery ?? {}),
+                    }
+                }),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\Admin\KepengurusanController::destroy
+ * @see app/Http/Controllers/Admin/KepengurusanController.php:190
+ * @route '/admin/kepengurusan/{kepengurusan}'
+ */
+        destroyForm.delete = (args: { kepengurusan: number | { id: number } } | [kepengurusan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: destroy.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'DELETE',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'post',
+        })
+    
+    destroy.form = destroyForm
 const kepengurusan = {
     reorder: Object.assign(reorder, reorder),
 index: Object.assign(index, index),
