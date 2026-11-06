@@ -129,7 +129,7 @@ export default function KoreksiPage({
                             >
                                 {({ processing, errors }) => (
                                     <>
-                                        <div className="grid gap-2">
+                                        <div className="grid min-w-0 gap-2">
                                             <Label htmlFor="pendaftaran_id">
                                                 Kegiatan
                                             </Label>
@@ -137,7 +137,7 @@ export default function KoreksiPage({
                                                 id="pendaftaran_id"
                                                 name="pendaftaran_id"
                                                 required
-                                                className="h-11 rounded-md border border-input bg-background px-3 text-sm md:h-9"
+                                                className="flex h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm md:h-9"
                                             >
                                                 <option value="">
                                                     Pilih kegiatan...
@@ -158,7 +158,7 @@ export default function KoreksiPage({
                                             )}
                                         </div>
 
-                                        <div className="grid gap-2">
+                                        <div className="grid min-w-0 gap-2">
                                             <Label htmlFor="jenis">
                                                 Jenis Koreksi
                                             </Label>
@@ -166,7 +166,7 @@ export default function KoreksiPage({
                                                 id="jenis"
                                                 name="jenis"
                                                 required
-                                                className="h-11 rounded-md border border-input bg-background px-3 text-sm md:h-9"
+                                                className="flex h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm md:h-9"
                                             >
                                                 <option value="">
                                                     Pilih jenis...

@@ -88,7 +88,7 @@ export default function Profile() {
                                             defaultValue={
                                                 mahasiswa.jenis_kelamin ?? ''
                                             }
-                                            className="h-10 rounded-md border bg-background px-3 text-sm"
+                                            className="h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm"
                                         >
                                             <option value="">Pilih</option>
                                             <option>Laki-laki</option>
