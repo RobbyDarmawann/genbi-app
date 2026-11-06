@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::create
  * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
@@ -66,44 +66,9 @@ create.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::create
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-    const createForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: create.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::create
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        createForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::create
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        createForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 export const store = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -118,7 +83,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 store.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -151,35 +116,13 @@ store.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 store.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: store.url(args, options),
     method: 'post',
 })
-
-    /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
- * @route '/kegiatan/{kegiatan}/absen'
- */
-    const storeForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: store.url(args, options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        storeForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: store.url(args, options),
-            method: 'post',
-        })
-    
-    store.form = storeForm
 const AbsensiController = { create, store }
 
 export default AbsensiController

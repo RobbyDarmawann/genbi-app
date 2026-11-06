@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::index
  * @see app/Http/Controllers/Admin/KegiatanController.php:27
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::index
- * @see app/Http/Controllers/Admin/KegiatanController.php:27
- * @route '/admin/kegiatan'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::index
- * @see app/Http/Controllers/Admin/KegiatanController.php:27
- * @route '/admin/kegiatan'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::index
- * @see app/Http/Controllers/Admin/KegiatanController.php:27
- * @route '/admin/kegiatan'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
  * @see app/Http/Controllers/Admin/KegiatanController.php:84
@@ -120,41 +85,6 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:84
- * @route '/admin/kegiatan/create'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: create.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:84
- * @route '/admin/kegiatan/create'
- */
-        createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:84
- * @route '/admin/kegiatan/create'
- */
-        createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
  * @see app/Http/Controllers/Admin/KegiatanController.php:91
@@ -189,27 +119,6 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:91
- * @route '/admin/kegiatan'
- */
-    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: store.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:91
- * @route '/admin/kegiatan'
- */
-        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: store.url(options),
-            method: 'post',
-        })
-    
-    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
  * @see app/Http/Controllers/Admin/KegiatanController.php:101
@@ -277,41 +186,6 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:101
- * @route '/admin/kegiatan/{kegiatan}'
- */
-    const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: show.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:101
- * @route '/admin/kegiatan/{kegiatan}'
- */
-        showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:101
- * @route '/admin/kegiatan/{kegiatan}'
- */
-        showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    show.form = showForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
  * @see app/Http/Controllers/Admin/KegiatanController.php:116
@@ -379,41 +253,6 @@ edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:116
- * @route '/admin/kegiatan/{kegiatan}/edit'
- */
-    const editForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: edit.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:116
- * @route '/admin/kegiatan/{kegiatan}/edit'
- */
-        editForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: edit.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:116
- * @route '/admin/kegiatan/{kegiatan}/edit'
- */
-        editForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: edit.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    edit.form = editForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
  * @see app/Http/Controllers/Admin/KegiatanController.php:128
@@ -481,51 +320,6 @@ update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
     method: 'patch',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:128
- * @route '/admin/kegiatan/{kegiatan}'
- */
-    const updateForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: update.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PUT',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:128
- * @route '/admin/kegiatan/{kegiatan}'
- */
-        updateForm.put = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PUT',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:128
- * @route '/admin/kegiatan/{kegiatan}'
- */
-        updateForm.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
  * @see app/Http/Controllers/Admin/KegiatanController.php:138
@@ -583,38 +377,6 @@ updateStatus.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: n
     url: updateStatus.url(args, options),
     method: 'patch',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:138
- * @route '/admin/kegiatan/{kegiatan}/status'
- */
-    const updateStatusForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: updateStatus.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PATCH',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:138
- * @route '/admin/kegiatan/{kegiatan}/status'
- */
-        updateStatusForm.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: updateStatus.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    updateStatus.form = updateStatusForm
 const KegiatanController = { index, create, store, show, edit, update, updateStatus }
 
 export default KegiatanController

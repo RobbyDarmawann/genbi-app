@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
@@ -66,41 +66,6 @@ index.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-    const indexForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-        indexForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-        indexForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::changeRole
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
@@ -156,37 +121,6 @@ changeRole.patch = (args: { kegiatan: number | { id: number }, pendaftaran: numb
     method: 'patch',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::changeRole
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
- */
-    const changeRoleForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: changeRole.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PATCH',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::changeRole
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
- */
-        changeRoleForm.patch = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: changeRole.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    changeRole.form = changeRoleForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::cancel
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
@@ -241,38 +175,6 @@ cancel.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number 
     url: cancel.url(args, options),
     method: 'delete',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::cancel
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
- */
-    const cancelForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: cancel.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::cancel
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
- */
-        cancelForm.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: cancel.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    cancel.form = cancelForm
 const PesertaKegiatanController = { index, changeRole, cancel }
 
 export default PesertaKegiatanController

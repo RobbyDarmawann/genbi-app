@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\KepengurusanController::__invoke
  * @see app/Http/Controllers/Public/KepengurusanController.php:15
@@ -42,41 +42,6 @@ KepengurusanController.head = (options?: RouteQueryOptions): RouteDefinition<'he
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
- * @see app/Http/Controllers/Public/KepengurusanController.php:15
- * @route '/kepengurusan'
- */
-    const KepengurusanControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: KepengurusanController.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
- * @see app/Http/Controllers/Public/KepengurusanController.php:15
- * @route '/kepengurusan'
- */
-        KepengurusanControllerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: KepengurusanController.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Public\KepengurusanController::__invoke
- * @see app/Http/Controllers/Public/KepengurusanController.php:15
- * @route '/kepengurusan'
- */
-        KepengurusanControllerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: KepengurusanController.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    KepengurusanController.form = KepengurusanControllerForm
 /**
 * @see \App\Http\Controllers\Public\KepengurusanController::mahasiswa
  * @see app/Http/Controllers/Public/KepengurusanController.php:20
@@ -119,42 +84,6 @@ mahasiswa.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: mahasiswa.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Public\KepengurusanController::mahasiswa
- * @see app/Http/Controllers/Public/KepengurusanController.php:20
- * @route '/mahasiswa/kepengurusan'
- */
-    const mahasiswaForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: mahasiswa.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Public\KepengurusanController::mahasiswa
- * @see app/Http/Controllers/Public/KepengurusanController.php:20
- * @route '/mahasiswa/kepengurusan'
- */
-        mahasiswaForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mahasiswa.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Public\KepengurusanController::mahasiswa
- * @see app/Http/Controllers/Public/KepengurusanController.php:20
- * @route '/mahasiswa/kepengurusan'
- */
-        mahasiswaForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mahasiswa.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    mahasiswa.form = mahasiswaForm
 KepengurusanController.mahasiswa = mahasiswa
 
 export default KepengurusanController

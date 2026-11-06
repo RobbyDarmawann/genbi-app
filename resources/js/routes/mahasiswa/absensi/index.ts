@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::form
  * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
@@ -66,44 +66,9 @@ form.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::form
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-    const formForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: form.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::form
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        formForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: form.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::form
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:22
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        formForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: form.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    form.form = formForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 export const submit = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -118,7 +83,7 @@ submit.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 submit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -151,35 +116,13 @@ submit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:102
  * @route '/kegiatan/{kegiatan}/absen'
  */
 submit.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     url: submit.url(args, options),
     method: 'post',
 })
-
-    /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
- * @route '/kegiatan/{kegiatan}/absen'
- */
-    const submitForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: submit.url(args, options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
- * @route '/kegiatan/{kegiatan}/absen'
- */
-        submitForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: submit.url(args, options),
-            method: 'post',
-        })
-    
-    submit.form = submitForm
 const absensi = {
     form: Object.assign(form, form),
 submit: Object.assign(submit, submit),

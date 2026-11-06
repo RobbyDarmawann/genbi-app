@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
 import kegiatan from './kegiatan'
 import mahasiswa from './mahasiswa'
 import periode from './periode'
@@ -50,42 +50,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: dashboard.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\DashboardController::__invoke
- * @see app/Http/Controllers/Admin/DashboardController.php:19
- * @route '/admin/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\DashboardController::__invoke
- * @see app/Http/Controllers/Admin/DashboardController.php:19
- * @route '/admin/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\DashboardController::__invoke
- * @see app/Http/Controllers/Admin/DashboardController.php:19
- * @route '/admin/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 const admin = {
     dashboard: Object.assign(dashboard, dashboard),
 kegiatan: Object.assign(kegiatan, kegiatan),

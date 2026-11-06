@@ -39,12 +39,14 @@ class AbsensiController extends Controller
             'Halaman absensi hanya dapat dibuka untuk pendaftaran aktif Anda.'
         );
 
-        $kegiatan->load(['komsat:id,kode,nama', 'bobot', 'sesiAbsensi']);
+        $kegiatan->load(['komsat:id,kode,nama', 'bobot']);
         $matchedBobot = $kegiatan->bobot->firstWhere('peran', $pendaftaran->peran);
         $bobotPoin = $matchedBobot !== null ? (int) $matchedBobot->poin : 0;
 
         $today = now(config('app.timezone'))->toDateString();
-        $sesiHariIni = $kegiatan->sesiAbsensi->firstWhere('tanggal', $today);
+        $sesiHariIni = $kegiatan->sesiAbsensi()
+            ->whereDate('tanggal', $today)
+            ->first();
 
         $existingKehadiran = $pendaftaran->kehadiran
             ->first(fn ($k) => $k->tanggal->toDateString() === $today);

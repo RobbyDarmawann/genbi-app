@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\PeriodeController::index
  * @see app/Http/Controllers/Admin/PeriodeController.php:22
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PeriodeController::index
- * @see app/Http/Controllers/Admin/PeriodeController.php:22
- * @route '/admin/periode'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::index
- * @see app/Http/Controllers/Admin/PeriodeController.php:22
- * @route '/admin/periode'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::index
- * @see app/Http/Controllers/Admin/PeriodeController.php:22
- * @route '/admin/periode'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\PeriodeController::store
  * @see app/Http/Controllers/Admin/PeriodeController.php:55
@@ -111,27 +76,6 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     method: 'post',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PeriodeController::store
- * @see app/Http/Controllers/Admin/PeriodeController.php:55
- * @route '/admin/periode'
- */
-    const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: store.url(options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::store
- * @see app/Http/Controllers/Admin/PeriodeController.php:55
- * @route '/admin/periode'
- */
-        storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: store.url(options),
-            method: 'post',
-        })
-    
-    store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\PeriodeController::update
  * @see app/Http/Controllers/Admin/PeriodeController.php:69
@@ -199,51 +143,6 @@ update.patch = (args: { periode: number | { id: number } } | [periode: number | 
     method: 'patch',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PeriodeController::update
- * @see app/Http/Controllers/Admin/PeriodeController.php:69
- * @route '/admin/periode/{periode}'
- */
-    const updateForm = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: update.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PUT',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::update
- * @see app/Http/Controllers/Admin/PeriodeController.php:69
- * @route '/admin/periode/{periode}'
- */
-        updateForm.put = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PUT',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::update
- * @see app/Http/Controllers/Admin/PeriodeController.php:69
- * @route '/admin/periode/{periode}'
- */
-        updateForm.patch = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: update.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\PeriodeController::destroy
  * @see app/Http/Controllers/Admin/PeriodeController.php:101
@@ -302,37 +201,6 @@ destroy.delete = (args: { periode: number | { id: number } } | [periode: number 
     method: 'delete',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PeriodeController::destroy
- * @see app/Http/Controllers/Admin/PeriodeController.php:101
- * @route '/admin/periode/{periode}'
- */
-    const destroyForm = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: destroy.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::destroy
- * @see app/Http/Controllers/Admin/PeriodeController.php:101
- * @route '/admin/periode/{periode}'
- */
-        destroyForm.delete = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: destroy.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    destroy.form = destroyForm
 /**
 * @see \App\Http\Controllers\Admin\PeriodeController::toggleAktif
  * @see app/Http/Controllers/Admin/PeriodeController.php:83
@@ -390,38 +258,6 @@ toggleAktif.patch = (args: { periode: number | { id: number } } | [periode: numb
     url: toggleAktif.url(args, options),
     method: 'patch',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\PeriodeController::toggleAktif
- * @see app/Http/Controllers/Admin/PeriodeController.php:83
- * @route '/admin/periode/{periode}/aktif'
- */
-    const toggleAktifForm = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: toggleAktif.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PATCH',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PeriodeController::toggleAktif
- * @see app/Http/Controllers/Admin/PeriodeController.php:83
- * @route '/admin/periode/{periode}/aktif'
- */
-        toggleAktifForm.patch = (args: { periode: number | { id: number } } | [periode: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: toggleAktif.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    toggleAktif.form = toggleAktifForm
 const PeriodeController = { index, store, update, destroy, toggleAktif }
 
 export default PeriodeController

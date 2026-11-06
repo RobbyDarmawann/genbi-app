@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
  * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
@@ -53,28 +53,6 @@ review.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { 
     url: review.url(args, options),
     method: 'post',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
- * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
- */
-    const reviewForm = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: review.url(args, options),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
- * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
- */
-        reviewForm.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: review.url(args, options),
-            method: 'post',
-        })
-    
-    review.form = reviewForm
 const kehadiran = {
     review: Object.assign(review, review),
 }

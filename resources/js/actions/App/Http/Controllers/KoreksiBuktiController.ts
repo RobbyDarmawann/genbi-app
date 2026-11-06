@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\KoreksiBuktiController::__invoke
  * @see app/Http/Controllers/KoreksiBuktiController.php:12
@@ -65,40 +65,4 @@ KoreksiBuktiController.head = (args: { koreksi: number | { id: number } } | [kor
     url: KoreksiBuktiController.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
- * @see app/Http/Controllers/KoreksiBuktiController.php:12
- * @route '/koreksi/{koreksi}/bukti'
- */
-    const KoreksiBuktiControllerForm = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: KoreksiBuktiController.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
- * @see app/Http/Controllers/KoreksiBuktiController.php:12
- * @route '/koreksi/{koreksi}/bukti'
- */
-        KoreksiBuktiControllerForm.get = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: KoreksiBuktiController.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\KoreksiBuktiController::__invoke
- * @see app/Http/Controllers/KoreksiBuktiController.php:12
- * @route '/koreksi/{koreksi}/bukti'
- */
-        KoreksiBuktiControllerForm.head = (args: { koreksi: number | { id: number } } | [koreksi: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: KoreksiBuktiController.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    KoreksiBuktiController.form = KoreksiBuktiControllerForm
 export default KoreksiBuktiController

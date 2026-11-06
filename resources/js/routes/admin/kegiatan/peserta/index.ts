@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
@@ -66,41 +66,6 @@ index.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-    const indexForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-        indexForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::index
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:26
- * @route '/admin/kegiatan/{kegiatan}/peserta'
- */
-        indexForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
@@ -156,37 +121,6 @@ ubahPeran.patch = (args: { kegiatan: number | { id: number }, pendaftaran: numbe
     method: 'patch',
 })
 
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
- */
-    const ubahPeranForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: ubahPeran.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'PATCH',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
- */
-        ubahPeranForm.patch = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: ubahPeran.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'PATCH',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    ubahPeran.form = ubahPeranForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
  * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
@@ -241,38 +175,6 @@ batal.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number |
     url: batal.url(args, options),
     method: 'delete',
 })
-
-    /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
- */
-    const batalForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-        action: batal.url(args, {
-                    [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                        _method: 'DELETE',
-                        ...(options?.query ?? options?.mergeQuery ?? {}),
-                    }
-                }),
-        method: 'post',
-    })
-
-            /**
-* @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
- * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
- */
-        batalForm.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
-            action: batal.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'DELETE',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'post',
-        })
-    
-    batal.form = batalForm
 const peserta = {
     index: Object.assign(index, index),
 ubahPeran: Object.assign(ubahPeran, ubahPeran),

@@ -413,6 +413,32 @@ test('kegiatan yang terkunci tidak menerima absensi baru', function () {
         ->and(PoinTransaksi::query()->count())->toBe(0);
 });
 
+test('halaman absensi kegiatan multi-hari mengisi sesi hari ini', function () {
+    $tanggalHariIni = now(config('app.timezone'))->toDateString();
+    $tanggalBesok = now(config('app.timezone'))->addDay()->toDateString();
+
+    $this->kegiatan->update([
+        'tanggal' => $tanggalHariIni,
+        'tanggal_selesai' => $tanggalBesok,
+    ]);
+    SesiAbsensi::query()->create([
+        'kegiatan_id' => $this->kegiatan->id,
+        'tanggal' => $tanggalBesok,
+        'jam_buka' => '08:00:00',
+        'jam_tutup' => '23:00:00',
+    ]);
+
+    $this->actingAs($this->mahasiswaUser)
+        ->get(route('mahasiswa.absensi.form', $this->kegiatan))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('mahasiswa/kehadiran/checkin')
+            ->where('kegiatan.sesi_hari_ini.tanggal', $tanggalHariIni)
+            ->where('kegiatan.sesi_hari_ini.id', fn ($id) => $id !== null)
+            ->where('pendaftaran.id', $this->pendaftaran->id)
+        );
+});
+
 test('halaman absensi menampilkan komponen Inertia checkin untuk pendaftar aktif', function () {
     $this->actingAs($this->mahasiswaUser)
         ->get(route('mahasiswa.absensi.form', $this->kegiatan))

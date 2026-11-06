@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\HomeController::__invoke
  * @see app/Http/Controllers/Public/HomeController.php:16
@@ -41,40 +41,4 @@ HomeController.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => 
     url: HomeController.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Public\HomeController::__invoke
- * @see app/Http/Controllers/Public/HomeController.php:16
- * @route '/'
- */
-    const HomeControllerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: HomeController.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Public\HomeController::__invoke
- * @see app/Http/Controllers/Public/HomeController.php:16
- * @route '/'
- */
-        HomeControllerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: HomeController.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Public\HomeController::__invoke
- * @see app/Http/Controllers/Public/HomeController.php:16
- * @route '/'
- */
-        HomeControllerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: HomeController.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    HomeController.form = HomeControllerForm
 export default HomeController
