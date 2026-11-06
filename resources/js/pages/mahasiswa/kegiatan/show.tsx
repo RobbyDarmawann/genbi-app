@@ -65,7 +65,7 @@ type Props = {
         poin: number;
         sudah_hadir: boolean;
         memiliki_kehadiran: boolean;
-        kehadiran: {
+        kehadiran_hari_ini: {
             status: string;
             status_label: string;
             alasan: string | null;
@@ -333,35 +333,39 @@ export default function Show({
                                         </p>
                                         <StatusBadge
                                             status={
-                                                pendaftaran.kehadiran
+                                                pendaftaran.kehadiran_hari_ini
                                                     ?.status === 'valid'
                                                     ? 'valid'
-                                                    : pendaftaran.kehadiran
+                                                    : pendaftaran
+                                                            .kehadiran_hari_ini
                                                             ?.status ===
                                                         'ditolak'
                                                       ? 'ditolak'
                                                       : 'diajukan'
                                             }
                                             label={
-                                                pendaftaran.kehadiran
+                                                pendaftaran.kehadiran_hari_ini
                                                     ?.status_label ?? 'Menunggu'
                                             }
                                         />
                                     </div>
-                                    {pendaftaran.kehadiran?.status ===
+                                    {pendaftaran.kehadiran_hari_ini?.status ===
                                         'valid' && (
                                         <p className="text-sm text-muted-foreground">
                                             Poin +
                                             {
-                                                pendaftaran.kehadiran
+                                                pendaftaran.kehadiran_hari_ini
                                                     .poin_terkredit
                                             }{' '}
                                             telah ditambahkan ke akun Anda.
                                         </p>
                                     )}
-                                    {pendaftaran.kehadiran?.alasan && (
+                                    {pendaftaran.kehadiran_hari_ini?.alasan && (
                                         <p className="text-sm text-muted-foreground">
-                                            {pendaftaran.kehadiran.alasan}
+                                            {
+                                                pendaftaran.kehadiran_hari_ini
+                                                    .alasan
+                                            }
                                         </p>
                                     )}
                                 </CardContent>

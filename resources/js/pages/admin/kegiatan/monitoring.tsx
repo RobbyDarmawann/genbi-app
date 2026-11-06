@@ -42,6 +42,19 @@ import { formatAngka, formatTanggalWita, formatWaktuWita } from '@/lib/format';
 import admin from '@/routes/admin';
 import kehadiranRoutes from '@/routes/kehadiran';
 
+type KehadiranRecord = {
+    id: number;
+    tanggal: string;
+    status: string;
+    status_label: string;
+    waktu_checkin: string;
+    jarak_m: string | null;
+    akurasi_m: string | null;
+    alasan_penolakan: string | null;
+    has_foto: boolean;
+    poin_terkredit: number | null;
+};
+
 type PesertaMonitoring = {
     id: number;
     nama: string;
@@ -49,17 +62,7 @@ type PesertaMonitoring = {
     komsat_kode: string;
     divisi_nama: string;
     peran_label: string;
-    kehadiran: {
-        id: number;
-        status: string;
-        status_label: string;
-        waktu_checkin: string;
-        jarak_m: string | null;
-        akurasi_m: string | null;
-        alasan_penolakan: string | null;
-        has_foto: boolean;
-        poin_terkredit: number | null;
-    } | null;
+    kehadiran: KehadiranRecord[];
 };
 
 type PenghambatItem = {
@@ -173,26 +176,35 @@ export default function MonitoringKegiatanShow({
             key: 'status',
             header: 'Status Kehadiran',
             cell: (row) =>
-                row.kehadiran ? (
-                    <div className="space-y-1">
-                        <StatusBadge
-                            status={attendanceSemantic(row.kehadiran.status)}
-                            label={row.kehadiran.status_label}
-                        />
-                        <p className="text-xs text-muted-foreground tabular-nums">
-                            {formatWaktuWita(row.kehadiran.waktu_checkin)}
-                        </p>
-                        {row.kehadiran.alasan_penolakan && (
-                            <p className="max-w-xs text-xs text-destructive">
-                                Alasan: {row.kehadiran.alasan_penolakan}
-                            </p>
-                        )}
-                        {row.kehadiran.status === 'ditolak' && (
-                            <p className="text-xs text-muted-foreground">
-                                Perubahan status ditolak wajib melalui alur
-                                pengajuan koreksi formal mahasiswa.
-                            </p>
-                        )}
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id} className="space-y-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <StatusBadge
+                                        status={attendanceSemantic(
+                                            record.status,
+                                        )}
+                                        label={record.status_label}
+                                    />
+                                    <span className="text-xs text-muted-foreground tabular-nums">
+                                        {formatTanggalWita(record.tanggal)} ·{' '}
+                                        {formatWaktuWita(record.waktu_checkin)}
+                                    </span>
+                                </div>
+                                {record.alasan_penolakan && (
+                                    <p className="max-w-xs text-xs text-destructive">
+                                        Alasan: {record.alasan_penolakan}
+                                    </p>
+                                )}
+                                {record.status === 'ditolak' && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Perubahan status ditolak wajib melalui
+                                        alur pengajuan koreksi formal mahasiswa.
+                                    </p>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <StatusBadge status="draft" label="Belum Hadir" />
@@ -203,15 +215,22 @@ export default function MonitoringKegiatanShow({
             header: 'Jarak / Akurasi',
             align: 'right',
             cell: (row) =>
-                row.kehadiran?.jarak_m !== null &&
-                row.kehadiran?.jarak_m !== undefined ? (
-                    <div className="text-xs tabular-nums">
-                        <div>{row.kehadiran.jarak_m} m</div>
-                        {row.kehadiran.akurasi_m && (
-                            <div className="text-muted-foreground">
-                                ±{row.kehadiran.akurasi_m} m
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2 text-xs tabular-nums">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id}>
+                                <div>
+                                    {record.jarak_m !== null
+                                        ? `${record.jarak_m} m`
+                                        : '-'}
+                                </div>
+                                {record.akurasi_m && (
+                                    <div className="text-muted-foreground">
+                                        ±{record.akurasi_m} m
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        ))}
                     </div>
                 ) : (
                     '-'
@@ -222,74 +241,81 @@ export default function MonitoringKegiatanShow({
             header: 'Foto & Peninjauan',
             align: 'right',
             cell: (row) => (
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                    {row.kehadiran?.has_foto && (
-                        <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                                setSelectedFoto({
-                                    id: row.kehadiran!.id,
-                                    nama: row.nama,
-                                })
-                            }
+                <div className="space-y-2">
+                    {row.kehadiran.map((record) => (
+                        <div
+                            key={record.id}
+                            className="flex flex-wrap items-center justify-end gap-2"
                         >
-                            <Camera className="size-4" />
-                            Foto
-                        </Button>
-                    )}
-
-                    {!isLocked &&
-                        row.kehadiran?.status === 'menunggu_tinjau' && (
-                            <>
-                                <Form
-                                    {...MonitoringKegiatanController.reviewAttendance.form(
-                                        {
-                                            kegiatan: kegiatan.id,
-                                            kehadiran: row.kehadiran.id,
-                                        },
-                                    )}
-                                >
-                                    {({ processing }) => (
-                                        <>
-                                            <input
-                                                type="hidden"
-                                                name="status"
-                                                value="valid"
-                                            />
-                                            <Button
-                                                type="submit"
-                                                size="sm"
-                                                disabled={processing}
-                                            >
-                                                {processing ? (
-                                                    <Spinner />
-                                                ) : (
-                                                    <CheckCircle2 className="size-4" />
-                                                )}
-                                                Setujui
-                                            </Button>
-                                        </>
-                                    )}
-                                </Form>
-
+                            {record.has_foto && (
                                 <Button
                                     type="button"
                                     size="sm"
-                                    variant="destructive"
+                                    variant="outline"
                                     onClick={() =>
-                                        setRejectTarget({
-                                            kehadiranId: row.kehadiran!.id,
+                                        setSelectedFoto({
+                                            id: record.id,
                                             nama: row.nama,
                                         })
                                     }
                                 >
-                                    <XCircle className="size-4" />
-                                    Tolak
+                                    <Camera className="size-4" />
+                                    Foto
                                 </Button>
-                            </>
-                        )}
+                            )}
+
+                            {!isLocked &&
+                                record.status === 'menunggu_tinjau' && (
+                                    <>
+                                        <Form
+                                            {...MonitoringKegiatanController.reviewAttendance.form(
+                                                {
+                                                    kegiatan: kegiatan.id,
+                                                    kehadiran: record.id,
+                                                },
+                                            )}
+                                        >
+                                            {({ processing }) => (
+                                                <>
+                                                    <input
+                                                        type="hidden"
+                                                        name="status"
+                                                        value="valid"
+                                                    />
+                                                    <Button
+                                                        type="submit"
+                                                        size="sm"
+                                                        disabled={processing}
+                                                    >
+                                                        {processing ? (
+                                                            <Spinner />
+                                                        ) : (
+                                                            <CheckCircle2 className="size-4" />
+                                                        )}
+                                                        Setujui
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </Form>
+
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={() =>
+                                                setRejectTarget({
+                                                    kehadiranId: record.id,
+                                                    nama: row.nama,
+                                                })
+                                            }
+                                        >
+                                            <XCircle className="size-4" />
+                                            Tolak
+                                        </Button>
+                                    </>
+                                )}
+                        </div>
+                    ))}
                 </div>
             ),
         },
@@ -457,38 +483,65 @@ export default function MonitoringKegiatanShow({
                                 </Badge>
                             </div>
 
-                            {row.kehadiran ? (
-                                <div className="space-y-2 rounded-md bg-muted/50 p-2.5 text-xs">
-                                    <div className="flex items-center justify-between gap-2">
-                                        <StatusBadge
-                                            status={attendanceSemantic(
-                                                row.kehadiran.status,
+                            {row.kehadiran.length > 0 ? (
+                                <div className="space-y-2">
+                                    {row.kehadiran.map((record) => (
+                                        <div
+                                            key={record.id}
+                                            className="space-y-2 rounded-md bg-muted/50 p-2.5 text-xs"
+                                        >
+                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                <StatusBadge
+                                                    status={attendanceSemantic(
+                                                        record.status,
+                                                    )}
+                                                    label={record.status_label}
+                                                />
+                                                <span className="tabular-nums">
+                                                    {formatTanggalWita(
+                                                        record.tanggal,
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <span className="text-muted-foreground">
+                                                        Check-in
+                                                    </span>
+                                                    <p className="font-medium text-muted-foreground tabular-nums">
+                                                        {formatWaktuWita(
+                                                            record.waktu_checkin,
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <span className="text-muted-foreground">
+                                                        Jarak / Akurasi
+                                                    </span>
+                                                    <p className="font-medium tabular-nums">
+                                                        {record.jarak_m ?? '-'}{' '}
+                                                        m
+                                                        {record.akurasi_m &&
+                                                            ` / ±${record.akurasi_m} m`}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {record.alasan_penolakan && (
+                                                <p className="text-destructive">
+                                                    Alasan:{' '}
+                                                    {record.alasan_penolakan}
+                                                </p>
                                             )}
-                                            label={row.kehadiran.status_label}
-                                        />
-                                        <span className="tabular-nums">
-                                            {row.kehadiran.jarak_m ?? '-'} m
-                                        </span>
-                                    </div>
-                                    <p className="text-muted-foreground tabular-nums">
-                                        Check-in:{' '}
-                                        {formatWaktuWita(
-                                            row.kehadiran.waktu_checkin,
-                                        )}
-                                    </p>
-                                    {row.kehadiran.alasan_penolakan && (
-                                        <p className="text-destructive">
-                                            Alasan:{' '}
-                                            {row.kehadiran.alasan_penolakan}
-                                        </p>
-                                    )}
-                                    {row.kehadiran.status === 'ditolak' && (
-                                        <p className="text-muted-foreground">
-                                            Perubahan status ditolak hanya dapat
-                                            diproses melalui pengajuan koreksi
-                                            formal mahasiswa.
-                                        </p>
-                                    )}
+                                            {record.status === 'ditolak' && (
+                                                <p className="text-muted-foreground">
+                                                    Perubahan status ditolak
+                                                    hanya dapat diproses melalui
+                                                    pengajuan koreksi formal
+                                                    mahasiswa.
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             ) : (
                                 <StatusBadge
@@ -498,75 +551,83 @@ export default function MonitoringKegiatanShow({
                             )}
 
                             <div className="flex flex-wrap gap-2">
-                                {row.kehadiran?.has_foto && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="h-11 flex-1"
-                                        onClick={() =>
-                                            setSelectedFoto({
-                                                id: row.kehadiran!.id,
-                                                nama: row.nama,
-                                            })
-                                        }
+                                {row.kehadiran.map((record) => (
+                                    <div
+                                        key={record.id}
+                                        className="flex w-full flex-wrap gap-2"
                                     >
-                                        <Camera className="size-4" />
-                                        Lihat Foto
-                                    </Button>
-                                )}
-
-                                {!isLocked &&
-                                    row.kehadiran?.status ===
-                                        'menunggu_tinjau' && (
-                                        <>
-                                            <Form
-                                                {...MonitoringKegiatanController.reviewAttendance.form(
-                                                    {
-                                                        kegiatan: kegiatan.id,
-                                                        kehadiran:
-                                                            row.kehadiran.id,
-                                                    },
-                                                )}
-                                                className="flex-1"
-                                            >
-                                                {({ processing }) => (
-                                                    <>
-                                                        <input
-                                                            type="hidden"
-                                                            name="status"
-                                                            value="valid"
-                                                        />
-                                                        <Button
-                                                            type="submit"
-                                                            className="h-11 w-full"
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                        >
-                                                            {processing && (
-                                                                <Spinner />
-                                                            )}
-                                                            Setujui
-                                                        </Button>
-                                                    </>
-                                                )}
-                                            </Form>
+                                        {record.has_foto && (
                                             <Button
                                                 type="button"
-                                                variant="destructive"
+                                                variant="outline"
                                                 className="h-11 flex-1"
                                                 onClick={() =>
-                                                    setRejectTarget({
-                                                        kehadiranId:
-                                                            row.kehadiran!.id,
+                                                    setSelectedFoto({
+                                                        id: record.id,
                                                         nama: row.nama,
                                                     })
                                                 }
                                             >
-                                                Tolak
+                                                <Camera className="size-4" />
+                                                Lihat Foto
                                             </Button>
-                                        </>
-                                    )}
+                                        )}
+
+                                        {!isLocked &&
+                                            record.status ===
+                                                'menunggu_tinjau' && (
+                                                <>
+                                                    <Form
+                                                        {...MonitoringKegiatanController.reviewAttendance.form(
+                                                            {
+                                                                kegiatan:
+                                                                    kegiatan.id,
+                                                                kehadiran:
+                                                                    record.id,
+                                                            },
+                                                        )}
+                                                        className="flex-1"
+                                                    >
+                                                        {({ processing }) => (
+                                                            <>
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="status"
+                                                                    value="valid"
+                                                                />
+                                                                <Button
+                                                                    type="submit"
+                                                                    className="h-11 w-full"
+                                                                    disabled={
+                                                                        processing
+                                                                    }
+                                                                >
+                                                                    {processing && (
+                                                                        <Spinner />
+                                                                    )}
+                                                                    Setujui
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </Form>
+                                                    <Button
+                                                        type="button"
+                                                        variant="destructive"
+                                                        className="h-11 flex-1"
+                                                        onClick={() =>
+                                                            setRejectTarget({
+                                                                kehadiranId:
+                                                                    record.id,
+                                                                nama: row.nama,
+                                                            })
+                                                        }
+                                                    >
+                                                        Tolak
+                                                    </Button>
+                                                </>
+                                            )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}

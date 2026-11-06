@@ -212,15 +212,14 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
         };
     }, []);
 
-    const bukaMs = kegiatan.sesi_hari_ini
-        ? new Date(kegiatan.sesi_hari_ini.buka_at).getTime()
-        : Number.POSITIVE_INFINITY;
-    const tutupMs = kegiatan.sesi_hari_ini
-        ? new Date(kegiatan.sesi_hari_ini.tutup_at).getTime()
-        : Number.NEGATIVE_INFINITY;
-    const belumBuka = nowMs < bukaMs;
-    const sudahTutup = nowMs > tutupMs;
-    const dalamJendela = !belumBuka && !sudahTutup;
+    const sesiHariIni = kegiatan.sesi_hari_ini;
+    const bukaMs =
+        sesiHariIni !== null ? new Date(sesiHariIni.buka_at).getTime() : null;
+    const tutupMs =
+        sesiHariIni !== null ? new Date(sesiHariIni.tutup_at).getTime() : null;
+    const belumBuka = bukaMs !== null && nowMs < bukaMs;
+    const sudahTutup = tutupMs !== null && nowMs > tutupMs;
+    const dalamJendela = sesiHariIni !== null && !belumBuka && !sudahTutup;
 
     const handleAmbilLokasi = () => {
         if (typeof navigator === 'undefined' || !('geolocation' in navigator)) {
@@ -419,6 +418,7 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
 
     const kehadiran = pendaftaran.kehadiran;
     const siapKirim =
+        sesiHariIni !== null &&
         geoState.status === 'success' &&
         form.data.foto !== null &&
         !form.processing &&
@@ -518,12 +518,15 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                 </p>
                                 {kehadiran === null && (
                                     <p className="text-xs font-medium text-primary tabular-nums">
-                                        {belumBuka &&
-                                            `Hitung mundur pembukaan absensi: ${formatDurationMs(bukaMs - nowMs)}`}
-                                        {dalamJendela &&
-                                            `Absensi sedang dibuka • Sisa waktu: ${formatDurationMs(tutupMs - nowMs)}`}
-                                        {sudahTutup &&
-                                            'Jendela waktu absensi telah berakhir.'}
+                                        {sesiHariIni === null
+                                            ? 'Absensi tidak dijadwalkan untuk hari ini.'
+                                            : belumBuka
+                                              ? `Hitung mundur pembukaan absensi: ${formatDurationMs(new Date(sesiHariIni.buka_at).getTime() - nowMs)}`
+                                              : dalamJendela
+                                                ? `Absensi sedang dibuka • Sisa waktu: ${formatDurationMs(new Date(sesiHariIni.tutup_at).getTime() - nowMs)}`
+                                                : sudahTutup
+                                                  ? 'Jendela waktu absensi telah berakhir.'
+                                                  : null}
                                     </p>
                                 )}
                             </div>
@@ -663,6 +666,7 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                         className="h-11 w-full sm:w-auto md:h-9"
                                         onClick={handleAmbilLokasi}
                                         disabled={
+                                            sesiHariIni === null ||
                                             geoState.status === 'loading' ||
                                             form.processing
                                         }
@@ -767,7 +771,10 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                         type="button"
                                         className="h-11 w-full sm:w-auto md:h-9"
                                         onClick={() => void handleMulaiKamera()}
-                                        disabled={form.processing}
+                                        disabled={
+                                            sesiHariIni === null ||
+                                            form.processing
+                                        }
                                     >
                                         <Camera className="size-4" />
                                         <span>Buka Kamera Selfie</span>
@@ -792,7 +799,10 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                                 onClick={() =>
                                                     void handleAmbilFotoDariVideo()
                                                 }
-                                                disabled={compressing}
+                                                disabled={
+                                                    sesiHariIni === null ||
+                                                    compressing
+                                                }
                                             >
                                                 {compressing ? (
                                                     <Spinner />
@@ -829,6 +839,7 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                                 className="h-11 md:h-9"
                                                 onClick={handleUlangFoto}
                                                 disabled={
+                                                    sesiHariIni === null ||
                                                     form.processing ||
                                                     compressing
                                                 }
@@ -863,7 +874,9 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                                 fallbackInputRef.current?.click()
                                             }
                                             disabled={
-                                                compressing || form.processing
+                                                sesiHariIni === null ||
+                                                compressing ||
+                                                form.processing
                                             }
                                         >
                                             {compressing ? (

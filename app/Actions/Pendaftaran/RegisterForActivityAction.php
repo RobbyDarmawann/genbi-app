@@ -69,7 +69,6 @@ class RegisterForActivityAction
             $activeCount = Pendaftaran::query()
                 ->where('kegiatan_id', $lockedActivity->id)
                 ->where('status', StatusPendaftaran::Terdaftar)
-                ->lockForUpdate()
                 ->count();
 
             if ($lockedActivity->kuota !== null && $activeCount >= $lockedActivity->kuota) {

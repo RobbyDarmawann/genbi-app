@@ -46,12 +46,12 @@ type Props = {
             id: number;
             peran: string;
             status: string;
-            kehadiran?: {
+            kehadiran: {
                 id: number;
                 status: string;
                 waktu_checkin: string;
                 sumber: string;
-            } | null;
+            }[];
         } | null;
         pemroses?: { name: string } | null;
     };
@@ -258,29 +258,42 @@ export default function AdminKoreksiShow({ koreksi, riwayat_poin }: Props) {
                                 </Badge>
                             </div>
                         )}
-                        {koreksi.pendaftaran?.kehadiran && (
-                            <div>
-                                <p className="text-sm text-muted-foreground">
-                                    Status Kehadiran Saat Ini
-                                </p>
-                                <div className="mt-1 flex items-center gap-2">
-                                    <Badge
-                                        variant={
-                                            koreksi.pendaftaran.kehadiran
-                                                .status === 'valid'
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {koreksi.pendaftaran.kehadiran.status}
-                                    </Badge>
-                                    <span className="text-xs text-muted-foreground">
-                                        Sumber:{' '}
-                                        {koreksi.pendaftaran.kehadiran.sumber}
-                                    </span>
+                        {koreksi.pendaftaran &&
+                            koreksi.pendaftaran.kehadiran.length > 0 && (
+                                <div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Status Kehadiran Saat Ini
+                                    </p>
+                                    <div className="mt-1 space-y-2">
+                                        {koreksi.pendaftaran.kehadiran.map(
+                                            (kehadiran) => (
+                                                <div
+                                                    key={kehadiran.id}
+                                                    className="flex flex-wrap items-center gap-2"
+                                                >
+                                                    <Badge
+                                                        variant={
+                                                            kehadiran.status ===
+                                                            'valid'
+                                                                ? 'default'
+                                                                : 'secondary'
+                                                        }
+                                                    >
+                                                        {kehadiran.status}
+                                                    </Badge>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {formatWaktuWita(
+                                                            kehadiran.waktu_checkin,
+                                                        )}{' '}
+                                                        · Sumber:{' '}
+                                                        {kehadiran.sumber}
+                                                    </span>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                         {koreksi.catatan_proses && (
                             <div>
                                 <p className="text-sm text-muted-foreground">

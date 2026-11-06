@@ -21,22 +21,25 @@ import { formatAngka, formatTanggalWita, formatWaktuWita } from '@/lib/format';
 import kehadiranRoutes from '@/routes/kehadiran';
 import mahasiswa from '@/routes/mahasiswa';
 
+type KehadiranRecord = {
+    id: number;
+    tanggal: string;
+    waktu_checkin: string;
+    status: string;
+    status_label: string;
+    jarak_m: string | null;
+    akurasi_m: string | null;
+    alasan_penolakan: string | null;
+    has_foto: boolean;
+    poin: number | null;
+};
+
 type RiwayatItem = {
     kegiatan_id: number;
     kegiatan_judul: string;
     kegiatan_tanggal: string;
     peran_label: string;
-    kehadiran: {
-        id: number;
-        waktu_checkin: string;
-        status: string;
-        status_label: string;
-        jarak_m: string | null;
-        akurasi_m: string | null;
-        alasan_penolakan: string | null;
-        has_foto: boolean;
-    } | null;
-    poin: number | null;
+    kehadiran: KehadiranRecord[];
 };
 
 type PaginationLink = {
@@ -97,10 +100,17 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
             key: 'waktu',
             header: 'Waktu Check-in',
             cell: (row) =>
-                row.kehadiran ? (
-                    <span className="text-xs tabular-nums">
-                        {formatWaktuWita(row.kehadiran.waktu_checkin)}
-                    </span>
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2 text-xs tabular-nums">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id}>
+                                <div>{formatTanggalWita(record.tanggal)}</div>
+                                <div>
+                                    {formatWaktuWita(record.waktu_checkin)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 ) : (
                     '-'
                 ),
@@ -109,17 +119,21 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
             key: 'status',
             header: 'Status & Catatan',
             cell: (row) =>
-                row.kehadiran ? (
-                    <div className="space-y-1">
-                        <StatusBadge
-                            status={attendanceSemantic(row.kehadiran.status)}
-                            label={row.kehadiran.status_label}
-                        />
-                        {row.kehadiran.alasan_penolakan && (
-                            <p className="max-w-xs text-xs text-destructive">
-                                {row.kehadiran.alasan_penolakan}
-                            </p>
-                        )}
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id} className="space-y-1">
+                                <StatusBadge
+                                    status={attendanceSemantic(record.status)}
+                                    label={record.status_label}
+                                />
+                                {record.alasan_penolakan && (
+                                    <p className="max-w-xs text-xs text-destructive">
+                                        {record.alasan_penolakan}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     '-'
@@ -130,15 +144,22 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
             header: 'Jarak / Akurasi',
             align: 'right',
             cell: (row) =>
-                row.kehadiran?.jarak_m !== null &&
-                row.kehadiran?.jarak_m !== undefined ? (
-                    <div className="text-xs tabular-nums">
-                        <div>{row.kehadiran.jarak_m} m</div>
-                        {row.kehadiran.akurasi_m && (
-                            <div className="text-muted-foreground">
-                                ±{row.kehadiran.akurasi_m} m
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2 text-xs tabular-nums">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id}>
+                                <div>
+                                    {record.jarak_m !== null
+                                        ? `${record.jarak_m} m`
+                                        : '-'}
+                                </div>
+                                {record.akurasi_m && (
+                                    <div className="text-muted-foreground">
+                                        ±{record.akurasi_m} m
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        ))}
                     </div>
                 ) : (
                     '-'
@@ -149,12 +170,24 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
             header: 'Poin Diterima',
             align: 'right',
             cell: (row) =>
-                row.poin !== null ? (
-                    <span className="font-semibold text-success tabular-nums">
-                        +{formatAngka(row.poin)}
-                    </span>
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2">
+                        {row.kehadiran.map((record) => (
+                            <div key={record.id}>
+                                {record.poin !== null ? (
+                                    <span className="font-semibold text-success tabular-nums">
+                                        +{formatAngka(record.poin)}
+                                    </span>
+                                ) : (
+                                    <span className="text-xs text-muted-foreground">
+                                        0
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 ) : (
-                    <span className="text-xs text-muted-foreground">0</span>
+                    '-'
                 ),
         },
         {
@@ -162,25 +195,37 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
             header: 'Bukti Foto',
             align: 'right',
             cell: (row) =>
-                row.kehadiran?.has_foto ? (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                            setSelectedFoto({
-                                id: row.kehadiran!.id,
-                                judul: row.kegiatan_judul,
-                            })
-                        }
-                    >
-                        <Camera className="size-4" />
-                        Lihat Foto
-                    </Button>
+                row.kehadiran.length > 0 ? (
+                    <div className="space-y-2">
+                        {row.kehadiran.map((record) =>
+                            record.has_foto ? (
+                                <Button
+                                    key={record.id}
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setSelectedFoto({
+                                            id: record.id,
+                                            judul: row.kegiatan_judul,
+                                        })
+                                    }
+                                >
+                                    <Camera className="size-4" />
+                                    Lihat Foto
+                                </Button>
+                            ) : (
+                                <span
+                                    key={record.id}
+                                    className="block text-xs text-muted-foreground"
+                                >
+                                    Tidak ada
+                                </span>
+                            ),
+                        )}
+                    </div>
                 ) : (
-                    <span className="text-xs text-muted-foreground">
-                        Tidak ada
-                    </span>
+                    '-'
                 ),
         },
     ];
@@ -210,7 +255,7 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
                     caption="Daftar riwayat kehadiran mahasiswa"
                     columns={columns}
                     data={kehadiran.data}
-                    keyExtractor={(row) => row.kehadiran?.id ?? row.kegiatan_id}
+                    keyExtractor={(row) => row.kegiatan_id}
                     emptyState={
                         <Card>
                             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -234,13 +279,10 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
                     renderMobileCard={(row) => (
                         <div className="space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                {row.kehadiran && (
-                                    <StatusBadge
-                                        status={attendanceSemantic(
-                                            row.kehadiran.status,
-                                        )}
-                                        label={row.kehadiran.status_label}
-                                    />
+                                {row.kehadiran.length > 0 && (
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        {row.kehadiran.length} rekaman kehadiran
+                                    </span>
                                 )}
                                 <Badge variant="outline">
                                     {row.peran_label}
@@ -255,58 +297,83 @@ export default function RiwayatKehadiranIndex({ kehadiran }: Props) {
                                 >
                                     {row.kegiatan_judul}
                                 </Link>
-                                {row.kehadiran && (
-                                    <p className="mt-1 text-xs text-muted-foreground tabular-nums">
-                                        Check-in:{' '}
-                                        {formatWaktuWita(
-                                            row.kehadiran.waktu_checkin,
+                            </div>
+                            <div className="space-y-2">
+                                {row.kehadiran.map((record) => (
+                                    <div
+                                        key={record.id}
+                                        className="space-y-2 rounded-md bg-muted/50 p-2.5 text-xs"
+                                    >
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <StatusBadge
+                                                status={attendanceSemantic(
+                                                    record.status,
+                                                )}
+                                                label={record.status_label}
+                                            />
+                                            <span className="tabular-nums">
+                                                {formatTanggalWita(
+                                                    record.tanggal,
+                                                )}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <span className="text-muted-foreground">
+                                                    Check-in
+                                                </span>
+                                                <p className="font-medium tabular-nums">
+                                                    {formatWaktuWita(
+                                                        record.waktu_checkin,
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <span className="text-muted-foreground">
+                                                    Jarak / Akurasi
+                                                </span>
+                                                <p className="font-medium tabular-nums">
+                                                    {record.jarak_m ?? '-'} m
+                                                    {record.akurasi_m &&
+                                                        ` / ±${record.akurasi_m} m`}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <span className="text-muted-foreground">
+                                                    Poin Diterima
+                                                </span>
+                                                <p className="font-semibold text-success tabular-nums">
+                                                    {record.poin !== null
+                                                        ? `+${formatAngka(record.poin)} poin`
+                                                        : '0 poin'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {record.alasan_penolakan && (
+                                            <p className="text-destructive">
+                                                Catatan:{' '}
+                                                {record.alasan_penolakan}
+                                            </p>
                                         )}
-                                    </p>
-                                )}
+                                        {record.has_foto && (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="h-11 w-full"
+                                                onClick={() =>
+                                                    setSelectedFoto({
+                                                        id: record.id,
+                                                        judul: row.kegiatan_judul,
+                                                    })
+                                                }
+                                            >
+                                                <Camera className="size-4" />
+                                                Lihat Bukti Foto Saya
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                            <div className="grid grid-cols-2 gap-2 rounded-md bg-muted/50 p-2.5 text-xs">
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Jarak Lokasi
-                                    </span>
-                                    <p className="font-medium tabular-nums">
-                                        {row.kehadiran?.jarak_m
-                                            ? `${row.kehadiran.jarak_m} m`
-                                            : '-'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <span className="text-muted-foreground">
-                                        Poin Diterima
-                                    </span>
-                                    <p className="font-semibold text-success tabular-nums">
-                                        {row.poin !== null
-                                            ? `+${formatAngka(row.poin)} poin`
-                                            : '0 poin'}
-                                    </p>
-                                </div>
-                            </div>
-                            {row.kehadiran?.alasan_penolakan && (
-                                <p className="text-xs text-destructive">
-                                    Catatan: {row.kehadiran.alasan_penolakan}
-                                </p>
-                            )}
-                            {row.kehadiran?.has_foto && (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="h-11 w-full"
-                                    onClick={() =>
-                                        setSelectedFoto({
-                                            id: row.kehadiran!.id,
-                                            judul: row.kegiatan_judul,
-                                        })
-                                    }
-                                >
-                                    <Camera className="size-4" />
-                                    Lihat Bukti Foto Saya
-                                </Button>
-                            )}
                         </div>
                     )}
                 />
