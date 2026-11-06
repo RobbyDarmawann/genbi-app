@@ -31,19 +31,20 @@ class RiwayatController extends Controller
                 'kegiatan_judul' => $p->kegiatan->judul,
                 'kegiatan_tanggal' => $p->kegiatan->tanggal->toDateString(),
                 'peran_label' => $p->peran->label(),
-                'kehadiran' => $p->kehadiran ? [
-                    'id' => $p->kehadiran->id,
-                    'waktu_checkin' => $p->kehadiran->waktu_checkin->toIso8601String(),
-                    'status' => $p->kehadiran->status->value,
-                    'status_label' => $p->kehadiran->status->label(),
-                    'jarak_m' => $p->kehadiran->jarak_m,
-                    'akurasi_m' => $p->kehadiran->akurasi_m,
-                    'alasan_penolakan' => $p->kehadiran->alasan_penolakan,
-                    'has_foto' => $p->kehadiran->foto_path !== null,
-                ] : null,
-                'poin' => $p->kehadiran && $p->kehadiran->status->value === 'valid'
-                    ? (int) ($p->kehadiran->poinTransaksi->jumlah ?? 0)
-                    : null,
+                'kehadiran' => $p->kehadiran->map(fn ($kehadiran): array => [
+                    'id' => $kehadiran->id,
+                    'tanggal' => $kehadiran->tanggal->toDateString(),
+                    'waktu_checkin' => $kehadiran->waktu_checkin->toIso8601String(),
+                    'status' => $kehadiran->status->value,
+                    'status_label' => $kehadiran->status->label(),
+                    'jarak_m' => $kehadiran->jarak_m,
+                    'akurasi_m' => $kehadiran->akurasi_m,
+                    'alasan_penolakan' => $kehadiran->alasan_penolakan,
+                    'has_foto' => $kehadiran->foto_path !== null,
+                    'poin' => $kehadiran->status->value === 'valid'
+                        ? (int) ($kehadiran->poinTransaksi->jumlah ?? 0)
+                        : null,
+                ])->values()->all(),
             ]);
 
         return Inertia::render('mahasiswa/kehadiran/index', [

@@ -17,7 +17,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 import admin from '@/routes/admin';
 
 type Activity = {
@@ -25,6 +25,7 @@ type Activity = {
     judul: string;
     deskripsi: string | null;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     jam_selesai: string;
     lokasi_nama: string;
@@ -139,12 +140,10 @@ export default function Show({ kegiatan, map }: Props) {
                             <Item
                                 icon={Calendar}
                                 label="Tanggal"
-                                value={formatTanggalWita(kegiatan.tanggal, {
-                                    weekday: 'long',
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                })}
+                                value={formatRentangTanggalWita(
+                                    kegiatan.tanggal,
+                                    kegiatan.tanggal_selesai,
+                                )}
                             />
                             <Item
                                 icon={Clock}

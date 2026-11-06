@@ -28,10 +28,10 @@ type Activity = {
     longitude: string;
     radius_m: number;
     tanggal: string;
+    tanggal_selesai: string | null;
     jam_mulai: string;
     jam_selesai: string;
-    absensi_buka_at: string;
-    absensi_tutup_at: string;
+    sesi_absensi: { tanggal: string; jam_buka: string; jam_tutup: string }[];
     pendaftaran_dibuka_at: string | null;
     batas_daftar_at: string | null;
     kuota: number | null;
@@ -39,6 +39,38 @@ type Activity = {
     divisi_ids: number[];
     bobot: Record<string, number>;
 };
+
+type AttendanceSession = {
+    tanggal: string;
+    jam_buka: string;
+    jam_tutup: string;
+};
+
+function dateRange(start: string, end: string): string[] {
+    if (!start) {
+        return [];
+    }
+
+    const dates: string[] = [];
+    const current = new Date(`${start}T12:00:00`);
+    const last = new Date(`${end || start}T12:00:00`);
+
+    while (current <= last) {
+        dates.push(current.toISOString().slice(0, 10));
+        current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+}
+
+function sessionLabel(date: string): string {
+    return new Intl.DateTimeFormat('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    }).format(new Date(`${date}T12:00:00`));
+}
 type Props = {
     record?: Activity;
     komsatOptions: Option[];
@@ -66,10 +98,55 @@ export function KegiatanForm({
         record?.longitude ? parseFloat(String(record.longitude)) : 123.0567972,
     );
     const [radius, setRadius] = useState<number>(record?.radius_m ?? 100);
+    const [tanggal, setTanggal] = useState(record?.tanggal ?? '');
+    const [tanggalSelesai, setTanggalSelesai] = useState(
+        record?.tanggal_selesai ?? '',
+    );
+    const [sessions, setSessions] = useState<AttendanceSession[]>(() => {
+        const saved = new Map(
+            (record?.sesi_absensi ?? []).map((session) => [
+                session.tanggal,
+                session,
+            ]),
+        );
+        return dateRange(
+            record?.tanggal ?? '',
+            record?.tanggal_selesai ?? '',
+        ).map(
+            (date) =>
+                saved.get(date) ?? {
+                    tanggal: date,
+                    jam_buka: '07:30',
+                    jam_tutup: '12:30',
+                },
+        );
+    });
     const locationLocked = Boolean(record && peringatanKehadiran);
     const endpoint = record
         ? AdminKegiatanController.update.form(record.id)
         : AdminKegiatanController.store.form();
+    const updateSession = (
+        index: number,
+        changes: Partial<AttendanceSession>,
+    ) => {
+        setSessions((current) =>
+            current.map((session, sessionIndex) =>
+                sessionIndex === index ? { ...session, ...changes } : session,
+            ),
+        );
+    };
+    const setAllSessionTimes = (
+        jamBuka: string | undefined,
+        jamTutup: string | undefined,
+    ) => {
+        setSessions((current) =>
+            current.map((session) => ({
+                ...session,
+                ...(jamBuka === undefined ? {} : { jam_buka: jamBuka }),
+                ...(jamTutup === undefined ? {} : { jam_tutup: jamTutup }),
+            })),
+        );
+    };
     return (
         <Form
             {...endpoint}
@@ -160,8 +237,55 @@ export function KegiatanForm({
                                 name="tanggal"
                                 type="date"
                                 error={errors.tanggal}
-                                defaultValue={record?.tanggal}
+                                value={tanggal}
+                                onChange={(event) => {
+                                    const next = event.target.value;
+                                    setTanggal(next);
+                                    const saved = new Map(
+                                        sessions.map((session) => [
+                                            session.tanggal,
+                                            session,
+                                        ]),
+                                    );
+                                    setSessions(
+                                        dateRange(next, tanggalSelesai).map(
+                                            (date) =>
+                                                saved.get(date) ?? {
+                                                    tanggal: date,
+                                                    jam_buka: '07:30',
+                                                    jam_tutup: '12:30',
+                                                },
+                                        ),
+                                    );
+                                }}
                                 required
+                            />
+                            <Field
+                                label="Tanggal selesai"
+                                name="tanggal_selesai"
+                                type="date"
+                                error={errors.tanggal_selesai}
+                                value={tanggalSelesai}
+                                onChange={(event) => {
+                                    const next = event.target.value;
+                                    setTanggalSelesai(next);
+                                    const saved = new Map(
+                                        sessions.map((session) => [
+                                            session.tanggal,
+                                            session,
+                                        ]),
+                                    );
+                                    setSessions(
+                                        dateRange(tanggal, next).map(
+                                            (date) =>
+                                                saved.get(date) ?? {
+                                                    tanggal: date,
+                                                    jam_buka: '07:30',
+                                                    jam_tutup: '12:30',
+                                                },
+                                        ),
+                                    );
+                                }}
                             />
                             <Field
                                 label="Jam mulai"
@@ -259,22 +383,6 @@ export function KegiatanForm({
                                 required
                             />
                             <Field
-                                label="Absensi dibuka"
-                                name="absensi_buka_at"
-                                type="datetime-local"
-                                error={errors.absensi_buka_at}
-                                defaultValue={record?.absensi_buka_at}
-                                required
-                            />
-                            <Field
-                                label="Absensi ditutup"
-                                name="absensi_tutup_at"
-                                type="datetime-local"
-                                error={errors.absensi_tutup_at}
-                                defaultValue={record?.absensi_tutup_at}
-                                required
-                            />
-                            <Field
                                 label="Kuota (opsional)"
                                 name="kuota"
                                 type="number"
@@ -295,6 +403,104 @@ export function KegiatanForm({
                                 error={errors.batas_daftar_at}
                                 defaultValue={record?.batas_daftar_at}
                             />
+                        </div>
+                        <div className="grid gap-3 rounded-md border p-4">
+                            <div className="flex flex-wrap items-end justify-between gap-3">
+                                <div>
+                                    <h3 className="font-medium">
+                                        Jadwal absensi per hari
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Kosongkan tanggal selesai bila kegiatan
+                                        hanya satu hari.
+                                    </p>
+                                </div>
+                                <div className="flex items-end gap-2">
+                                    <div className="grid gap-1">
+                                        <Label htmlFor="jam_semua_buka">
+                                            Jam untuk semua hari
+                                        </Label>
+                                        <Input
+                                            id="jam_semua_buka"
+                                            type="time"
+                                            className="h-11 w-32 md:h-9"
+                                            onChange={(event) =>
+                                                setAllSessionTimes(
+                                                    event.target.value,
+                                                    undefined,
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                    <div className="grid gap-1">
+                                        <Label htmlFor="jam_semua_tutup">
+                                            Jam tutup
+                                        </Label>
+                                        <Input
+                                            id="jam_semua_tutup"
+                                            type="time"
+                                            className="h-11 w-32 md:h-9"
+                                            onChange={(event) =>
+                                                setAllSessionTimes(
+                                                    undefined,
+                                                    event.target.value,
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {sessions.map((session, index) => (
+                                <div
+                                    key={session.tanggal}
+                                    className="grid gap-3 rounded-md bg-muted/40 p-3 md:grid-cols-[minmax(0,1fr)_10rem_10rem]"
+                                >
+                                    <div className="flex items-center text-sm font-medium">
+                                        {sessionLabel(session.tanggal)}
+                                        <input
+                                            type="hidden"
+                                            name={`sesi_absensi[${index}][tanggal]`}
+                                            value={session.tanggal}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <Field
+                                        label="Jam buka"
+                                        name={`sesi_absensi[${index}][jam_buka]`}
+                                        type="time"
+                                        value={session.jam_buka}
+                                        error={
+                                            errors[
+                                                `sesi_absensi.${index}.jam_buka`
+                                            ]
+                                        }
+                                        onChange={(event) =>
+                                            updateSession(index, {
+                                                jam_buka: event.target.value,
+                                            })
+                                        }
+                                        required
+                                    />
+                                    <Field
+                                        label="Jam tutup"
+                                        name={`sesi_absensi[${index}][jam_tutup]`}
+                                        type="time"
+                                        value={session.jam_tutup}
+                                        error={
+                                            errors[
+                                                `sesi_absensi.${index}.jam_tutup`
+                                            ]
+                                        }
+                                        onChange={(event) =>
+                                            updateSession(index, {
+                                                jam_tutup: event.target.value,
+                                            })
+                                        }
+                                        required
+                                    />
+                                </div>
+                            ))}
+                            <InputError message={errors.sesi_absensi} />
                         </div>
                     </section>
                     <section className="grid gap-4 rounded-lg border p-4 sm:p-6">

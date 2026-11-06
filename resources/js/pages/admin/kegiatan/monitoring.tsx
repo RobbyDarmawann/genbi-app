@@ -76,6 +76,7 @@ type Props = {
         status: string;
         status_label: string;
         tanggal: string;
+        tanggal_selesai: string;
         jam_selesai: string;
         kuota: number | null;
         dapat_ditandai_selesai: boolean;

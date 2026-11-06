@@ -193,7 +193,7 @@ describe('Layanan Poin & Ledger Scope', function () {
             ->assertInertia(fn (Assert $page) => $page
                 ->component('mahasiswa/kehadiran/index')
                 ->has('kehadiran.data', 1)
-                ->where('kehadiran.data.0.kehadiran.jarak_m', '12.50')
+                ->where('kehadiran.data.0.kehadiran.0.jarak_m', '12.50')
             );
 
         // Dashboard mahasiswa menampilkan peringkat dan KPI

@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 export const review = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -16,7 +16,7 @@ review.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 review.url = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -46,7 +46,7 @@ review.url = (args: { kegiatan: number | { id: number }, kehadiran: number | { i
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 review.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -56,7 +56,7 @@ review.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { 
 
     /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
     const reviewForm = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -66,7 +66,7 @@ review.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { 
 
             /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::review
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
         reviewForm.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

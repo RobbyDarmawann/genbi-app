@@ -17,13 +17,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CountUpNumber } from '@/components/ui/count-up-number';
 import { RevealSection } from '@/components/ui/reveal-section';
 import PublicLayout from '@/layouts/public-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 import { jadwal, kepengurusan, statistik } from '@/routes/public';
 
 type KegiatanItem = {
     id: number;
     judul: string;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     jam_selesai: string;
     lokasi_nama: string;
@@ -274,13 +275,9 @@ export default function Welcome({
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="size-4 shrink-0 text-primary/70" />
                                                 <span>
-                                                    {formatTanggalWita(
+                                                    {formatRentangTanggalWita(
                                                         item.tanggal,
-                                                        {
-                                                            day: 'numeric',
-                                                            month: 'short',
-                                                            year: 'numeric',
-                                                        },
+                                                        item.tanggal_selesai,
                                                     )}{' '}
                                                     · {item.jam_mulai} WITA
                                                 </span>

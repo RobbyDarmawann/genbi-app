@@ -103,7 +103,7 @@ form.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     form.form = formForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 export const submit = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -118,7 +118,7 @@ submit.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 submit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -151,7 +151,7 @@ submit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 submit.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -161,7 +161,7 @@ submit.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
     const submitForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -171,7 +171,7 @@ submit.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::submit
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
         submitForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

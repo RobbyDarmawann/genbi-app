@@ -39,18 +39,32 @@ class AbsensiController extends Controller
             'Halaman absensi hanya dapat dibuka untuk pendaftaran aktif Anda.'
         );
 
-        $kegiatan->load(['komsat:id,kode,nama', 'bobot']);
+        $kegiatan->load(['komsat:id,kode,nama', 'bobot', 'sesiAbsensi']);
         $matchedBobot = $kegiatan->bobot->firstWhere('peran', $pendaftaran->peran);
         $bobotPoin = $matchedBobot !== null ? (int) $matchedBobot->poin : 0;
 
-        $existingKehadiran = $pendaftaran->kehadiran;
+        $today = now(config('app.timezone'))->toDateString();
+        $sesiHariIni = $kegiatan->sesiAbsensi->firstWhere('tanggal', $today);
+
+        $existingKehadiran = $pendaftaran->kehadiran
+            ->first(fn ($k) => $k->tanggal->toDateString() === $today);
         $existingPoin = $existingKehadiran?->poinTransaksi;
+
+        $sesiHariIniData = $sesiHariIni === null ? null : [
+            'id' => $sesiHariIni->id,
+            'tanggal' => $sesiHariIni->tanggal->toDateString(),
+            'jam_buka' => substr($sesiHariIni->jam_buka, 0, 5),
+            'jam_tutup' => substr($sesiHariIni->jam_tutup, 0, 5),
+            'buka_at' => $sesiHariIni->bukaAt()->toIso8601String(),
+            'tutup_at' => $sesiHariIni->tutupAt()->toIso8601String(),
+        ];
 
         return Inertia::render('mahasiswa/kehadiran/checkin', [
             'kegiatan' => [
                 'id' => $kegiatan->id,
                 'judul' => $kegiatan->judul,
                 'tanggal' => $kegiatan->tanggal->toDateString(),
+                'tanggal_selesai' => $kegiatan->tanggal_selesai?->toDateString(),
                 'jam_mulai' => substr($kegiatan->jam_mulai, 0, 5),
                 'jam_selesai' => substr($kegiatan->jam_selesai, 0, 5),
                 'lokasi_nama' => $kegiatan->lokasi_nama,
@@ -60,6 +74,7 @@ class AbsensiController extends Controller
                 'status_label' => $kegiatan->statusEfektifLabel(),
                 'radius_m' => $kegiatan->radius_m,
                 'bobot_poin' => $bobotPoin,
+                'sesi_hari_ini' => $sesiHariIniData,
             ],
             'pendaftaran' => [
                 'id' => $pendaftaran->id,

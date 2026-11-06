@@ -22,6 +22,7 @@ use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
 use App\Models\Periode;
 use App\Models\PoinTransaksi;
+use App\Models\SesiAbsensi;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -48,8 +49,42 @@ class DemoSeeder extends Seeder
             $mahasiswaList = $this->seedMahasiswaDemo();
             $this->seedKepengurusanDemo($mahasiswaList);
             $this->seedKegiatanDemo($mahasiswaList);
+            $this->syncAttendanceSessions();
 
             $this->command?->info('✓ DemoSeeder selesai: periode demo, divisi, 15 mahasiswa, kepengurusan, dan 8 kegiatan dengan pendaftaran/kehadiran/poin.');
+        });
+    }
+
+    private function syncAttendanceSessions(): void
+    {
+        Kegiatan::query()->get()->each(function (Kegiatan $kegiatan): void {
+            $start = $kegiatan->tanggal->copy();
+            $end = $kegiatan->tanggalSelesaiEfektif();
+            $open = $kegiatan->absensi_buka_at->format('H:i:s');
+            $close = $kegiatan->absensi_tutup_at->format('H:i:s');
+
+            for ($date = $start->copy(); $date->lte($end); $date = $date->addDay()) {
+                $sesi = SesiAbsensi::query()
+                    ->where('kegiatan_id', $kegiatan->id)
+                    ->whereDate('tanggal', $date->toDateString())
+                    ->first();
+
+                if ($sesi === null) {
+                    SesiAbsensi::query()->create([
+                        'kegiatan_id' => $kegiatan->id,
+                        'tanggal' => $date->toDateString(),
+                        'jam_buka' => $open,
+                        'jam_tutup' => $close,
+                    ]);
+
+                    continue;
+                }
+
+                $sesi->update([
+                    'jam_buka' => $open,
+                    'jam_tutup' => $close,
+                ]);
+            }
         });
     }
 
@@ -587,6 +622,7 @@ class DemoSeeder extends Seeder
         $kehadiran = Kehadiran::updateOrCreate(
             ['pendaftaran_id' => $pendaftaran->id],
             [
+                'tanggal' => $kegiatan->tanggal,
                 'waktu_checkin' => $kegiatan->absensi_buka_at->copy()->addMinutes(15),
                 'latitude' => $kegiatan->latitude,
                 'longitude' => $kegiatan->longitude,
@@ -631,6 +667,7 @@ class DemoSeeder extends Seeder
         $kehadiran = Kehadiran::updateOrCreate(
             ['pendaftaran_id' => $pendaftaran->id],
             [
+                'tanggal' => $kegiatan->tanggal,
                 'waktu_checkin' => $kegiatan->absensi_buka_at->copy()->addMinutes(30),
                 'latitude' => null,
                 'longitude' => null,

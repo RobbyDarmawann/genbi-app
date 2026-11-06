@@ -4,7 +4,9 @@ namespace Database\Factories;
 
 use App\Enums\StatusKegiatan;
 use App\Models\Kegiatan;
+use App\Models\SesiAbsensi;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -39,5 +41,17 @@ class KegiatanFactory extends Factory
             'status' => StatusKegiatan::Terbit,
             'dibuat_oleh' => User::factory(),
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Kegiatan $kegiatan) {
+            SesiAbsensi::query()->create([
+                'kegiatan_id' => $kegiatan->id,
+                'tanggal' => $kegiatan->tanggal->toDateString(),
+                'jam_buka' => Carbon::parse($kegiatan->absensi_buka_at)->format('H:i:s'),
+                'jam_tutup' => Carbon::parse($kegiatan->absensi_tutup_at)->format('H:i:s'),
+            ]);
+        });
     }
 }

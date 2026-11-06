@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property string $longitude
  * @property int $radius_m
  * @property Carbon $tanggal
+ * @property Carbon|null $tanggal_selesai
  * @property string $jam_mulai
  * @property string $jam_selesai
  * @property Carbon $absensi_buka_at
@@ -47,6 +48,7 @@ use Illuminate\Support\Carbon;
     'longitude',
     'radius_m',
     'tanggal',
+    'tanggal_selesai',
     'jam_mulai',
     'jam_selesai',
     'absensi_buka_at',
@@ -74,6 +76,7 @@ class Kegiatan extends Model
             'longitude' => 'decimal:7',
             'radius_m' => 'integer',
             'tanggal' => 'date',
+            'tanggal_selesai' => 'date',
             'absensi_buka_at' => 'datetime',
             'absensi_tutup_at' => 'datetime',
             'pendaftaran_dibuka_at' => 'datetime',
@@ -121,6 +124,14 @@ class Kegiatan extends Model
     public function pendaftaran(): HasMany
     {
         return $this->hasMany(Pendaftaran::class);
+    }
+
+    /**
+     * @return HasMany<SesiAbsensi, $this>
+     */
+    public function sesiAbsensi(): HasMany
+    {
+        return $this->hasMany(SesiAbsensi::class)->orderBy('tanggal');
     }
 
     /**
@@ -185,6 +196,16 @@ class Kegiatan extends Model
     }
 
     /**
+     * Tanggal selesai efektif (tanggal_selesai ?? tanggal).
+     */
+    public function tanggalSelesaiEfektif(): Carbon
+    {
+        $date = $this->tanggal_selesai ?? $this->tanggal;
+
+        return Carbon::parse($date->toDateString(), config('app.timezone'));
+    }
+
+    /**
      * Scope urutan jadwal kronologis: kegiatan berlangsung/mendatang (tanggal ASC, jam_mulai ASC)
      * ditampilkan lebih dulu, disusul kegiatan selesai/terkunci (tanggal DESC, jam_selesai DESC).
      *
@@ -198,27 +219,27 @@ class Kegiatan extends Model
         $jam = $now->format('H:i:s');
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN 0 ELSE 1 END ASC",
+            "CASE WHEN (status != 'terkunci' AND (COALESCE(tanggal_selesai, tanggal) > ? OR (COALESCE(tanggal_selesai, tanggal) = ? AND jam_selesai >= ?))) THEN 0 ELSE 1 END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN tanggal END ASC",
+            "CASE WHEN (status != 'terkunci' AND (COALESCE(tanggal_selesai, tanggal) > ? OR (COALESCE(tanggal_selesai, tanggal) = ? AND jam_selesai >= ?))) THEN tanggal END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN jam_mulai END ASC",
+            "CASE WHEN (status != 'terkunci' AND (COALESCE(tanggal_selesai, tanggal) > ? OR (COALESCE(tanggal_selesai, tanggal) = ? AND jam_selesai >= ?))) THEN jam_mulai END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN NOT (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN tanggal END DESC",
+            "CASE WHEN NOT (status != 'terkunci' AND (COALESCE(tanggal_selesai, tanggal) > ? OR (COALESCE(tanggal_selesai, tanggal) = ? AND jam_selesai >= ?))) THEN COALESCE(tanggal_selesai, tanggal) END DESC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN NOT (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN jam_selesai END DESC",
+            "CASE WHEN NOT (status != 'terkunci' AND (COALESCE(tanggal_selesai, tanggal) > ? OR (COALESCE(tanggal_selesai, tanggal) = ? AND jam_selesai >= ?))) THEN jam_selesai END DESC",
             [$tanggal, $tanggal, $jam]
         );
 
@@ -248,15 +269,15 @@ class Kegiatan extends Model
                 ->whereDate('tanggal', '>', $tanggal)
                 ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_mulai', '>', $jam))),
             StatusKegiatan::Selesai => $query->where(fn (Builder $q) => $q
-                ->whereDate('tanggal', '<', $tanggal)
-                ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_selesai', '<', $jam))),
+                ->whereRaw('COALESCE(tanggal_selesai, tanggal) < ?', [$tanggal])
+                ->orWhere(fn (Builder $w) => $w->whereRaw('COALESCE(tanggal_selesai, tanggal) = ?', [$tanggal])->where('jam_selesai', '<', $jam))),
             default => $query
                 ->where(fn (Builder $q) => $q
                     ->whereDate('tanggal', '<', $tanggal)
                     ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_mulai', '<=', $jam)))
                 ->where(fn (Builder $q) => $q
-                    ->whereDate('tanggal', '>', $tanggal)
-                    ->orWhere(fn (Builder $w) => $w->whereDate('tanggal', $tanggal)->where('jam_selesai', '>=', $jam))),
+                    ->whereRaw('COALESCE(tanggal_selesai, tanggal) > ?', [$tanggal])
+                    ->orWhere(fn (Builder $w) => $w->whereRaw('COALESCE(tanggal_selesai, tanggal) = ?', [$tanggal])->where('jam_selesai', '>=', $jam))),
         };
     }
 
@@ -273,7 +294,7 @@ class Kegiatan extends Model
 
         $now = Carbon::now(config('app.timezone'));
         $mulai = Carbon::parse($this->tanggal->toDateString().' '.$this->jam_mulai, config('app.timezone'));
-        $selesai = Carbon::parse($this->tanggal->toDateString().' '.$this->jam_selesai, config('app.timezone'));
+        $selesai = Carbon::parse($this->tanggalSelesaiEfektif()->toDateString().' '.$this->jam_selesai, config('app.timezone'));
 
         if ($now->lt($mulai)) {
             return StatusKegiatan::Terbit;

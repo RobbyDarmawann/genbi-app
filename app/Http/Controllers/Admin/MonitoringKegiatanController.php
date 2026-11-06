@@ -95,17 +95,18 @@ class MonitoringKegiatanController extends Controller
                 'komsat_kode' => $p->mahasiswa->komsat->kode,
                 'divisi_nama' => $p->mahasiswa->divisi->nama,
                 'peran_label' => $p->peran->label(),
-                'kehadiran' => $p->kehadiran ? [
-                    'id' => $p->kehadiran->id,
-                    'status' => $p->kehadiran->status->value,
-                    'status_label' => $p->kehadiran->status->label(),
-                    'waktu_checkin' => $p->kehadiran->waktu_checkin->toIso8601String(),
-                    'jarak_m' => $p->kehadiran->jarak_m,
-                    'akurasi_m' => $p->kehadiran->akurasi_m,
-                    'alasan_penolakan' => $p->kehadiran->alasan_penolakan,
-                    'has_foto' => $p->kehadiran->foto_path !== null,
-                    'poin_terkredit' => $p->kehadiran->poinTransaksi->jumlah ?? null,
-                ] : null,
+                'kehadiran' => $p->kehadiran->map(fn ($item): array => [
+                    'id' => $item->id,
+                    'tanggal' => $item->tanggal->toDateString(),
+                    'status' => $item->status->value,
+                    'status_label' => $item->status->label(),
+                    'waktu_checkin' => $item->waktu_checkin->toIso8601String(),
+                    'jarak_m' => $item->jarak_m,
+                    'akurasi_m' => $item->akurasi_m,
+                    'alasan_penolakan' => $item->alasan_penolakan,
+                    'has_foto' => $item->foto_path !== null,
+                    'poin_terkredit' => $item->poinTransaksi->jumlah ?? null,
+                ])->values()->all(),
             ]);
 
         // Daftar detail item penghambat kunci
@@ -145,6 +146,7 @@ class MonitoringKegiatanController extends Controller
                 'status' => $statusEfektif->value,
                 'status_label' => $statusEfektif->label(),
                 'tanggal' => $kegiatan->tanggal->toDateString(),
+                'tanggal_selesai' => $kegiatan->tanggalSelesaiEfektif()->toDateString(),
                 'jam_selesai' => $kegiatan->jam_selesai,
                 'kuota' => $kegiatan->kuota,
                 'dapat_dikunci' => $dapatDikunci,

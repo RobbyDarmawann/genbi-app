@@ -247,7 +247,7 @@ test('IM dapat menyetujui koreksi dan memberikan poin', function () {
     $koreksi->refresh();
     expect($koreksi->status)->toBe(StatusKoreksi::Disetujui);
 
-    $kehadiran = $this->pendaftaran->kehadiran;
+    $kehadiran = $this->pendaftaran->kehadiran()->first();
     expect($kehadiran)->not->toBeNull()
         ->and($kehadiran->status)->toBe(StatusKehadiran::Valid);
 

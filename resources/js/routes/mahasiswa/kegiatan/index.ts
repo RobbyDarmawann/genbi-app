@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
     const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
         indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::index
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:29
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:30
  * @route '/kegiatan'
  */
         indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
 export const show = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
 show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -127,7 +127,7 @@ show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
 show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -136,7 +136,7 @@ show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 })
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
 show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -146,7 +146,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
     const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -156,7 +156,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
         showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -165,7 +165,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
         })
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::show
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:127
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:167
  * @route '/kegiatan/{kegiatan}'
  */
         showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -181,7 +181,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     show.form = showForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:276
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
  * @route '/kegiatan/{kegiatan}/daftar'
  */
 export const daftar = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -196,7 +196,7 @@ daftar.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:276
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
  * @route '/kegiatan/{kegiatan}/daftar'
  */
 daftar.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -229,7 +229,7 @@ daftar.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:276
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
  * @route '/kegiatan/{kegiatan}/daftar'
  */
 daftar.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -239,7 +239,7 @@ daftar.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:276
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
  * @route '/kegiatan/{kegiatan}/daftar'
  */
     const daftarForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -249,7 +249,7 @@ daftar.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::daftar
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:276
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:339
  * @route '/kegiatan/{kegiatan}/daftar'
  */
         daftarForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -260,7 +260,7 @@ daftar.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
     daftar.form = daftarForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:289
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
  * @route '/kegiatan/{kegiatan}/batal'
  */
 export const batal = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -275,7 +275,7 @@ batal.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:289
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
  * @route '/kegiatan/{kegiatan}/batal'
  */
 batal.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -308,7 +308,7 @@ batal.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:289
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
  * @route '/kegiatan/{kegiatan}/batal'
  */
 batal.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -318,7 +318,7 @@ batal.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:289
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
  * @route '/kegiatan/{kegiatan}/batal'
  */
     const batalForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -333,7 +333,7 @@ batal.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\KegiatanController::batal
- * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:289
+ * @see app/Http/Controllers/Mahasiswa/KegiatanController.php:352
  * @route '/kegiatan/{kegiatan}/batal'
  */
         batalForm.delete = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

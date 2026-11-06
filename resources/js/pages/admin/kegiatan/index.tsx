@@ -24,6 +24,7 @@ type Activity = {
     id: number;
     judul: string;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     lokasi_nama: string;
     status: string;

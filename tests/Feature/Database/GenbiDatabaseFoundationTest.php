@@ -130,6 +130,7 @@ test('kehadiran memiliki kunci idempotensi unik per pendaftaran', function () {
 
     Kehadiran::create([
         'pendaftaran_id' => $pendaftaran->id,
+        'tanggal' => $pendaftaran->kegiatan->tanggal,
         'waktu_checkin' => now(),
         'status' => StatusKehadiran::Valid,
     ]);
@@ -137,6 +138,7 @@ test('kehadiran memiliki kunci idempotensi unik per pendaftaran', function () {
     expect(function () use ($pendaftaran) {
         Kehadiran::create([
             'pendaftaran_id' => $pendaftaran->id,
+            'tanggal' => $pendaftaran->kegiatan->tanggal,
             'waktu_checkin' => now(),
             'status' => StatusKehadiran::Valid,
         ]);

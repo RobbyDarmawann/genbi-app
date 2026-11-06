@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PublicLayout from '@/layouts/public-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 import { jadwal } from '@/routes/public';
 type Props = {
     kegiatan: {
@@ -13,6 +13,7 @@ type Props = {
         judul: string;
         deskripsi: string | null;
         tanggal: string;
+        tanggal_selesai: string;
         jam_mulai: string;
         jam_selesai: string;
         lokasi_nama: string;
@@ -53,12 +54,10 @@ export default function JadwalShow({ kegiatan }: Props) {
                                     Tanggal
                                 </p>
                                 <p className="font-medium">
-                                    {formatTanggalWita(kegiatan.tanggal, {
-                                        weekday: 'long',
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    })}
+                                    {formatRentangTanggalWita(
+                                        kegiatan.tanggal,
+                                        kegiatan.tanggal_selesai,
+                                    )}
                                 </p>
                             </div>
                         </div>

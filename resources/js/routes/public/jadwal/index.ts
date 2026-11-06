@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
 export const show = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
 show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -49,7 +49,7 @@ show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
 show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -58,7 +58,7 @@ show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 })
 /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
 show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -68,7 +68,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
     const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -78,7 +78,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
         showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -87,7 +87,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
         })
             /**
 * @see \App\Http\Controllers\Public\JadwalController::show
- * @see app/Http/Controllers/Public/JadwalController.php:48
+ * @see app/Http/Controllers/Public/JadwalController.php:54
  * @route '/jadwal/{kegiatan}'
  */
         showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

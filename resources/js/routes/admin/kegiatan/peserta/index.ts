@@ -103,7 +103,7 @@ index.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:122
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
  */
 export const ubahPeran = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -118,7 +118,7 @@ ubahPeran.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:122
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
  */
 ubahPeran.url = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -148,7 +148,7 @@ ubahPeran.url = (args: { kegiatan: number | { id: number }, pendaftaran: number 
 
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:122
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
  */
 ubahPeran.patch = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -158,7 +158,7 @@ ubahPeran.patch = (args: { kegiatan: number | { id: number }, pendaftaran: numbe
 
     /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:122
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
  */
     const ubahPeranForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -173,7 +173,7 @@ ubahPeran.patch = (args: { kegiatan: number | { id: number }, pendaftaran: numbe
 
             /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::ubahPeran
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:122
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:129
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}/peran'
  */
         ubahPeranForm.patch = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -189,7 +189,7 @@ ubahPeran.patch = (args: { kegiatan: number | { id: number }, pendaftaran: numbe
     ubahPeran.form = ubahPeranForm
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:134
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
  */
 export const batal = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -204,7 +204,7 @@ batal.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:134
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
  */
 batal.url = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -234,7 +234,7 @@ batal.url = (args: { kegiatan: number | { id: number }, pendaftaran: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:134
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
  */
 batal.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'delete'> => ({
@@ -244,7 +244,7 @@ batal.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number |
 
     /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:134
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
  */
     const batalForm = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -259,7 +259,7 @@ batal.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number |
 
             /**
 * @see \App\Http\Controllers\Admin\PesertaKegiatanController::batal
- * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:134
+ * @see app/Http/Controllers/Admin/PesertaKegiatanController.php:141
  * @route '/admin/kegiatan/{kegiatan}/peserta/{pendaftaran}'
  */
         batalForm.delete = (args: { kegiatan: number | { id: number }, pendaftaran: number | { id: number } } | [kegiatan: number | { id: number }, pendaftaran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

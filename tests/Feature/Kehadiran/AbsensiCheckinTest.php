@@ -15,8 +15,10 @@ use App\Models\Komsat;
 use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
 use App\Models\PoinTransaksi;
+use App\Models\SesiAbsensi;
 use App\Models\User;
 use App\Support\Haversine;
+use Carbon\CarbonImmutable;
 use Database\Seeders\KomsatSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -88,6 +90,7 @@ beforeEach(function () {
         'latitude' => (string) $this->centerLat,
         'longitude' => (string) $this->centerLng,
         'radius_m' => 100,
+        'tanggal' => now()->toDateString(),
         'pendaftaran_dibuka_at' => now()->subDays(2),
         'batas_daftar_at' => now()->addHours(2),
         'absensi_buka_at' => now()->subMinutes(30),
@@ -211,6 +214,10 @@ test('absensi di luar jendela waktu ditolak dan tidak membuat kehadiran maupun p
         'absensi_buka_at' => now()->addHour(),
         'absensi_tutup_at' => now()->addHours(3),
     ]);
+    $this->kegiatan->sesiAbsensi()->update([
+        'jam_buka' => now()->addHour()->format('H:i:s'),
+        'jam_tutup' => now()->addHours(3)->format('H:i:s'),
+    ]);
 
     $response = $this->actingAs($this->mahasiswaUser)->post(
         route('mahasiswa.absensi.submit', $this->kegiatan),
@@ -230,6 +237,10 @@ test('absensi di luar jendela waktu ditolak dan tidak membuat kehadiran maupun p
     $this->kegiatan->update([
         'absensi_buka_at' => now()->subHours(4),
         'absensi_tutup_at' => now()->subHour(),
+    ]);
+    $this->kegiatan->sesiAbsensi()->update([
+        'jam_buka' => now()->subHours(4)->format('H:i:s'),
+        'jam_tutup' => now()->subHour()->format('H:i:s'),
     ]);
 
     $responseAfterClose = $this->actingAs($this->mahasiswaUser)->post(
@@ -291,6 +302,49 @@ test('submit dua kali bersifat idempoten dan hanya menghasilkan satu kehadiran s
         ->and(PoinTransaksi::query()->where('mahasiswa_id', $this->mahasiswa->id)->count())->toBe(1)
         ->and((int) PoinTransaksi::query()->where('mahasiswa_id', $this->mahasiswa->id)->sum('jumlah'))->toBe(10)
         ->and(AuditLog::query()->where('aksi', 'kehadiran.duplicate_attempt')->exists())->toBeTrue();
+});
+
+test('kegiatan multi-hari memberikan satu kredit untuk setiap hari absensi', function () {
+    $tanggalMulai = CarbonImmutable::parse($this->kegiatan->tanggal->toDateString(), config('app.timezone'));
+    $tanggalKedua = $tanggalMulai->addDay();
+
+    $this->kegiatan->update([
+        'tanggal' => $tanggalMulai->toDateString(),
+        'tanggal_selesai' => $tanggalKedua->toDateString(),
+    ]);
+    SesiAbsensi::query()->create([
+        'kegiatan_id' => $this->kegiatan->id,
+        'tanggal' => $tanggalKedua->toDateString(),
+        'jam_buka' => '00:01:00',
+        'jam_tutup' => '23:59:00',
+    ]);
+
+    $this->actingAs($this->mahasiswaUser)->post(
+        route('mahasiswa.absensi.submit', $this->kegiatan),
+        [
+            'latitude' => $this->centerLat,
+            'longitude' => $this->centerLng,
+            'akurasi_m' => 10.0,
+            'foto' => UploadedFile::fake()->image('selfie-hari-1.jpg', 640, 480),
+        ],
+    )->assertRedirect(route('mahasiswa.absensi.form', $this->kegiatan));
+
+    $this->travelTo($tanggalKedua->setTime(10, 0));
+    $this->actingAs($this->mahasiswaUser)->post(
+        route('mahasiswa.absensi.submit', $this->kegiatan),
+        [
+            'latitude' => $this->centerLat,
+            'longitude' => $this->centerLng,
+            'akurasi_m' => 10.0,
+            'foto' => UploadedFile::fake()->image('selfie-hari-2.jpg', 640, 480),
+        ],
+    )->assertRedirect(route('mahasiswa.absensi.form', $this->kegiatan));
+
+    $this->travelBack();
+
+    expect(Kehadiran::query()->where('pendaftaran_id', $this->pendaftaran->id)->count())->toBe(2)
+        ->and(PoinTransaksi::query()->where('mahasiswa_id', $this->mahasiswa->id)->count())->toBe(2)
+        ->and((int) PoinTransaksi::query()->where('mahasiswa_id', $this->mahasiswa->id)->sum('jumlah'))->toBe(20);
 });
 
 test('bobot poin yang diberikan mengikuti peran pada pendaftaran mahasiswa', function () {

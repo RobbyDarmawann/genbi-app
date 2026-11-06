@@ -65,21 +65,33 @@ class SubmitAttendanceAction
                 ]);
             }
 
-            if ($now->lt($lockedActivity->absensi_buka_at)) {
+            $today = $now->toDateString();
+            $sesiHariIni = $lockedActivity->sesiAbsensi()
+                ->whereDate('tanggal', $today)
+                ->first();
+
+            if ($sesiHariIni === null) {
                 throw ValidationException::withMessages([
-                    'absensi' => 'Jendela absensi belum dibuka.',
+                    'absensi' => 'Tidak ada sesi absensi yang dijadwalkan untuk hari ini.',
                 ]);
             }
 
-            if ($now->gt($lockedActivity->absensi_tutup_at)) {
+            if ($now->lt($sesiHariIni->bukaAt())) {
                 throw ValidationException::withMessages([
-                    'absensi' => 'Jendela absensi sudah ditutup.',
+                    'absensi' => 'Jendela absensi hari ini belum dibuka.',
+                ]);
+            }
+
+            if ($now->gt($sesiHariIni->tutupAt())) {
+                throw ValidationException::withMessages([
+                    'absensi' => 'Jendela absensi hari ini sudah ditutup.',
                 ]);
             }
 
             $existingKehadiran = Kehadiran::query()
                 ->with('poinTransaksi')
                 ->where('pendaftaran_id', $pendaftaran->id)
+                ->whereDate('tanggal', $today)
                 ->lockForUpdate()
                 ->first();
 
@@ -92,6 +104,7 @@ class SubmitAttendanceAction
                     metadata: [
                         'kegiatan_id' => $lockedActivity->id,
                         'mahasiswa_id' => $mahasiswa->id,
+                        'tanggal' => $today,
                     ],
                     ipAddress: $ipAddress,
                 );
@@ -131,6 +144,7 @@ class SubmitAttendanceAction
 
             $kehadiran = Kehadiran::query()->create([
                 'pendaftaran_id' => $pendaftaran->id,
+                'tanggal' => $today,
                 'waktu_checkin' => $now,
                 'latitude' => (string) $latitude,
                 'longitude' => (string) $longitude,

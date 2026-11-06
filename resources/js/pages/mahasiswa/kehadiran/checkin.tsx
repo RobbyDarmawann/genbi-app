@@ -52,6 +52,13 @@ type Props = {
         lokasi_nama: string;
         absensi_buka_at: string;
         absensi_tutup_at: string;
+        sesi_hari_ini: {
+            tanggal: string;
+            jam_buka: string;
+            jam_tutup: string;
+            buka_at: string;
+            tutup_at: string;
+        } | null;
         status: string;
         status_label: string;
         radius_m: number;
@@ -205,8 +212,12 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
         };
     }, []);
 
-    const bukaMs = new Date(kegiatan.absensi_buka_at).getTime();
-    const tutupMs = new Date(kegiatan.absensi_tutup_at).getTime();
+    const bukaMs = kegiatan.sesi_hari_ini
+        ? new Date(kegiatan.sesi_hari_ini.buka_at).getTime()
+        : Number.POSITIVE_INFINITY;
+    const tutupMs = kegiatan.sesi_hari_ini
+        ? new Date(kegiatan.sesi_hari_ini.tutup_at).getTime()
+        : Number.NEGATIVE_INFINITY;
     const belumBuka = nowMs < bukaMs;
     const sudahTutup = nowMs > tutupMs;
     const dalamJendela = !belumBuka && !sudahTutup;
@@ -493,9 +504,17 @@ export default function Checkin({ kegiatan, pendaftaran }: Props) {
                                     Jendela Waktu Absensi (WITA)
                                 </p>
                                 <p className="text-sm font-medium tabular-nums">
-                                    {formatWaktuWita(kegiatan.absensi_buka_at)}{' '}
+                                    {kegiatan.sesi_hari_ini
+                                        ? formatWaktuWita(
+                                              kegiatan.sesi_hari_ini.buka_at,
+                                          )
+                                        : '-'}{' '}
                                     s.d.{' '}
-                                    {formatWaktuWita(kegiatan.absensi_tutup_at)}
+                                    {kegiatan.sesi_hari_ini
+                                        ? formatWaktuWita(
+                                              kegiatan.sesi_hari_ini.tutup_at,
+                                          )
+                                        : '-'}
                                 </p>
                                 {kehadiran === null && (
                                     <p className="text-xs font-medium text-primary tabular-nums">

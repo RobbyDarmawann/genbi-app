@@ -19,6 +19,7 @@ class KehadiranFactory extends Factory
     {
         return [
             'pendaftaran_id' => Pendaftaran::factory(),
+            'tanggal' => now()->toDateString(),
             'waktu_checkin' => now(),
             'latitude' => 0.5400000,
             'longitude' => 123.0600000,

@@ -24,6 +24,7 @@ type KegiatanMendatang = {
     id: number;
     judul: string;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     jam_selesai: string;
     lokasi_nama: string;
@@ -32,9 +33,10 @@ type KegiatanMendatang = {
     peran_label: string;
     kehadiran: {
         id: number;
+        tanggal: string | null;
         status: string;
         status_label: string;
-    } | null;
+    }[];
 };
 
 type LeaderboardItem = {
@@ -297,13 +299,18 @@ export default function MahasiswaDashboard({
                                                         Peran:{' '}
                                                         {item.peran_label}
                                                     </Badge>
-                                                    {item.kehadiran && (
+                                                    {item.kehadiran.length >
+                                                        0 && (
                                                         <StatusBadge
                                                             status={statusKehadiranToSemantic(
-                                                                item.kehadiran
-                                                                    .status,
+                                                                item.kehadiran[
+                                                                    item
+                                                                        .kehadiran
+                                                                        .length -
+                                                                        1
+                                                                ].status,
                                                             )}
-                                                            label={`Kehadiran: ${item.kehadiran.status_label}`}
+                                                            label={`Kehadiran: ${item.kehadiran[item.kehadiran.length - 1].status_label}`}
                                                         />
                                                     )}
                                                 </div>
@@ -338,7 +345,7 @@ export default function MahasiswaDashboard({
                                             <div className="flex shrink-0 items-center gap-2">
                                                 {item.status_kegiatan ===
                                                     'berlangsung' &&
-                                                !item.kehadiran ? (
+                                                item.kehadiran.length === 0 ? (
                                                     <Button
                                                         asChild
                                                         className="h-11 md:h-9"

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import PublicLayout from '@/layouts/public-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 import { jadwal } from '@/routes/public';
 
 type Item = {
@@ -20,6 +20,7 @@ type Item = {
     judul: string;
     deskripsi: string | null;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     jam_selesai: string;
     lokasi_nama: string;
@@ -87,11 +88,10 @@ export default function Jadwal({ kegiatan, filters }: Props) {
                                 <div className="space-y-1.5 text-sm text-muted-foreground">
                                     <div className="flex gap-2">
                                         <Calendar className="size-4" />
-                                        {formatTanggalWita(item.tanggal, {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                        })}
+                                        {formatRentangTanggalWita(
+                                            item.tanggal,
+                                            item.tanggal_selesai,
+                                        )}
                                     </div>
                                     <div className="flex gap-2">
                                         <Clock className="size-4" />

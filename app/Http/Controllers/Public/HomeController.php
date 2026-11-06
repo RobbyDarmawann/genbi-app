@@ -17,7 +17,7 @@ class HomeController extends Controller
     {
         $kegiatanTerbaru = Kegiatan::query()
             ->terbit()
-            ->with('komsat:id,kode,nama')
+            ->with(['komsat:id,kode,nama', 'sesiAbsensi'])
             ->orderBy('tanggal')
             ->orderBy('jam_mulai')
             ->take(3)
@@ -30,6 +30,7 @@ class HomeController extends Controller
                     'judul' => $item->judul,
                     'deskripsi' => $item->deskripsi,
                     'tanggal' => $item->tanggal->toDateString(),
+                    'tanggal_selesai' => $item->tanggalSelesaiEfektif()->toDateString(),
                     'jam_mulai' => substr($item->jam_mulai, 0, 5),
                     'jam_selesai' => substr($item->jam_selesai, 0, 5),
                     'lokasi_nama' => $item->lokasi_nama,

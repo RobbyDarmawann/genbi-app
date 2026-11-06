@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 export const riwayat = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ riwayat.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 riwayat.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ riwayat.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 riwayat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ riwayat.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 riwayat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ riwayat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
     const riwayatForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ riwayat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
         riwayatForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ riwayat.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::riwayat
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
         riwayatForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

@@ -17,7 +17,7 @@ class JadwalController extends Controller
 
         $kegiatan = Kegiatan::query()
             ->terbit()
-            ->with('komsat:id,kode,nama')
+            ->with(['komsat:id,kode,nama', 'sesiAbsensi'])
             ->when($search !== '', fn ($query) => $query->where('judul', 'like', "%{$search}%"))
             ->urutJadwal()
             ->paginate(9)
@@ -30,6 +30,12 @@ class JadwalController extends Controller
                     'judul' => $item->judul,
                     'deskripsi' => $item->deskripsi,
                     'tanggal' => $item->tanggal->toDateString(),
+                    'tanggal_selesai' => $item->tanggalSelesaiEfektif()->toDateString(),
+                    'sesi_absensi' => $item->sesiAbsensi->map(fn ($sesi): array => [
+                        'tanggal' => $sesi->tanggal->toDateString(),
+                        'jam_buka' => substr($sesi->jam_buka, 0, 5),
+                        'jam_tutup' => substr($sesi->jam_tutup, 0, 5),
+                    ])->values()->all(),
                     'jam_mulai' => substr($item->jam_mulai, 0, 5),
                     'jam_selesai' => substr($item->jam_selesai, 0, 5),
                     'lokasi_nama' => $item->lokasi_nama,
@@ -49,7 +55,7 @@ class JadwalController extends Controller
     {
         $statusEfektif = $kegiatan->statusEfektif();
         abort_unless(in_array($statusEfektif, [StatusKegiatan::Terbit, StatusKegiatan::Berlangsung, StatusKegiatan::Selesai, StatusKegiatan::Terkunci], true), 404);
-        $kegiatan->load('komsat:id,kode,nama');
+        $kegiatan->load(['komsat:id,kode,nama', 'sesiAbsensi']);
 
         return Inertia::render('public/jadwal-show', [
             'kegiatan' => [
@@ -57,6 +63,12 @@ class JadwalController extends Controller
                 'judul' => $kegiatan->judul,
                 'deskripsi' => $kegiatan->deskripsi,
                 'tanggal' => $kegiatan->tanggal->toDateString(),
+                'tanggal_selesai' => $kegiatan->tanggalSelesaiEfektif()->toDateString(),
+                'sesi_absensi' => $kegiatan->sesiAbsensi->map(fn ($sesi): array => [
+                    'tanggal' => $sesi->tanggal->toDateString(),
+                    'jam_buka' => substr($sesi->jam_buka, 0, 5),
+                    'jam_tutup' => substr($sesi->jam_tutup, 0, 5),
+                ])->values()->all(),
                 'jam_mulai' => substr($kegiatan->jam_mulai, 0, 5),
                 'jam_selesai' => substr($kegiatan->jam_selesai, 0, 5),
                 'lokasi_nama' => $kegiatan->lokasi_nama,

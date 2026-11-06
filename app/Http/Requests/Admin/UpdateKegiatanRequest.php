@@ -48,7 +48,7 @@ class UpdateKegiatanRequest extends FormRequest
             }
         }
 
-        foreach (['deskripsi', 'pendaftaran_dibuka_at', 'batas_daftar_at', 'kuota'] as $nullableField) {
+        foreach (['deskripsi', 'pendaftaran_dibuka_at', 'batas_daftar_at', 'kuota', 'tanggal_selesai'] as $nullableField) {
             if ($this->input($nullableField) === '') {
                 $merges[$nullableField] = null;
             }
@@ -70,6 +70,21 @@ class UpdateKegiatanRequest extends FormRequest
 
         if (! $this->has('divisi_ids')) {
             $merges['divisi_ids'] = [];
+        }
+
+        $sesiAbsensi = $this->input('sesi_absensi');
+        if (is_array($sesiAbsensi) && ! empty($sesiAbsensi)) {
+            $sortedSesi = $sesiAbsensi;
+            usort($sortedSesi, fn ($a, $b) => strcmp((string) ($a['tanggal'] ?? ''), (string) ($b['tanggal'] ?? '')));
+            $first = $sortedSesi[0];
+            $last = $sortedSesi[count($sortedSesi) - 1];
+
+            if (! empty($first['tanggal']) && ! empty($first['jam_buka'])) {
+                $merges['absensi_buka_at'] = "{$first['tanggal']} {$first['jam_buka']}";
+            }
+            if (! empty($last['tanggal']) && ! empty($last['jam_tutup'])) {
+                $merges['absensi_tutup_at'] = "{$last['tanggal']} {$last['jam_tutup']}";
+            }
         }
 
         if (! empty($merges)) {
@@ -102,14 +117,19 @@ class UpdateKegiatanRequest extends FormRequest
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'radius_m' => ['required', 'integer', 'between:10,1000'],
             'tanggal' => ['required', 'date_format:Y-m-d'],
+            'tanggal_selesai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:tanggal'],
             'jam_mulai' => ['required', 'date_format:H:i'],
-            'jam_selesai' => ['required', 'date_format:H:i', 'after:jam_mulai'],
+            'jam_selesai' => ['required', 'date_format:H:i'],
             'absensi_buka_at' => ['required', 'date'],
             'absensi_tutup_at' => ['required', 'date', 'after:absensi_buka_at'],
             'pendaftaran_dibuka_at' => ['nullable', 'date', 'before_or_equal:absensi_tutup_at'],
             'batas_daftar_at' => ['nullable', 'date', 'before_or_equal:absensi_tutup_at'],
             'kuota' => ['nullable', 'integer', 'min:1'],
             'status' => ['required', Rule::enum(StatusKegiatan::class)],
+            'sesi_absensi' => ['required', 'array', 'min:1'],
+            'sesi_absensi.*.tanggal' => ['required', 'date_format:Y-m-d'],
+            'sesi_absensi.*.jam_buka' => ['required', 'date_format:H:i'],
+            'sesi_absensi.*.jam_tutup' => ['required', 'date_format:H:i', 'after:sesi_absensi.*.jam_buka'],
             'divisi_ids' => $requiresPublishReadiness ? ['required', 'array', 'min:1'] : ['nullable', 'array'],
             'divisi_ids.*' => [
                 'integer',
@@ -153,8 +173,8 @@ class UpdateKegiatanRequest extends FormRequest
                     return;
                 }
 
-                $targetStatus = StatusKegiatan::from($this->string('status')->toString());
-                if (! $kegiatan->status->canTransitionTo($targetStatus)) {
+                $targetStatus = StatusKegiatan::tryFrom($this->string('status')->toString());
+                if ($targetStatus !== null && ! $kegiatan->status->canTransitionTo($targetStatus)) {
                     $validator->errors()->add(
                         'status',
                         sprintf(
@@ -166,25 +186,43 @@ class UpdateKegiatanRequest extends FormRequest
                 }
 
                 $tanggal = $this->string('tanggal')->toString();
+                $tanggalSelesai = $this->string('tanggal_selesai')->toString() ?: $tanggal;
                 $jamMulai = $this->string('jam_mulai')->toString();
                 $jamSelesai = $this->string('jam_selesai')->toString();
+                $isSingleDay = $tanggalSelesai === $tanggal;
 
-                $mulaiKegiatan = Carbon::parse("{$tanggal} {$jamMulai}");
-                $selesaiKegiatan = Carbon::parse("{$tanggal} {$jamSelesai}");
-                $absensiBuka = Carbon::parse($this->string('absensi_buka_at')->toString());
-                $absensiTutup = Carbon::parse($this->string('absensi_tutup_at')->toString());
-
-                if ($absensiBuka->lt($mulaiKegiatan->copy()->subHours(12)) || $absensiBuka->gt($selesaiKegiatan)) {
+                if (
+                    ! $validator->errors()->hasAny(['tanggal', 'tanggal_selesai', 'jam_mulai', 'jam_selesai'])
+                    && $isSingleDay
+                    && $jamSelesai <= $jamMulai
+                ) {
                     $validator->errors()->add(
-                        'absensi_buka_at',
-                        'Waktu buka absensi harus berada dalam rentang logis pelaksanaan kegiatan (maksimal 12 jam sebelum jam mulai hingga jam selesai).'
+                        'jam_selesai',
+                        'Jam selesai harus setelah jam mulai untuk kegiatan satu hari.'
                     );
                 }
 
-                if ($absensiTutup->gt($selesaiKegiatan->copy()->addHours(12))) {
+                $tanggalMulai = Carbon::parse($tanggal);
+                $tanggalAkhir = Carbon::parse($tanggalSelesai);
+                $expectedDates = [];
+                for ($date = $tanggalMulai->copy(); $date->lte($tanggalAkhir); $date->addDay()) {
+                    $expectedDates[] = $date->toDateString();
+                }
+
+                $sesiAbsensi = $this->input('sesi_absensi');
+                $sesiDates = is_array($sesiAbsensi)
+                    ? array_values(array_filter(array_map(
+                        fn ($sesi) => is_array($sesi) ? ($sesi['tanggal'] ?? null) : null,
+                        $sesiAbsensi,
+                    )))
+                    : [];
+                sort($expectedDates);
+                sort($sesiDates);
+
+                if (! $validator->errors()->hasAny(['tanggal', 'tanggal_selesai']) && $expectedDates !== $sesiDates) {
                     $validator->errors()->add(
-                        'absensi_tutup_at',
-                        'Waktu tutup absensi tidak boleh melewati 12 jam setelah kegiatan selesai.'
+                        'sesi_absensi',
+                        'Sesi absensi harus mencakup tepat semua hari dari tanggal mulai hingga tanggal selesai kegiatan, tanpa kurang atau lebih.'
                     );
                 }
 

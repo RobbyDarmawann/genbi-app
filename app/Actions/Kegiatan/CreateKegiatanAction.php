@@ -27,6 +27,7 @@ class CreateKegiatanAction
                 'longitude' => $data['longitude'],
                 'radius_m' => (int) $data['radius_m'],
                 'tanggal' => $data['tanggal'],
+                'tanggal_selesai' => $data['tanggal_selesai'] ?? null,
                 'jam_mulai' => $data['jam_mulai'],
                 'jam_selesai' => $data['jam_selesai'],
                 'absensi_buka_at' => $data['absensi_buka_at'],
@@ -59,6 +60,14 @@ class CreateKegiatanAction
     private function syncRelated(Kegiatan $kegiatan, array $data): void
     {
         $kegiatan->divisiTarget()->sync($data['divisi_ids'] ?? []);
+        $kegiatan->sesiAbsensi()->createMany(array_map(
+            fn (array $sesi): array => [
+                'tanggal' => $sesi['tanggal'],
+                'jam_buka' => $sesi['jam_buka'],
+                'jam_tutup' => $sesi['jam_tutup'],
+            ],
+            $data['sesi_absensi'] ?? [],
+        ));
         foreach (($data['bobot'] ?? []) as $peran => $poin) {
             if ($poin !== null && $poin !== '') {
                 KegiatanBobot::updateOrCreate(

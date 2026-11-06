@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 
 type Props = {
     kegiatan: {
@@ -36,6 +36,7 @@ type Props = {
         judul: string;
         deskripsi: string | null;
         tanggal: string;
+        tanggal_selesai: string;
         jam_mulai: string;
         jam_selesai: string;
         lokasi_nama: string;
@@ -386,12 +387,10 @@ export default function Show({
                                     Tanggal
                                 </p>
                                 <p className="font-medium">
-                                    {formatTanggalWita(kegiatan.tanggal, {
-                                        weekday: 'long',
-                                        day: 'numeric',
-                                        month: 'long',
-                                        year: 'numeric',
-                                    })}
+                                    {formatRentangTanggalWita(
+                                        kegiatan.tanggal,
+                                        kegiatan.tanggal_selesai,
+                                    )}
                                 </p>
                             </div>
                         </div>

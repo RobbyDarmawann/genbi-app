@@ -16,6 +16,7 @@ use App\Models\Kegiatan;
 use App\Models\KegiatanBobot;
 use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
+use App\Models\SesiAbsensi;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,9 @@ class KegiatanController extends Controller
         $forMeOnly = $hasExplicitUntukSaya
             ? $request->boolean('untuk_saya')
             : ($tabInput !== 'semua');
-        $activeTab = $forMeOnly ? 'untuk_saya' : 'semua';
+        $isAvailableTab = $tabInput === 'bisa_daftar';
+        $activeTab = $isAvailableTab ? 'bisa_daftar' : ($forMeOnly ? 'untuk_saya' : 'semua');
+        $now = Carbon::now(config('app.timezone'));
 
         $query = Kegiatan::query()
             ->terbit()
@@ -47,6 +50,7 @@ class KegiatanController extends Controller
                 'komsat:id,kode,nama',
                 'divisiTarget.komsat:id,kode,nama',
                 'bobot',
+                'sesiAbsensi',
                 'pendaftaran' => fn ($q) => $q->where('mahasiswa_id', $mahasiswa->id)->with('kehadiran'),
             ])
             ->withCount([
@@ -54,11 +58,46 @@ class KegiatanController extends Controller
             ])
             ->when($search !== '', fn ($q) => $q->where('judul', 'like', "%{$search}%"));
 
-        if ($forMeOnly) {
+        if ($isAvailableTab) {
+            $query
+                ->whereHas('divisiTarget', fn ($q) => $q->where('divisi.id', $mahasiswa->divisi_id))
+                ->where(function ($q) use ($now): void {
+                    $q->whereNull('tanggal_selesai')
+                        ->orWhereRaw(
+                            '(tanggal_selesai > ? OR (tanggal_selesai = ? AND jam_selesai >= ?))',
+                            [$now->toDateString(), $now->toDateString(), $now->format('H:i:s')],
+                        );
+                })
+                ->where(function ($q) use ($mahasiswa): void {
+                    $q->whereDoesntHave('pendaftaran', fn ($p) => $p
+                        ->where('mahasiswa_id', $mahasiswa->id)
+                        ->where('status', StatusPendaftaran::Terdaftar))
+                        ->whereDoesntHave('pendaftaran', fn ($p) => $p
+                            ->where('mahasiswa_id', $mahasiswa->id)
+                            ->whereHas('kehadiran'));
+                })
+                ->where(function ($q) use ($now): void {
+                    $q->whereNull('pendaftaran_dibuka_at')
+                        ->orWhere('pendaftaran_dibuka_at', '<=', $now);
+                })
+                ->where(function ($q) use ($now): void {
+                    $q->whereNull('batas_daftar_at')
+                        ->orWhere('batas_daftar_at', '>=', $now);
+                })
+                ->where(function ($q): void {
+                    $q->whereNull('kuota')
+                        ->orWhere('kuota', '>', Pendaftaran::query()
+                            ->selectRaw('count(*)')
+                            ->whereColumn('pendaftaran.kegiatan_id', 'kegiatan.id')
+                            ->where('status', StatusPendaftaran::Terdaftar));
+                });
+        } elseif ($forMeOnly) {
             $query->whereHas('divisiTarget', fn ($q) => $q->where('divisi.id', $mahasiswa->divisi_id));
         }
 
-        $pageName = $forMeOnly ? 'halaman_untuk_saya' : 'halaman_semua';
+        $pageName = $isAvailableTab
+            ? 'halaman_bisa_daftar'
+            : ($forMeOnly ? 'halaman_untuk_saya' : 'halaman_semua');
         $kegiatan = $query
             ->urutJadwal()
             ->paginate(9, ['*'], $pageName)
@@ -82,6 +121,7 @@ class KegiatanController extends Controller
                     'judul' => $item->judul,
                     'deskripsi' => $item->deskripsi,
                     'tanggal' => $item->tanggal->toDateString(),
+                    'tanggal_selesai' => $item->tanggalSelesaiEfektif()->toDateString(),
                     'jam_mulai' => substr($item->jam_mulai, 0, 5),
                     'jam_selesai' => substr($item->jam_selesai, 0, 5),
                     'lokasi_nama' => $item->lokasi_nama,
@@ -163,7 +203,12 @@ class KegiatanController extends Controller
         $lewatBatasDaftar = $kegiatan->batas_daftar_at !== null && $now->gt($kegiatan->batas_daftar_at);
         $kuotaPenuh = $kegiatan->kuota !== null && $jumlahPendaftar >= $kegiatan->kuota;
         $sudahTerdaftarAktif = $pendaftaran !== null && $pendaftaran->status === StatusPendaftaran::Terdaftar;
-        $memilikiKehadiran = $pendaftaran?->kehadiran !== null;
+        $kehadiranHariIni = $pendaftaran?->kehadiran
+            ->first(fn ($item) => $item->tanggal->toDateString() === $now->toDateString());
+        $memilikiKehadiran = $pendaftaran?->kehadiran->isNotEmpty() ?? false;
+        $sesiHariIni = $kegiatan->sesiAbsensi()
+            ->whereDate('tanggal', $now->toDateString())
+            ->first();
 
         $dapatMendaftar = $targeted
             && ! $sudahTerdaftarAktif
@@ -182,8 +227,10 @@ class KegiatanController extends Controller
         $dapatAbsen = $sudahTerdaftarAktif
             && ! $memilikiKehadiran
             && $statusKegiatanBuka
-            && $now->gte($kegiatan->absensi_buka_at)
-            && $now->lte($kegiatan->absensi_tutup_at);
+            && $sesiHariIni !== null
+            && $now->gte($sesiHariIni->bukaAt())
+            && $now->lte($sesiHariIni->tutupAt())
+            && $kehadiranHariIni === null;
 
         $alasanTidakDapatMendaftar = null;
         if (! $targeted) {
@@ -206,6 +253,7 @@ class KegiatanController extends Controller
                 'judul' => $kegiatan->judul,
                 'deskripsi' => $kegiatan->deskripsi,
                 'tanggal' => $kegiatan->tanggal->toDateString(),
+                'tanggal_selesai' => $kegiatan->tanggalSelesaiEfektif()->toDateString(),
                 'jam_mulai' => substr($kegiatan->jam_mulai, 0, 5),
                 'jam_selesai' => substr($kegiatan->jam_selesai, 0, 5),
                 'lokasi_nama' => $kegiatan->lokasi_nama,
@@ -223,6 +271,11 @@ class KegiatanController extends Controller
                 'pendaftaran_dibuka_at' => $kegiatan->pendaftaran_dibuka_at?->toIso8601String(),
                 'absensi_buka_at' => $kegiatan->absensi_buka_at->toIso8601String(),
                 'absensi_tutup_at' => $kegiatan->absensi_tutup_at->toIso8601String(),
+                'sesi_absensi' => $kegiatan->sesiAbsensi->map(fn (SesiAbsensi $sesi): array => [
+                    'tanggal' => $sesi->tanggal->toDateString(),
+                    'jam_buka' => substr($sesi->jam_buka, 0, 5),
+                    'jam_tutup' => substr($sesi->jam_tutup, 0, 5),
+                ])->values()->all(),
                 'divisi_target' => $kegiatan->divisiTarget->map(fn (Divisi $d): array => [
                     'id' => $d->id,
                     'nama' => $d->nama,
@@ -253,16 +306,26 @@ class KegiatanController extends Controller
                 'status_tampil' => $statusTampil,
                 'status_label' => $statusLabel,
                 'poin' => $bobotMap[$pendaftaran->peran->value] ?? 0,
-                'sudah_hadir' => $pendaftaran->kehadiran?->status === StatusKehadiran::Valid,
-                'memiliki_kehadiran' => $pendaftaran->kehadiran !== null,
-                'kehadiran' => $pendaftaran->kehadiran !== null ? [
-                    'status' => $pendaftaran->kehadiran->status->value,
-                    'status_label' => $pendaftaran->kehadiran->status->label(),
-                    'alasan' => $pendaftaran->kehadiran->alasan_penolakan,
-                    'poin_terkredit' => $pendaftaran->kehadiran->poinTransaksi !== null
-                        ? $pendaftaran->kehadiran->poinTransaksi->jumlah
-                        : 0,
+                'sudah_hadir' => $kehadiranHariIni?->status === StatusKehadiran::Valid,
+                'kehadiran_hari_ini' => $kehadiranHariIni !== null ? [
+                    'tanggal' => $kehadiranHariIni->tanggal->toDateString(),
+                    'status' => $kehadiranHariIni->status->value,
+                    'status_label' => $kehadiranHariIni->status->label(),
+                    'alasan' => $kehadiranHariIni->alasan_penolakan,
+                    'poin_terkredit' => $kehadiranHariIni->poinTransaksi === null
+                        ? 0
+                        : $kehadiranHariIni->poinTransaksi->jumlah,
                 ] : null,
+                'memiliki_kehadiran' => $pendaftaran->kehadiran->isNotEmpty(),
+                'daftar_kehadiran' => $pendaftaran->kehadiran->map(fn ($item): array => [
+                    'tanggal' => $item->tanggal->toDateString(),
+                    'status' => $item->status->value,
+                    'status_label' => $item->status->label(),
+                    'alasan' => $item->alasan_penolakan,
+                    'poin_terkredit' => $item->poinTransaksi === null
+                        ? 0
+                        : $item->poinTransaksi->jumlah,
+                ])->values()->all(),
                 'created_at' => $pendaftaran->created_at?->toIso8601String(),
             ] : null,
             'peran_efektif' => [
@@ -312,7 +375,7 @@ class KegiatanController extends Controller
             return ['batal', 'Batal'];
         }
 
-        if ($pendaftaran->kehadiran?->status === StatusKehadiran::Valid) {
+        if ($pendaftaran->kehadiran->contains(fn ($item) => $item->status === StatusKehadiran::Valid)) {
             return ['sudah_hadir', 'Sudah Hadir'];
         }
 

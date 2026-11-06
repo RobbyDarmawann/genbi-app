@@ -103,7 +103,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     show.form = showForm
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::reviewAttendance
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 export const reviewAttendance = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -118,7 +118,7 @@ reviewAttendance.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::reviewAttendance
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 reviewAttendance.url = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions) => {
@@ -148,7 +148,7 @@ reviewAttendance.url = (args: { kegiatan: number | { id: number }, kehadiran: nu
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::reviewAttendance
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
 reviewAttendance.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -158,7 +158,7 @@ reviewAttendance.post = (args: { kegiatan: number | { id: number }, kehadiran: n
 
     /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::reviewAttendance
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
     const reviewAttendanceForm = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -168,7 +168,7 @@ reviewAttendance.post = (args: { kegiatan: number | { id: number }, kehadiran: n
 
             /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::reviewAttendance
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:173
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:175
  * @route '/admin/kegiatan/{kegiatan}/kehadiran/{kehadiran}/review'
  */
         reviewAttendanceForm.post = (args: { kegiatan: number | { id: number }, kehadiran: number | { id: number } } | [kegiatan: number | { id: number }, kehadiran: number | { id: number } ], options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -179,7 +179,7 @@ reviewAttendance.post = (args: { kegiatan: number | { id: number }, kehadiran: n
     reviewAttendance.form = reviewAttendanceForm
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 export const lock = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -194,7 +194,7 @@ lock.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 lock.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -227,7 +227,7 @@ lock.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -237,7 +237,7 @@ lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
     const lockForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -247,7 +247,7 @@ lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
         lockForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

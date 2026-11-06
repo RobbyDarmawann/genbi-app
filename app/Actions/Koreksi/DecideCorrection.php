@@ -70,6 +70,7 @@ class DecideCorrection
                 if ($attendance === null) {
                     $attendance = Kehadiran::query()->create([
                         'pendaftaran_id' => $registration->id,
+                        'tanggal' => now(config('app.timezone'))->toDateString(),
                         'waktu_checkin' => now(),
                         'sumber' => SumberKehadiran::Koreksi,
                         'status' => StatusKehadiran::Valid,

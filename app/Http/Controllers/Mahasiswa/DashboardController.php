@@ -108,11 +108,12 @@ class DashboardController extends Controller
                 'status_kegiatan' => $p->kegiatan->statusEfektif()->value,
                 'status_kegiatan_label' => $p->kegiatan->statusEfektifLabel(),
                 'peran_label' => $p->peran->label(),
-                'kehadiran' => $p->kehadiran ? [
-                    'id' => $p->kehadiran->id,
-                    'status' => $p->kehadiran->status->value,
-                    'status_label' => $p->kehadiran->status->label(),
-                ] : null,
+                'kehadiran' => $p->kehadiran->map(fn ($kehadiran): array => [
+                    'id' => $kehadiran->id,
+                    'tanggal' => $kehadiran->tanggal->toDateString(),
+                    'status' => $kehadiran->status->value,
+                    'status_label' => $kehadiran->status->label(),
+                ])->values()->all(),
             ]);
 
         // Leaderboard: hanya nama, komsat, dan total poin (tanpa mengekspos NIM atau data pribadi)

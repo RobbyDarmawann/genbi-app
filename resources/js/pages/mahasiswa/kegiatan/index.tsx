@@ -16,12 +16,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { formatTanggalWita } from '@/lib/format';
+import { formatRentangTanggalWita } from '@/lib/format';
 
 type Activity = {
     id: number;
     judul: string;
     tanggal: string;
+    tanggal_selesai: string;
     jam_mulai: string;
     jam_selesai: string;
     lokasi_nama: string;
@@ -88,6 +89,13 @@ export default function Index({ kegiatan, filters }: Props) {
                     >
                         Semua Jadwal
                     </button>
+                    <button
+                        type="button"
+                        onClick={() => handleTabChange('bisa_daftar')}
+                        className={`border-b-2 px-4 py-2 text-sm font-medium ${filters.tab === 'bisa_daftar' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
+                    >
+                        Bisa Didaftar
+                    </button>
                 </div>
                 <form onSubmit={handleSearch} className="flex gap-2">
                     <div className="relative flex-1">
@@ -103,77 +111,86 @@ export default function Index({ kegiatan, filters }: Props) {
                         Cari
                     </Button>
                 </form>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {kegiatan.data.map((item) => (
-                        <Card key={item.id}>
-                            <CardContent className="space-y-3 p-4">
-                                <div className="flex items-start justify-between gap-2">
-                                    <Link
-                                        href={MahasiswaKegiatanController.show(
-                                            item.id,
-                                        )}
-                                        className="line-clamp-2 font-semibold hover:underline"
-                                    >
-                                        {item.judul}
-                                    </Link>
-                                    <StatusBadge
-                                        status={kegiatanStatusToSemantic(
-                                            item.status,
-                                        )}
-                                        label={kegiatanStatusLabel(item.status)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5 text-sm text-muted-foreground">
-                                    <div className="flex items-center gap-2">
-                                        <Calendar className="size-4 shrink-0" />
-                                        <span>
-                                            {formatTanggalWita(item.tanggal, {
-                                                day: 'numeric',
-                                                month: 'short',
-                                                year: 'numeric',
-                                            })}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="size-4 shrink-0" />
-                                        <span>
-                                            {item.jam_mulai} -{' '}
-                                            {item.jam_selesai} WITA
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="size-4 shrink-0" />
-                                        <span className="truncate">
-                                            {item.lokasi_nama}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2 pt-2">
-                                    {item.ditargetkan_untuk_saya ? (
-                                        <Badge
-                                            variant="outline"
-                                            className="border-primary/30 bg-primary/10 text-primary"
+                {kegiatan.data.length === 0 && filters.tab === 'bisa_daftar' ? (
+                    <Card>
+                        <CardContent className="p-6 text-center text-muted-foreground">
+                            Tidak ada kegiatan yang bisa didaftar saat ini.
+                        </CardContent>
+                    </Card>
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {kegiatan.data.map((item) => (
+                            <Card key={item.id}>
+                                <CardContent className="space-y-3 p-4">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <Link
+                                            href={MahasiswaKegiatanController.show(
+                                                item.id,
+                                            )}
+                                            className="line-clamp-2 font-semibold hover:underline"
                                         >
-                                            Target divisi Anda
-                                        </Badge>
-                                    ) : (
-                                        <Badge variant="outline">
-                                            Divisi terpilih
-                                        </Badge>
-                                    )}
-                                    {item.status_pendaftaran_label && (
-                                        <Badge variant="secondary">
-                                            {item.status_pendaftaran_label}
-                                        </Badge>
-                                    )}
-                                    <span className="ml-auto text-sm font-semibold tabular-nums">
-                                        {item.poin_peran_saya} poin
-                                    </span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                                            {item.judul}
+                                        </Link>
+                                        <StatusBadge
+                                            status={kegiatanStatusToSemantic(
+                                                item.status,
+                                            )}
+                                            label={kegiatanStatusLabel(
+                                                item.status,
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5 text-sm text-muted-foreground">
+                                        <div className="flex items-center gap-2">
+                                            <Calendar className="size-4 shrink-0" />
+                                            <span>
+                                                {formatRentangTanggalWita(
+                                                    item.tanggal,
+                                                    item.tanggal_selesai,
+                                                )}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="size-4 shrink-0" />
+                                            <span>
+                                                {item.jam_mulai} -{' '}
+                                                {item.jam_selesai} WITA
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="size-4 shrink-0" />
+                                            <span className="truncate">
+                                                {item.lokasi_nama}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2 pt-2">
+                                        {item.ditargetkan_untuk_saya ? (
+                                            <Badge
+                                                variant="outline"
+                                                className="border-primary/30 bg-primary/10 text-primary"
+                                            >
+                                                Target divisi Anda
+                                            </Badge>
+                                        ) : (
+                                            <Badge variant="outline">
+                                                Divisi terpilih
+                                            </Badge>
+                                        )}
+                                        {item.status_pendaftaran_label && (
+                                            <Badge variant="secondary">
+                                                {item.status_pendaftaran_label}
+                                            </Badge>
+                                        )}
+                                        <span className="ml-auto text-sm font-semibold tabular-nums">
+                                            {item.poin_peran_saya} poin
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
                 <PaginationControls meta={kegiatan} itemLabel="kegiatan" />
             </div>
         </>

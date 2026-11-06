@@ -65,7 +65,8 @@ class PesertaKegiatanController extends Controller
             ->withQueryString()
             ->through(function (Pendaftaran $pendaftaran) use ($bobotMap, $kegiatan, $isKegiatanTerkunciAtauBatal): array {
                 $kehadiran = $pendaftaran->kehadiran;
-                $hadirValid = $kehadiran?->status === StatusKehadiran::Valid;
+                $jumlahHadirValid = $kehadiran->where('status', StatusKehadiran::Valid)->count();
+                $hadirValid = $jumlahHadirValid > 0;
                 $terdaftarAktif = $pendaftaran->status === StatusPendaftaran::Terdaftar;
 
                 return [
@@ -81,10 +82,16 @@ class PesertaKegiatanController extends Controller
                     'status' => $pendaftaran->status->value,
                     'status_label' => $pendaftaran->status->label(),
                     'waktu_daftar' => ($pendaftaran->updated_at ?? $pendaftaran->created_at)?->toIso8601String(),
-                    'status_kehadiran' => $kehadiran?->status->value,
-                    'status_kehadiran_label' => $kehadiran !== null ? $kehadiran->status->label() : 'Belum Hadir',
+                    'jumlah_hari_hadir_valid' => $jumlahHadirValid,
+                    'ringkasan_kehadiran' => $kehadiran->map(fn ($item): array => [
+                        'tanggal' => $item->tanggal->toDateString(),
+                        'status' => $item->status->value,
+                        'status_label' => $item->status->label(),
+                    ])->values()->all(),
+                    'status_kehadiran' => $kehadiran->first()?->status->value,
+                    'status_kehadiran_label' => $kehadiran->first()?->status->label() ?? 'Belum Hadir',
                     'dapat_ubah_peran' => $terdaftarAktif && ! $isKegiatanTerkunciAtauBatal && ! $hadirValid,
-                    'dapat_batalkan' => $terdaftarAktif && $kegiatan->status !== StatusKegiatan::Terkunci && $kehadiran === null,
+                    'dapat_batalkan' => $terdaftarAktif && $kegiatan->status !== StatusKegiatan::Terkunci && $kehadiran->isEmpty(),
                 ];
             });
 

@@ -103,7 +103,7 @@ create.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number |
     create.form = createForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 export const store = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -118,7 +118,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 store.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -151,7 +151,7 @@ store.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
 store.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -161,7 +161,7 @@ store.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
     const storeForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -171,7 +171,7 @@ store.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\AbsensiController::store
- * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:85
+ * @see app/Http/Controllers/Mahasiswa/AbsensiController.php:100
  * @route '/kegiatan/{kegiatan}/absen'
  */
         storeForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

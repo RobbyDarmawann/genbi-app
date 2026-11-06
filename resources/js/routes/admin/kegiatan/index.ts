@@ -81,7 +81,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
 export const create = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -96,7 +96,7 @@ create.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
 create.url = (options?: RouteQueryOptions) => {
@@ -105,7 +105,7 @@ create.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
 create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -114,7 +114,7 @@ create.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
 create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -124,7 +124,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
     const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -134,7 +134,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
         createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -143,7 +143,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::create
- * @see app/Http/Controllers/Admin/KegiatanController.php:83
+ * @see app/Http/Controllers/Admin/KegiatanController.php:84
  * @route '/admin/kegiatan/create'
  */
         createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -159,7 +159,7 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     create.form = createForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:90
+ * @see app/Http/Controllers/Admin/KegiatanController.php:91
  * @route '/admin/kegiatan'
  */
 export const store = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -174,7 +174,7 @@ store.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:90
+ * @see app/Http/Controllers/Admin/KegiatanController.php:91
  * @route '/admin/kegiatan'
  */
 store.url = (options?: RouteQueryOptions) => {
@@ -183,7 +183,7 @@ store.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:90
+ * @see app/Http/Controllers/Admin/KegiatanController.php:91
  * @route '/admin/kegiatan'
  */
 store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -193,7 +193,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:90
+ * @see app/Http/Controllers/Admin/KegiatanController.php:91
  * @route '/admin/kegiatan'
  */
     const storeForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -203,7 +203,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::store
- * @see app/Http/Controllers/Admin/KegiatanController.php:90
+ * @see app/Http/Controllers/Admin/KegiatanController.php:91
  * @route '/admin/kegiatan'
  */
         storeForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -214,7 +214,7 @@ store.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
     store.form = storeForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
 export const show = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -229,7 +229,7 @@ show.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
 show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -262,7 +262,7 @@ show.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
 show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -271,7 +271,7 @@ show.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 })
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
 show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -281,7 +281,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
     const showForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -291,7 +291,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
         showForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -300,7 +300,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
         })
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::show
- * @see app/Http/Controllers/Admin/KegiatanController.php:100
+ * @see app/Http/Controllers/Admin/KegiatanController.php:101
  * @route '/admin/kegiatan/{kegiatan}'
  */
         showForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -316,7 +316,7 @@ show.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     show.form = showForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
 export const edit = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -331,7 +331,7 @@ edit.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
 edit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -364,7 +364,7 @@ edit.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
 edit.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -373,7 +373,7 @@ edit.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 })
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
 edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -383,7 +383,7 @@ edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
     const editForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -393,7 +393,7 @@ edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
         editForm.get = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -402,7 +402,7 @@ edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
         })
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::edit
- * @see app/Http/Controllers/Admin/KegiatanController.php:115
+ * @see app/Http/Controllers/Admin/KegiatanController.php:116
  * @route '/admin/kegiatan/{kegiatan}/edit'
  */
         editForm.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -418,7 +418,7 @@ edit.head = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
     edit.form = editForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
 export const update = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -433,7 +433,7 @@ update.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
 update.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -466,7 +466,7 @@ update.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
 update.put = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -475,7 +475,7 @@ update.put = (args: { kegiatan: number | { id: number } } | [kegiatan: number | 
 })
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
 update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -485,7 +485,7 @@ update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
     const updateForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -500,7 +500,7 @@ update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
         updateForm.put = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -514,7 +514,7 @@ update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
         })
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::update
- * @see app/Http/Controllers/Admin/KegiatanController.php:127
+ * @see app/Http/Controllers/Admin/KegiatanController.php:128
  * @route '/admin/kegiatan/{kegiatan}'
  */
         updateForm.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -530,7 +530,7 @@ update.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number 
     update.form = updateForm
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:137
+ * @see app/Http/Controllers/Admin/KegiatanController.php:138
  * @route '/admin/kegiatan/{kegiatan}/status'
  */
 export const updateStatus = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -545,7 +545,7 @@ updateStatus.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:137
+ * @see app/Http/Controllers/Admin/KegiatanController.php:138
  * @route '/admin/kegiatan/{kegiatan}/status'
  */
 updateStatus.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -578,7 +578,7 @@ updateStatus.url = (args: { kegiatan: number | { id: number } } | [kegiatan: num
 
 /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:137
+ * @see app/Http/Controllers/Admin/KegiatanController.php:138
  * @route '/admin/kegiatan/{kegiatan}/status'
  */
 updateStatus.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'patch'> => ({
@@ -588,7 +588,7 @@ updateStatus.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: n
 
     /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:137
+ * @see app/Http/Controllers/Admin/KegiatanController.php:138
  * @route '/admin/kegiatan/{kegiatan}/status'
  */
     const updateStatusForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -603,7 +603,7 @@ updateStatus.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: n
 
             /**
 * @see \App\Http\Controllers\Admin\KegiatanController::updateStatus
- * @see app/Http/Controllers/Admin/KegiatanController.php:137
+ * @see app/Http/Controllers/Admin/KegiatanController.php:138
  * @route '/admin/kegiatan/{kegiatan}/status'
  */
         updateStatusForm.patch = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -721,7 +721,7 @@ monitoring.head = (args: { kegiatan: number | { id: number } } | [kegiatan: numb
     monitoring.form = monitoringForm
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 export const lock = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -736,7 +736,7 @@ lock.definition = {
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 lock.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions) => {
@@ -769,7 +769,7 @@ lock.url = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { 
 
 /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
 lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -779,7 +779,7 @@ lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
     /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
     const lockForm = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -789,7 +789,7 @@ lock.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | {
 
             /**
 * @see \App\Http\Controllers\Admin\MonitoringKegiatanController::lock
- * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:201
+ * @see app/Http/Controllers/Admin/MonitoringKegiatanController.php:203
  * @route '/admin/kegiatan/{kegiatan}/kunci'
  */
         lockForm.post = (args: { kegiatan: number | { id: number } } | [kegiatan: number | { id: number } ] | number | { id: number }, options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({

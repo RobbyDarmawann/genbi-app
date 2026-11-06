@@ -42,6 +42,7 @@ class UpdateKegiatanAction
                 'longitude' => $data['longitude'],
                 'radius_m' => (int) $data['radius_m'],
                 'tanggal' => $data['tanggal'],
+                'tanggal_selesai' => $data['tanggal_selesai'] ?? null,
                 'jam_mulai' => $data['jam_mulai'],
                 'jam_selesai' => $data['jam_selesai'],
                 'absensi_buka_at' => $data['absensi_buka_at'],
@@ -53,6 +54,15 @@ class UpdateKegiatanAction
             ]);
 
             $kegiatan->divisiTarget()->sync($divisiIds);
+            $kegiatan->sesiAbsensi()->delete();
+            $kegiatan->sesiAbsensi()->createMany(array_map(
+                fn (array $sesi): array => [
+                    'tanggal' => $sesi['tanggal'],
+                    'jam_buka' => $sesi['jam_buka'],
+                    'jam_tutup' => $sesi['jam_tutup'],
+                ],
+                $data['sesi_absensi'] ?? [],
+            ));
 
             $newBobot = [];
             foreach (['peserta', 'panitia', 'pemateri'] as $peran) {

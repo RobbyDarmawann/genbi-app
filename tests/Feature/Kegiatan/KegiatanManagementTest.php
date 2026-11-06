@@ -109,8 +109,11 @@ describe('Creation and Validation', function () {
             'tanggal' => '2026-04-10',
             'jam_mulai' => '08:00',
             'jam_selesai' => '12:00',
-            'absensi_buka_at' => '2026-04-10T07:30',
-            'absensi_tutup_at' => '2026-04-10T12:30',
+            'sesi_absensi' => [[
+                'tanggal' => '2026-04-10',
+                'jam_buka' => '07:30',
+                'jam_tutup' => '12:30',
+            ]],
             'pendaftaran_dibuka_at' => '2026-04-01T08:00',
             'batas_daftar_at' => '2026-04-09T23:59',
             'kuota' => 50,
@@ -330,8 +333,11 @@ describe('Status Workflow and Locking', function () {
                 'tanggal' => '2026-08-01',
                 'jam_mulai' => '08:00',
                 'jam_selesai' => '12:00',
-                'absensi_buka_at' => '2026-08-01T07:30',
-                'absensi_tutup_at' => '2026-08-01T12:30',
+                'sesi_absensi' => [[
+                    'tanggal' => '2026-08-01',
+                    'jam_buka' => '07:30',
+                    'jam_tutup' => '12:30',
+                ]],
                 'status' => 'draft',
                 'divisi_ids' => [$this->divisiUng->id],
                 'bobot' => ['peserta' => 25],
@@ -391,8 +397,11 @@ describe('Status Workflow and Locking', function () {
             'tanggal' => '2026-08-01',
             'jam_mulai' => '08:00',
             'jam_selesai' => '12:00',
-            'absensi_buka_at' => '2026-08-01T07:30',
-            'absensi_tutup_at' => '2026-08-01T12:30',
+            'sesi_absensi' => [[
+                'tanggal' => '2026-08-01',
+                'jam_buka' => '07:30',
+                'jam_tutup' => '12:30',
+            ]],
             'status' => 'berlangsung',
             'divisi_ids' => [$this->divisiUng->id],
             'bobot' => [
@@ -408,6 +417,51 @@ describe('Status Workflow and Locking', function () {
 });
 
 describe('Student Catalog and Public Schedule', function () {
+    test('tab bisa didaftar hanya menampilkan kegiatan target yang masih memenuhi syarat', function () {
+        $tanggalMulai = now()->addDay()->toDateString();
+        $tanggalSelesai = now()->addDays(2)->toDateString();
+
+        $tersedia = Kegiatan::factory()->create([
+            'judul' => 'Kegiatan Multi Hari Tersedia',
+            'status' => StatusKegiatan::Terbit,
+            'tanggal' => $tanggalMulai,
+            'tanggal_selesai' => $tanggalSelesai,
+            'pendaftaran_dibuka_at' => now()->subHour(),
+            'batas_daftar_at' => now()->addDay(),
+            'dibuat_oleh' => $this->internal->id,
+        ]);
+        $tersedia->divisiTarget()->sync([$this->divisiUng->id]);
+
+        $batalTanpaKehadiran = Kegiatan::factory()->create([
+            'judul' => 'Kegiatan Pendaftaran Batal',
+            'status' => StatusKegiatan::Terbit,
+            'tanggal' => $tanggalMulai,
+            'pendaftaran_dibuka_at' => now()->subHour(),
+            'batas_daftar_at' => now()->addDay(),
+            'dibuat_oleh' => $this->internal->id,
+        ]);
+        $batalTanpaKehadiran->divisiTarget()->sync([$this->divisiUng->id]);
+        Pendaftaran::factory()->create([
+            'kegiatan_id' => $batalTanpaKehadiran->id,
+            'mahasiswa_id' => $this->mahasiswa->id,
+            'status' => StatusPendaftaran::Batal,
+        ]);
+
+        $response = $this->actingAs($this->mahasiswaUser)
+            ->get(route('mahasiswa.kegiatan.index', [
+                'tab' => 'bisa_daftar',
+                'q' => 'Kegiatan',
+            ]));
+
+        $response->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->component('mahasiswa/kegiatan/index')
+            ->where('filters.tab', 'bisa_daftar')
+            ->has('kegiatan.data', 2)
+            ->where('kegiatan.data.0.judul', 'Kegiatan Multi Hari Tersedia')
+            ->where('kegiatan.data.1.judul', 'Kegiatan Pendaftaran Batal')
+        );
+    });
+
     test('student catalog filters kegiatan targeted to student division vs general schedule', function () {
         $kegiatanTargetUng = Kegiatan::factory()->create([
             'judul' => 'Kegiatan Khusus UNG',

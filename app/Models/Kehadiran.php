@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $pendaftaran_id
+ * @property Carbon $tanggal
  * @property Carbon $waktu_checkin
  * @property string|null $latitude
  * @property string|null $longitude
@@ -31,6 +32,7 @@ use Illuminate\Support\Carbon;
  */
 #[Fillable([
     'pendaftaran_id',
+    'tanggal',
     'waktu_checkin',
     'latitude',
     'longitude',
@@ -55,6 +57,7 @@ class Kehadiran extends Model
     protected function casts(): array
     {
         return [
+            'tanggal' => 'date',
             'waktu_checkin' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',

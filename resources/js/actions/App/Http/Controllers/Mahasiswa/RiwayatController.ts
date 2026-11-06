@@ -79,7 +79,7 @@ kehadiran.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     kehadiran.form = kehadiranForm
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 export const poin = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ poin.definition = {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 poin.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ poin.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 poin.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +112,7 @@ poin.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
 poin.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -122,7 +122,7 @@ poin.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
     const poinForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -132,7 +132,7 @@ poin.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
         poinForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -141,7 +141,7 @@ poin.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\Mahasiswa\RiwayatController::poin
- * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:54
+ * @see app/Http/Controllers/Mahasiswa/RiwayatController.php:55
  * @route '/poin/riwayat'
  */
         poinForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({

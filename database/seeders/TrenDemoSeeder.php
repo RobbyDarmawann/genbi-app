@@ -11,6 +11,7 @@ use App\Models\KegiatanBobot;
 use App\Models\Komsat;
 use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
+use App\Models\SesiAbsensi;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -168,6 +169,14 @@ class TrenDemoSeeder extends Seeder
                             ]
                         );
                     }
+
+                    SesiAbsensi::updateOrCreate(
+                        ['kegiatan_id' => $kegiatan->id, 'tanggal' => $kegiatan->tanggal],
+                        [
+                            'jam_buka' => Carbon::parse($kegiatanItem['absensi_buka_at'])->format('H:i:s'),
+                            'jam_tutup' => Carbon::parse($kegiatanItem['absensi_tutup_at'])->format('H:i:s'),
+                        ],
+                    );
                 }
             }
 

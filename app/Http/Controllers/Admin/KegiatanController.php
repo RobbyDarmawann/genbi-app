@@ -52,6 +52,7 @@ class KegiatanController extends Controller
                     'id' => $k->id,
                     'judul' => $k->judul,
                     'tanggal' => $k->tanggal->toDateString(),
+                    'tanggal_selesai' => $k->tanggalSelesaiEfektif()->toDateString(),
                     'jam_mulai' => substr($k->jam_mulai, 0, 5),
                     'lokasi_nama' => $k->lokasi_nama,
                     'status' => $statusEfektif->value,
@@ -115,7 +116,7 @@ class KegiatanController extends Controller
     public function edit(Kegiatan $kegiatan): Response
     {
         Gate::authorize('update', $kegiatan);
-        $kegiatan->load(['divisiTarget:id,komsat_id,nama,aktif', 'bobot']);
+        $kegiatan->load(['divisiTarget:id,komsat_id,nama,aktif', 'bobot', 'sesiAbsensi']);
 
         return Inertia::render('admin/kegiatan/edit', [
             ...$this->formOptions($kegiatan),
@@ -171,6 +172,7 @@ class KegiatanController extends Controller
             'status_label' => $statusEfektif->label(),
             'sisa_kuota' => $kegiatan->kuota !== null ? max(0, $kegiatan->kuota - $jumlahTerdaftar) : null,
             'tanggal' => $kegiatan->tanggal->toDateString(),
+            'tanggal_selesai' => $kegiatan->tanggalSelesaiEfektif()->toDateString(),
             'absensi_buka_at' => $kegiatan->absensi_buka_at->format('Y-m-d\TH:i'),
             'absensi_tutup_at' => $kegiatan->absensi_tutup_at->format('Y-m-d\TH:i'),
             'pendaftaran_dibuka_at' => $kegiatan->pendaftaran_dibuka_at?->format('Y-m-d\TH:i'),
@@ -183,6 +185,11 @@ class KegiatanController extends Controller
                 'komsat_kode' => $divisi->komsat?->kode,
             ])->all(),
             'bobot' => $kegiatan->bobot->mapWithKeys(fn ($bobot): array => [$bobot->peran->value => $bobot->poin]),
+            'sesi_absensi' => $kegiatan->sesiAbsensi->map(fn ($sesi): array => [
+                'tanggal' => $sesi->tanggal->toDateString(),
+                'jam_buka' => substr($sesi->jam_buka, 0, 5),
+                'jam_tutup' => substr($sesi->jam_tutup, 0, 5),
+            ])->values()->all(),
             'bobot_list' => $kegiatan->bobot->map(fn ($bobot): array => [
                 'peran' => $bobot->peran->value,
                 'label' => $bobot->peran->label(),
