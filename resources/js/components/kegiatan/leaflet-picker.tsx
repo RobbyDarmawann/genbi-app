@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import {
     Circle,
     CircleMarker,
+    LayerGroup,
+    LayersControl,
     MapContainer,
     TileLayer,
     useMap,
@@ -61,10 +63,26 @@ export default function LeafletPicker({
                 scrollWheelZoom={false}
                 className="h-full w-full"
             >
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
+                <LayersControl>
+                    <LayersControl.BaseLayer checked name="Jalan">
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                    </LayersControl.BaseLayer>
+                    <LayersControl.BaseLayer name="Satelit">
+                        <LayerGroup>
+                            <TileLayer
+                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                                attribution="Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
+                            />
+                            <TileLayer
+                                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png"
+                                attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+                            />
+                        </LayerGroup>
+                    </LayersControl.BaseLayer>
+                </LayersControl>
                 {!readOnly && onLocationChange && (
                     <MapClickHandler onLocationChange={onLocationChange} />
                 )}
