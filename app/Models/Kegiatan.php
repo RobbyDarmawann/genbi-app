@@ -198,27 +198,27 @@ class Kegiatan extends Model
         $jam = $now->format('H:i:s');
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN 0 ELSE 1 END ASC",
+            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN 0 ELSE 1 END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN DATE(tanggal) END ASC",
+            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN tanggal END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN TIME(jam_mulai) END ASC",
+            "CASE WHEN (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN jam_mulai END ASC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN NOT (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN DATE(tanggal) END DESC",
+            "CASE WHEN NOT (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN tanggal END DESC",
             [$tanggal, $tanggal, $jam]
         );
 
         $query->orderByRaw(
-            "CASE WHEN NOT (status != 'terkunci' AND (DATE(tanggal) > ? OR (DATE(tanggal) = ? AND TIME(jam_selesai) >= ?))) THEN TIME(jam_selesai) END DESC",
+            "CASE WHEN NOT (status != 'terkunci' AND (tanggal > ? OR (tanggal = ? AND jam_selesai >= ?))) THEN jam_selesai END DESC",
             [$tanggal, $tanggal, $jam]
         );
 
