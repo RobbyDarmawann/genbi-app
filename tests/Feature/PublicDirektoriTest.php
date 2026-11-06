@@ -53,7 +53,7 @@ test('direktori default menggunakan periode aktif dan menyembunyikan data sensit
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
         ->component('public/kepengurusan')
-        ->has('periode', fn ($aktif) => $aktif
+        ->has('periode_terpilih', fn ($aktif) => $aktif
             ->where('id', $periodeAktif->id)
             ->where('nama', '2026/2027')
             ->where('aktif', true))
@@ -97,7 +97,7 @@ test('filter komsat dan wilayah hanya menampilkan lingkup yang benar', function 
         'urutan' => 1,
     ]);
 
-    $responseUng = $this->get(route('public.kepengurusan', ['komsat_id' => $komsatUNG->id]));
+    $responseUng = $this->get(route('public.kepengurusan', ['lingkup' => 'UNG']));
     $responseUng->assertOk();
     $responseUng->assertInertia(fn ($page) => $page
         ->has('direktori.wilayah', 0)
@@ -105,7 +105,7 @@ test('filter komsat dan wilayah hanya menampilkan lingkup yang benar', function 
         ->where('direktori.komsat.UNG.0.nama_tampil', 'Pengurus UNG')
         ->missing('direktori.komsat.IAIN'));
 
-    $responseWilayah = $this->get(route('public.kepengurusan', ['komsat_id' => 'wilayah']));
+    $responseWilayah = $this->get(route('public.kepengurusan', ['lingkup' => 'wilayah']));
     $responseWilayah->assertOk();
     $responseWilayah->assertInertia(fn ($page) => $page
         ->has('direktori.wilayah', 1)
@@ -125,11 +125,11 @@ test('periode lama tidak diberi label aktif', function () {
         'urutan' => 1,
     ]);
 
-    $response = $this->get(route('public.kepengurusan', ['periode_id' => $periodeLama->id]));
+    $response = $this->get(route('public.kepengurusan', ['periode' => $periodeLama->id]));
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
-        ->has('periode', fn ($dipilih) => $dipilih
+        ->has('periode_terpilih', fn ($dipilih) => $dipilih
             ->where('id', $periodeLama->id)
             ->where('nama', '2025/2026')
             ->where('aktif', false))

@@ -6,9 +6,8 @@ import {
     MessageSquare,
     Phone,
     RotateCw,
-    Search,
 } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RevealSection } from '@/components/ui/reveal-section';
@@ -31,16 +30,20 @@ export type KepengurusanEntry = {
 };
 
 export type KepengurusanPageProps = {
-    periode: { id: number; nama: string; aktif: boolean } | null;
+    periode_terpilih: { id: number; nama: string; aktif: boolean } | null;
+    daftar_periode: {
+        id: number;
+        nama: string;
+        label: string;
+        aktif: boolean;
+        jumlah_pengurus: number;
+    }[];
     direktori: {
         wilayah: KepengurusanEntry[];
         komsat: Record<string, KepengurusanEntry[]>;
     };
-    filters: { periode_id: string; komsat_id: string };
-    options: {
-        periode: { id: number; nama: string; aktif: boolean }[];
-        komsat: { id: number; kode: string; nama: string }[];
-    };
+    komsat_tersedia: { kode: string; nama: string }[];
+    filters: { periode: string; lingkup: string };
 };
 
 function initials(name: string): string {
@@ -401,10 +404,12 @@ function KepengurusanPlayingCard({
 }
 
 function OrgChartGroup({
+    groupKey,
     title,
     subtitle,
     entries,
 }: {
+    groupKey: string;
     title: string;
     subtitle: string;
     entries: KepengurusanEntry[];
@@ -414,8 +419,11 @@ function OrgChartGroup({
     const tier3 = entries.slice(4);
 
     return (
-        <RevealSection className="rounded-2xl border border-border/80 bg-card p-5 shadow-2xs sm:p-8">
-            <div className="mb-8 border-b pb-4 text-center">
+        <RevealSection
+            id={`group-${groupKey}`}
+            className="scroll-mt-[204px] rounded-2xl border border-border/80 bg-card p-5 shadow-2xs sm:p-8 md:scroll-mt-[142px] lg:scroll-mt-20"
+        >
+            <div className="-mx-5 -mt-5 mb-8 rounded-t-2xl border-b border-border/80 bg-card px-5 py-4 text-center sm:-mx-8 sm:-mt-8 sm:px-8">
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                     <Building2 className="size-3.5" />
                     <span>Struktur Organisasi</span>
@@ -572,19 +580,387 @@ function OrgChartGroup({
     );
 }
 
+function PeriodeTimelineDesktop({
+    daftar_periode,
+    periode_terpilih,
+    onPeriodeSelect,
+}: {
+    daftar_periode: KepengurusanPageProps['daftar_periode'];
+    periode_terpilih: KepengurusanPageProps['periode_terpilih'];
+    onPeriodeSelect: (periodeId: number) => void;
+}) {
+    return (
+        <nav
+            aria-label="Linimasa Periode Kepengurusan"
+            className="relative max-h-[calc(100vh-6rem)] scrollbar-thin overflow-y-auto pr-2"
+        >
+            <div className="relative space-y-1">
+                {/* Garis vertikal netral 2px menembus titik-titik simpul */}
+                <div
+                    aria-hidden="true"
+                    className="absolute top-4 bottom-4 left-[19px] w-[2px] bg-border"
+                />
+                {daftar_periode.map((periode) => {
+                    const isSelected = periode.id === periode_terpilih?.id;
+                    return (
+                        <button
+                            key={periode.id}
+                            type="button"
+                            onClick={() => onPeriodeSelect(periode.id)}
+                            className={cn(
+                                'group relative flex w-full items-start gap-3 rounded-lg p-2 text-left transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                                isSelected && 'bg-muted/40',
+                            )}
+                            aria-label={`Pilih periode ${periode.label}`}
+                            aria-current={isSelected ? 'page' : undefined}
+                        >
+                            <span className="relative z-10 mt-0.5 flex size-6 shrink-0 items-center justify-center">
+                                <span
+                                    className={cn(
+                                        'rounded-full transition-all duration-200',
+                                        isSelected
+                                            ? 'size-4 border-2 border-white bg-[#0035a0] shadow-xs ring-4 ring-[#0035a0]/30'
+                                            : 'size-2.5 border border-background bg-muted-foreground/50 group-hover:scale-125 group-hover:bg-[#0035a0]',
+                                    )}
+                                />
+                            </span>
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                                <p
+                                    className={cn(
+                                        'line-clamp-2 text-sm leading-snug transition-colors',
+                                        isSelected
+                                            ? 'font-bold text-[#0035a0] dark:text-primary'
+                                            : 'font-medium text-foreground group-hover:text-primary',
+                                    )}
+                                >
+                                    {periode.label}
+                                </p>
+                                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                    {periode.aktif && (
+                                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                            Aktif
+                                        </span>
+                                    )}
+                                    <span className="text-xs text-muted-foreground tabular-nums">
+                                        {periode.jumlah_pengurus} pengurus
+                                    </span>
+                                </div>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+}
+
+function PeriodeTimelineMobile({
+    daftar_periode,
+    periode_terpilih,
+    onPeriodeSelect,
+}: {
+    daftar_periode: KepengurusanPageProps['daftar_periode'];
+    periode_terpilih: KepengurusanPageProps['periode_terpilih'];
+    onPeriodeSelect: (periodeId: number) => void;
+}) {
+    return (
+        <div className="rounded-xl border bg-card p-4 shadow-2xs">
+            <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Linimasa Periode
+            </p>
+            <div className="-mx-4 scrollbar-thin overflow-x-auto px-4">
+                <div
+                    className="flex snap-x snap-mandatory gap-2 pb-1"
+                    role="group"
+                    aria-label="Pilih periode kepengurusan"
+                >
+                    {daftar_periode.map((periode) => {
+                        const isSelected = periode.id === periode_terpilih?.id;
+                        return (
+                            <button
+                                key={periode.id}
+                                type="button"
+                                onClick={() => onPeriodeSelect(periode.id)}
+                                className={cn(
+                                    'shrink-0 snap-start rounded-lg border-2 px-3 py-2 text-left transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                                    isSelected
+                                        ? 'border-[#0035a0] bg-[#0035a0] text-white shadow-sm'
+                                        : 'border-border bg-background hover:border-[#0035a0]/50 hover:bg-muted',
+                                )}
+                                aria-label={`Pilih periode ${periode.label}`}
+                                aria-current={isSelected ? 'page' : undefined}
+                            >
+                                <p
+                                    className={cn(
+                                        'text-sm leading-snug font-semibold whitespace-nowrap',
+                                        isSelected
+                                            ? 'text-white'
+                                            : 'text-foreground',
+                                    )}
+                                >
+                                    {periode.label}
+                                </p>
+                                <div className="mt-1 flex items-center gap-2">
+                                    {periode.aktif && (
+                                        <span
+                                            className={cn(
+                                                'rounded-md px-1.5 py-0.5 text-[10px] font-semibold',
+                                                isSelected
+                                                    ? 'bg-white/20 text-white'
+                                                    : 'bg-primary/10 text-primary',
+                                            )}
+                                        >
+                                            Aktif
+                                        </span>
+                                    )}
+                                    <span
+                                        className={cn(
+                                            'text-xs tabular-nums',
+                                            isSelected
+                                                ? 'text-white/80'
+                                                : 'text-muted-foreground',
+                                        )}
+                                    >
+                                        {periode.jumlah_pengurus} pengurus
+                                    </span>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function useActiveGroupScrollspy(groups: { key: string }[]): string | null {
+    const [activeKey, setActiveKey] = useState<string | null>(
+        groups[0]?.key ?? null,
+    );
+
+    useEffect(() => {
+        if (groups.length === 0) {
+            setActiveKey(null);
+            return;
+        }
+
+        setActiveKey(groups[0]?.key ?? null);
+
+        const groupKeys = groups.map((g) => g.key);
+
+        const elements = groupKeys
+            .map((key) => ({
+                key,
+                element: document.getElementById(`group-${key}`),
+            }))
+            .filter(
+                (item): item is { key: string; element: HTMLElement } =>
+                    item.element !== null,
+            );
+
+        if (elements.length === 0) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const intersecting = entries.filter((e) => e.isIntersecting);
+                if (intersecting.length > 0) {
+                    const sorted = intersecting.sort((a, b) => {
+                        const topA = a.boundingClientRect.top;
+                        const topB = b.boundingClientRect.top;
+                        return Math.abs(topA) - Math.abs(topB);
+                    });
+                    const targetId = sorted[0]?.target.id;
+                    if (targetId?.startsWith('group-')) {
+                        setActiveKey(targetId.replace('group-', ''));
+                    }
+                }
+            },
+            {
+                rootMargin: '-10% 0px -65% 0px',
+                threshold: [0, 0.2, 0.5],
+            },
+        );
+
+        elements.forEach(({ element }) => observer.observe(element));
+
+        const handleScroll = () => {
+            if (window.scrollY < 120 && groups[0]) {
+                setActiveKey(groups[0].key);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [groups]);
+
+    return activeKey;
+}
+
+function AnchorJumpList({
+    groups,
+    activeLingkup,
+    activeGroupKey,
+}: {
+    groups: { key: string; title: string }[];
+    activeLingkup: string;
+    activeGroupKey: string | null;
+}) {
+    const visibleGroups =
+        activeLingkup === 'semua'
+            ? groups
+            : groups.filter((g) => g.key === activeLingkup);
+
+    if (visibleGroups.length === 0) {
+        return null;
+    }
+
+    const handleJump = (key: string) => {
+        const element = document.getElementById(`group-${key}`);
+        if (element) {
+            const reducedMotion = window.matchMedia(
+                '(prefers-reduced-motion: reduce)',
+            ).matches;
+            element.scrollIntoView({
+                behavior: reducedMotion ? 'auto' : 'smooth',
+                block: 'start',
+            });
+        }
+    };
+
+    return (
+        <div className="mt-6 border-t border-border pt-4">
+            <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                Isi periode ini
+            </p>
+            <nav
+                aria-label="Lompatan ke kelompok kepengurusan"
+                className="mt-2 space-y-1"
+            >
+                {visibleGroups.map((group) => {
+                    const isActive = activeGroupKey === group.key;
+                    return (
+                        <button
+                            key={group.key}
+                            type="button"
+                            onClick={() => handleJump(group.key)}
+                            className={cn(
+                                'group relative flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                                isActive
+                                    ? 'bg-[#0035a0]/10 font-bold text-[#0035a0] dark:text-primary'
+                                    : 'font-medium text-muted-foreground hover:bg-muted hover:text-foreground',
+                            )}
+                            aria-current={isActive ? 'location' : undefined}
+                        >
+                            <span
+                                className={cn(
+                                    'size-1.5 shrink-0 rounded-full transition-all duration-200',
+                                    isActive
+                                        ? 'scale-125 bg-[#0035a0] dark:bg-primary'
+                                        : 'bg-muted-foreground/40 group-hover:bg-muted-foreground',
+                                )}
+                                aria-hidden="true"
+                            />
+                            <span className="truncate">{group.title}</span>
+                        </button>
+                    );
+                })}
+            </nav>
+        </div>
+    );
+}
+
+function MobileGroupChips({
+    groups,
+    activeGroupKey,
+}: {
+    groups: { key: string; title: string }[];
+    activeGroupKey: string | null;
+}) {
+    const handleChipClick = (key: string) => {
+        const element = document.getElementById(`group-${key}`);
+        if (element) {
+            const reducedMotion = window.matchMedia(
+                '(prefers-reduced-motion: reduce)',
+            ).matches;
+            element.scrollIntoView({
+                behavior: reducedMotion ? 'auto' : 'smooth',
+                block: 'start',
+            });
+        }
+    };
+
+    if (groups.length <= 1) {
+        return null;
+    }
+
+    return (
+        <div className="sticky top-[142px] z-30 -mx-4 border-b border-border/80 bg-background/95 backdrop-blur-sm sm:-mx-6 lg:hidden">
+            <div className="scrollbar-thin overflow-x-auto px-4 py-2 sm:px-6">
+                <div
+                    className="flex gap-2"
+                    role="group"
+                    aria-label="Navigasi kelompok kepengurusan"
+                >
+                    {groups.map((group) => {
+                        const isActive = activeGroupKey === group.key;
+                        const label =
+                            group.key === 'wilayah' ? 'Wilayah' : group.key;
+                        return (
+                            <button
+                                key={group.key}
+                                type="button"
+                                onClick={() => handleChipClick(group.key)}
+                                className={cn(
+                                    'shrink-0 rounded-full border px-3.5 py-1.5 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                                    isActive
+                                        ? 'border-[#0035a0] bg-[#0035a0] font-semibold text-white shadow-xs'
+                                        : 'border-border bg-background font-medium text-muted-foreground hover:border-[#0035a0]/50 hover:text-foreground',
+                                )}
+                                aria-current={isActive ? 'location' : undefined}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export function DirektoriKepengurusanContent({
-    periode,
+    periode_terpilih,
+    daftar_periode,
     direktori,
+    komsat_tersedia,
     filters,
-    options,
     filterUrl,
 }: KepengurusanPageProps & { filterUrl: string }) {
-    const submit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const handlePeriodeSelect = (periodeId: number) => {
         router.get(
             filterUrl,
-            Object.fromEntries(new FormData(event.currentTarget)),
-            { preserveState: true, replace: true },
+            {
+                periode: String(periodeId),
+                lingkup: filters.lingkup || 'semua',
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
+
+    const handleLingkupSelect = (lingkup: string) => {
+        router.get(
+            filterUrl,
+            {
+                periode: filters.periode,
+                lingkup,
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
         );
     };
 
@@ -607,6 +983,13 @@ export function DirektoriKepengurusanContent({
         })),
     ];
 
+    const currentPeriode = daftar_periode.find(
+        (p) => p.id === periode_terpilih?.id,
+    );
+
+    const activeLingkup = filters.lingkup || 'semua';
+    const activeGroupKey = useActiveGroupScrollspy(groups);
+
     return (
         <div className="space-y-8">
             <header className="space-y-2">
@@ -624,87 +1007,173 @@ export function DirektoriKepengurusanContent({
                 </p>
             </header>
 
-            <form
-                onSubmit={submit}
-                className="grid gap-3 rounded-xl border bg-card p-4 shadow-2xs sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
-            >
-                <select
-                    name="periode_id"
-                    defaultValue={filters.periode_id}
-                    aria-label="Pilih periode kepengurusan"
-                    className="h-11 w-full min-w-0 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
-                >
-                    {options.periode.length === 0 ? (
-                        <option value="">Belum ada periode</option>
-                    ) : (
-                        options.periode.map((item) => (
-                            <option key={item.id} value={item.id}>
-                                {item.nama}
-                                {item.aktif ? ' (Periode Aktif)' : ' (Arsip)'}
-                            </option>
-                        ))
-                    )}
-                </select>
-                <select
-                    name="komsat_id"
-                    defaultValue={filters.komsat_id}
-                    aria-label="Pilih lingkup atau komisariat"
-                    className="h-11 w-full min-w-0 rounded-md border bg-background px-3 text-sm text-foreground md:h-9"
-                >
-                    <option value="">Semua lingkup</option>
-                    <option value="wilayah">Tingkat Wilayah</option>
-                    {options.komsat.map((item) => (
-                        <option key={item.id} value={item.id}>
-                            {item.kode} - {item.nama}
-                        </option>
-                    ))}
-                </select>
-                <Button type="submit" className="h-11 md:h-9">
-                    <Search className="size-4" />
-                    Terapkan
-                </Button>
-            </form>
-
-            {periode && (
-                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    <span>
-                        Menampilkan periode{' '}
-                        <span className="font-semibold text-foreground">
-                            {periode.nama}
-                        </span>
-                    </span>
-                    {periode.aktif ? (
-                        <span className="rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                            Periode Aktif
-                        </span>
-                    ) : (
-                        <span className="rounded-md bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                            Arsip Periode
-                        </span>
-                    )}
+            {/* Mobile: horizontal pill timeline (< lg) */}
+            {daftar_periode.length > 0 && (
+                <div className="lg:hidden">
+                    <PeriodeTimelineMobile
+                        daftar_periode={daftar_periode}
+                        periode_terpilih={periode_terpilih}
+                        onPeriodeSelect={handlePeriodeSelect}
+                    />
                 </div>
             )}
 
-            {groups.length === 0 ? (
-                <Card>
-                    <CardContent className="p-8 text-center text-muted-foreground">
-                        {periode
-                            ? 'Belum ada data kepengurusan untuk pilihan periode dan lingkup ini.'
-                            : 'Belum ada data kepengurusan periode aktif yang dipublikasikan.'}
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="space-y-10">
-                    {groups.map((group) => (
-                        <OrgChartGroup
-                            key={group.key}
-                            title={group.title}
-                            subtitle={group.subtitle}
-                            entries={group.entries}
-                        />
-                    ))}
+            {/* Desktop ≥ lg: Two-column layout */}
+            <div className="lg:flex lg:gap-8">
+                {/* Left rail: sticky vertical timeline + anchor jump list (desktop only ≥ lg) */}
+                {daftar_periode.length > 0 && (
+                    <aside className="hidden lg:block lg:w-[280px] lg:shrink-0">
+                        <div className="sticky top-20 space-y-0">
+                            <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                Linimasa Periode
+                            </p>
+                            <PeriodeTimelineDesktop
+                                daftar_periode={daftar_periode}
+                                periode_terpilih={periode_terpilih}
+                                onPeriodeSelect={handlePeriodeSelect}
+                            />
+                            {currentPeriode && groups.length > 0 && (
+                                <AnchorJumpList
+                                    groups={groups}
+                                    activeLingkup={activeLingkup}
+                                    activeGroupKey={activeGroupKey}
+                                />
+                            )}
+                        </div>
+                    </aside>
+                )}
+
+                {/* Right content: period context + scope chips + directory */}
+                <div className="min-w-0 flex-1 space-y-6">
+                    {currentPeriode && (
+                        <div className="space-y-4">
+                            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-4 py-3">
+                                <div className="flex flex-wrap items-center gap-2 text-sm">
+                                    <span className="text-muted-foreground">
+                                        Periode:
+                                    </span>
+                                    <span className="text-base font-bold text-foreground">
+                                        {currentPeriode.nama}
+                                    </span>
+                                    {currentPeriode.aktif ? (
+                                        <span className="rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                                            Periode Aktif
+                                        </span>
+                                    ) : (
+                                        <span className="rounded-md bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                                            Arsip Periode
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-xs font-medium text-muted-foreground tabular-nums sm:text-sm">
+                                    {currentPeriode.jumlah_pengurus} pengurus
+                                    terdaftar
+                                </span>
+                            </div>
+
+                            <div className="space-y-2">
+                                <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                    Pilihan Lingkup
+                                </p>
+                                <div
+                                    className="flex flex-wrap gap-2"
+                                    role="group"
+                                    aria-label="Filter Lingkup Kepengurusan"
+                                >
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            activeLingkup === 'semua'
+                                                ? 'default'
+                                                : 'outline'
+                                        }
+                                        onClick={() =>
+                                            handleLingkupSelect('semua')
+                                        }
+                                        className={cn(
+                                            'h-11 px-4 text-sm md:h-9',
+                                            activeLingkup === 'semua' &&
+                                                'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
+                                        )}
+                                    >
+                                        Semua
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            activeLingkup === 'wilayah'
+                                                ? 'default'
+                                                : 'outline'
+                                        }
+                                        onClick={() =>
+                                            handleLingkupSelect('wilayah')
+                                        }
+                                        className={cn(
+                                            'h-11 px-4 text-sm md:h-9',
+                                            activeLingkup === 'wilayah' &&
+                                                'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
+                                        )}
+                                    >
+                                        Wilayah
+                                    </Button>
+                                    {komsat_tersedia.map((komsat) => (
+                                        <Button
+                                            key={komsat.kode}
+                                            type="button"
+                                            size="sm"
+                                            variant={
+                                                activeLingkup === komsat.kode
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            onClick={() =>
+                                                handleLingkupSelect(komsat.kode)
+                                            }
+                                            className={cn(
+                                                'h-11 px-4 text-sm md:h-9',
+                                                activeLingkup === komsat.kode &&
+                                                    'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
+                                            )}
+                                        >
+                                            {komsat.kode}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {groups.length === 0 ? (
+                        <Card>
+                            <CardContent className="p-8 text-center text-muted-foreground">
+                                {periode_terpilih
+                                    ? 'Belum ada data pengurus untuk periode dan lingkup yang dipilih.'
+                                    : 'Belum ada data kepengurusan yang dipublikasikan.'}
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <div className="space-y-10">
+                            {activeLingkup === 'semua' && groups.length > 1 && (
+                                <MobileGroupChips
+                                    groups={groups}
+                                    activeGroupKey={activeGroupKey}
+                                />
+                            )}
+                            {groups.map((group) => (
+                                <OrgChartGroup
+                                    key={group.key}
+                                    groupKey={group.key}
+                                    title={group.title}
+                                    subtitle={group.subtitle}
+                                    entries={group.entries}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

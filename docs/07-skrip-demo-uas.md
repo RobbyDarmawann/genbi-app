@@ -127,9 +127,32 @@ atau transaksi poin baru; total poin, leaderboard, dan dashboard mahasiswa
 tidak berubah. Seeder tidak dipanggil oleh `DatabaseSeeder` dan aman dijalankan
 berulang kali.
 
+### Data demo historis kepengurusan multi-periode (opsional)
+
+Untuk mendemonstrasikan linimasa multi-periode di direktori kepengurusan publik
+dengan menampilkan enam periode masa lalu (2018–2025), jalankan:
+
+```powershell
+php artisan db:seed --class=KepengurusanHistorisSeeder
+```
+
+Seeder ini membuat:
+
+- 6 Periode lama tidak aktif: `Periode 2018/2020` s.d. `Periode 2024/2025`.
+- 126 pengurus historis:
+    - Periode 2018/2020: 23 orang (14 Wilayah, 3 Komsat IAIN, 3 Komsat UNG, 3 Komsat UG).
+    - Periode 2020/2021: 39 orang susunan lengkap (12 Wilayah, 9 Komsat UNG, 9 Komsat IAIN, 9 Komsat UG).
+    - Periode 2021/2022: 23 orang (14 Wilayah, 3 Komsat UNG, 3 Komsat IAIN, 3 Komsat UG).
+    - Periode 2022/2023: 15 orang (6 Wilayah, 3 Komsat UNG, 3 Komsat IAIN, 3 Komsat UG).
+    - Periode 2023/2024: 13 orang (4 Wilayah, 3 Komsat UNG, 3 Komsat IAIN, 3 Komsat UG).
+    - Periode 2024/2025: 13 orang (4 Wilayah, 3 Komsat UNG, 3 Komsat IAIN, 3 Komsat UG).
+- Nama asli dari organigram GenBI Gorontalo dibiarkan tanpa kontak karangan, sedangkan nama bertanda `(Demo)` membawa kontak contoh.
+- Bersifat idempoten (bisa dijalankan berulang tanpa menduplikasi data).
+- Tidak dipanggil oleh `DatabaseSeeder` maupun `DemoSeeder`, dan tidak mengubah data kanonis aktif.
+
 Untuk kembali ke data demo bawaan, jalankan perintah berikut pada database
 lokal yang aman di-reset. `DatabaseSeeder` memanggil seeder master saja dan
-tidak memanggil `DemoSeeder` atau `TrenDemoSeeder`; jalankan kembali `DemoSeeder`
+tidak memanggil `DemoSeeder` atau `TrenDemoSeeder`/`KepengurusanHistorisSeeder`; jalankan kembali `DemoSeeder`
 setelah reset untuk memulihkan seluruh dataset demo:
 
 ```powershell

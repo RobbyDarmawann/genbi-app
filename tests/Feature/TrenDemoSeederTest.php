@@ -13,8 +13,11 @@ use Database\Seeders\KomsatSeeder;
 use Database\Seeders\PeriodeSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\TrenDemoSeeder;
+use Illuminate\Support\Carbon;
 
 beforeEach(function () {
+    Carbon::setTestNow(Carbon::parse('2026-10-15 14:00:00', config('app.timezone')));
+
     $this->seed([
         RoleSeeder::class,
         KomsatSeeder::class,
@@ -28,7 +31,10 @@ beforeEach(function () {
 test('tren demo seeder menghasilkan deret bulanan n minimal 4 untuk kelima komsat dan tren naik untuk UNG', function () {
     $this->seed(TrenDemoSeeder::class);
 
-    $report = app(GetEvaluationReportAction::class)->handle([]);
+    $report = app(GetEvaluationReportAction::class)->handle([
+        'mulai' => '2026-06-01',
+        'akhir' => '2026-09-30',
+    ]);
 
     expect($report['proyeksi_tren'])->toHaveCount(5);
 

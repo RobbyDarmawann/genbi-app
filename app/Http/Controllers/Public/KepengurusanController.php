@@ -28,19 +28,46 @@ class KepengurusanController extends Controller
     private function buildPayload(Request $request): array
     {
         $periodeAktif = Periode::query()->aktif()->first();
-        $periodeId = $request->filled('periode_id') ? (int) $request->input('periode_id') : $periodeAktif?->id;
-        $komsatFilter = $request->input('komsat_id');
+
+        $periodeBerdata = Periode::query()
+            ->where(function ($q) use ($periodeAktif) {
+                $q->whereHas('kepengurusan');
+                if ($periodeAktif) {
+                    $q->orWhere('id', $periodeAktif->id);
+                }
+            })
+            ->orderByDesc('tanggal_mulai')
+            ->get(['id', 'nama', 'aktif']);
+
+        $periodeParam = $request->input('periode') ?? $request->input('periode_id');
+        $periodeIdRequest = ($periodeParam !== null && is_numeric($periodeParam)) ? (int) $periodeParam : null;
+
+        $defaultPeriodeId = $periodeAktif !== null ? $periodeAktif->id : $periodeBerdata->first()?->id;
+        $periodeId = $periodeIdRequest && $periodeBerdata->contains('id', $periodeIdRequest)
+            ? $periodeIdRequest
+            : $defaultPeriodeId;
+
+        $validKomsatKodes = Komsat::query()->where('aktif', true)->pluck('kode')->all();
+        $lingkupInput = $request->string('lingkup')->trim()->toString();
+        $lingkupFilter = in_array($lingkupInput, ['wilayah', ...$validKomsatKodes], true) ? $lingkupInput : 'semua';
 
         $periode = $periodeId ? Periode::find($periodeId) : null;
+
         $kepengurusan = $periode === null
             ? collect()
             : Kepengurusan::query()
                 ->with(['periode:id,nama,aktif', 'komsat:id,kode,nama'])
                 ->where('periode_id', $periode->id)
-                ->when($komsatFilter === 'wilayah', fn ($q) => $q->whereNull('komsat_id'))
-                ->when($komsatFilter !== null && $komsatFilter !== '' && $komsatFilter !== 'all' && $komsatFilter !== 'wilayah', function ($q) use ($komsatFilter) {
-                    $q->where('komsat_id', (int) $komsatFilter);
-                })
+                ->when($lingkupFilter === 'wilayah', fn ($q) => $q->whereNull('komsat_id'))
+                ->when(
+                    $lingkupFilter !== 'semua' && $lingkupFilter !== 'wilayah',
+                    function ($q) use ($lingkupFilter) {
+                        $komsat = Komsat::query()->where('kode', $lingkupFilter)->first();
+                        if ($komsat) {
+                            $q->where('komsat_id', $komsat->id);
+                        }
+                    }
+                )
                 ->orderBy('urutan')
                 ->orderBy('id')
                 ->get()
@@ -60,16 +87,44 @@ class KepengurusanController extends Controller
                     'foto_url' => $item->foto_path ? asset('storage/'.$item->foto_path) : null,
                 ]);
 
+        $komsatTersedia = $periode === null
+            ? []
+            : Komsat::query()
+                ->whereHas('kepengurusan', fn ($q) => $q->where('periode_id', $periode->id))
+                ->orderBy('kode')
+                ->get(['kode', 'nama'])
+                ->map(fn (Komsat $k) => [
+                    'kode' => $k->kode,
+                    'nama' => $k->nama,
+                ])
+                ->all();
+
+        $daftarPeriode = $periodeBerdata->map(function (Periode $p) {
+            $jumlah = Kepengurusan::query()->where('periode_id', $p->id)->count();
+
+            return [
+                'id' => $p->id,
+                'nama' => $p->nama,
+                'label' => $p->nama,
+                'label_tahun' => $p->nama,
+                'aktif' => (bool) $p->aktif,
+                'jumlah_pengurus' => $jumlah,
+            ];
+        })->values()->all();
+
         return [
+            'periode_terpilih' => $periode?->only(['id', 'nama', 'aktif']),
             'periode' => $periode?->only(['id', 'nama', 'aktif']),
+            'daftar_periode' => $daftarPeriode,
             'direktori' => [
                 'wilayah' => $kepengurusan->where('lingkup', 'wilayah')->values()->all(),
                 'komsat' => $kepengurusan->where('lingkup', 'komsat')->groupBy('komsat_kode')->all(),
             ],
-            'filters' => ['periode_id' => $periodeId !== null ? (string) $periodeId : '', 'komsat_id' => (string) ($komsatFilter ?? '')],
-            'options' => [
-                'periode' => Periode::query()->orderByDesc('aktif')->orderByDesc('tanggal_mulai')->get(['id', 'nama', 'aktif'])->all(),
-                'komsat' => Komsat::query()->where('aktif', true)->orderBy('id')->get(['id', 'kode', 'nama'])->all(),
+            'komsat_tersedia' => $komsatTersedia,
+            'filters' => [
+                'periode' => $periodeId !== null ? (string) $periodeId : '',
+                'periode_id' => $periodeId !== null ? (string) $periodeId : '',
+                'lingkup' => $lingkupFilter,
             ],
         ];
     }

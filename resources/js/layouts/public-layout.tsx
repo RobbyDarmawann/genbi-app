@@ -8,8 +8,9 @@ import {
     Music2,
     Youtube,
 } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useHeaderVisibility } from '@/hooks/use-header-visibility';
 import { dashboard, home, login } from '@/routes';
 import admin from '@/routes/admin';
 import mahasiswa from '@/routes/mahasiswa';
@@ -75,6 +76,8 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
     const { auth } = usePage().props;
     const [logoError, setLogoError] = useState(false);
     const currentYear = new Date().getFullYear();
+    const headerRef = useRef<HTMLElement>(null);
+    const { isVisible } = useHeaderVisibility({ headerRef });
 
     const dashboardHref = auth.user?.roles.includes('internal_manajemen')
         ? admin.dashboard()
@@ -84,7 +87,10 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
 
     return (
         <div className="flex min-h-dvh flex-col bg-background text-foreground">
-            <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+            <header
+                ref={headerRef}
+                className={`sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-md transition-transform duration-300 supports-[backdrop-filter]:bg-background/80 motion-reduce:transition-none ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}
+            >
                 <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                     <Link
                         href={home()}

@@ -1,0 +1,36 @@
+MODE EKSEKUSI. Kamu berjalan dalam Agent Mode di workspace genbigto-app dan WAJIB menjalankan tugas di bawah ini memakai tools. Jangan menjawab dengan sapaan atau pertanyaan generik, jangan bertanya balik. Kalau tools ternyata tidak tersedia untukmu, berhenti dan tulis persis: TOOLS TIDAK TERSEDIA.
+
+DIREKTORI KEPENGURUSAN MULTI-PERIODE DI HALAMAN PUBLIK /kepengurusan.
+
+TUJUAN. Halaman kepengurusan publik saat ini hanya menampilkan pengurus Periode aktif. Samakan kemampuannya dengan situs lama (yang punya linimasa per masa kepengurusan) tetapi dengan kualitas sistem baru: pengunjung bisa melihat susunan pengurus dari SEMUA periode yang datanya ada, dari periode terbaru ke yang paling lama, menyaring per lingkup, dan membagikannya lewat URL. Tampilan direktori yang sudah ada (kartu flip 3D berkelompok Wilayah → Komsat dengan garis hierarki) DIPERTAHANKAN persis — yang ditambah adalah navigasi periodenya.
+
+BAGIAN A — Audit & data (backend):
+
+1. Audit: relasi kepengurusan ↔ periode (kolom periode_id atau setara), master data Periode (nama + rentang tanggal/tahun ajaran), cara controller publik kepengurusan saat ini memilih data (asumsi: hanya Periode aktif), dan cara admin kepengurusan saat ini memilih periode kerjanya.
+2. Controller publik mengirim props tambahan: (a) daftar periode yang MEMILIKI data kepengurusan, terurut dari terbaru ke terlama (berdasarkan awal periode), masing-masing berisi id, nama periode, label tahun (diturunkan dari data periode yang ada, mis. nama periode itu sendiri atau rentang tahunnya — jangan mengarang format baru bila nama periode sudah memuat tahun), dan jumlah pengurus; (b) periode terpilih (dari query param `periode`, default = Periode aktif; bila id tidak valid/tidak punya data, jatuh ke Periode aktif); (c) data direktori untuk periode terpilih dengan pengelompokan dan urutan yang SAMA seperti sekarang.
+3. Query param kedua: `lingkup` (semua|wilayah|kode komsat) menyaring kelompok yang ditampilkan di server; nilai tidak valid → semua. Kedua param dipertahankan di URL (Inertia visit preserveState sesuai pola halaman publik lain di proyek) agar bisa dibagikan dan tombol kembali browser berperilaku benar.
+4. Periode TANPA data kepengurusan tidak muncul di daftar periode publik (tidak ada pilihan buntu), kecuali Periode aktif yang selalu jadi default walau datanya kosong (empty state mengikuti pola yang ada).
+5. TANPA perubahan skema untuk fitur ini (tidak ada migration/kolom baru). Pemetaan struktur situs lama ke model yang ada: Pembina adalah jabatan lingkup Wilayah; Ketua Komisariat suatu Komsat dicatat sebagai kepala kelompok Komsat-nya sendiri (lingkup Komsat tersebut, jabatan "Ketua Komisariat") — supaya penyaring per Komsat menjawab "siapa saja yang menjabat atas nama Komsat ini" — sedangkan pada tampilan lingkup "Semua" seluruh kelompok tampil sebagai satu kepengurusan utuh dengan garis hierarki dari kartu Ketua Umum, meniru organigram situs lama. Kelompok Komsat yang kosong pada periode terpilih tidak ditampilkan (dan tidak mendapat chip lingkup).
+
+BAGIAN B — UI publik:
+
+1. Di atas direktori, tampilkan LINIMASA PERIODE: garis horizontal (di mobile boleh membungkus/bergulir horizontal rapi tanpa overflow) dengan simpul untuk tiap periode dari daftar props, terurut terbaru → terlama; simpul berisi label tahun/nama periode; periode terpilih beraksen biru brand (#0035a0) dan tertandai jelas (mis. titik lebih besar + teks tebal); mengklik simpul mengganti periode (dan mempertahankan lingkup terpilih).
+2. Di bawah linimasa tampilkan judul konteks periode terpilih (nama periode + jumlah pengurus) dan PILIHAN LINGKUP berbentuk segmented control/chip: Semua, Wilayah, lalu satu chip per Komsat yang punya data pada periode terpilih.
+3. Direktori di bawahnya: komponen kartu flip + pengelompokan + garis hierarki yang SUDAH ADA dipakai ulang apa adanya untuk data periode terpilih dan lingkup terpilih (klik mengunci sisi belakang kontak tetap bekerja; Escape tetap menutup). Jangan menulis ulang komponen kartu.
+4. Empty state: periode terpilih tanpa pengurus pada lingkup tersaring → pesan kosong yang sopan mengikuti pola proyek; BUKAN halaman error.
+5. Ikuti skill responsive-ui-ux: linimasa dan chip terbaca di 360 px, tidak ada overflow horizontal di 360/390/768/1280/1536, animasi transisi antar periode (bila ditambahkan) menghormati prefers-reduced-motion.
+
+BAGIAN C — Admin (hanya bila hasil audit menunjukkan admin belum bisa bekerja per periode):
+Bila admin kepengurusan saat ini terkunci di Periode aktif, tambahkan pemilih periode di halaman admin kepengurusan (dropdown sederhana, default Periode aktif) agar IM bisa melihat DAN mengelola (tambah/ubah/hapus mengikuti aturan yang sudah ada) susunan pengurus periode mana pun — ini prasyarat agar data historis bisa diisi. Bila audit membuktikan pemilih periode sudah ada, lewati bagian ini dan tulis buktinya di laporan. Jangan mengubah aturan/skema kontak terstruktur yang sudah ada.
+
+BAGIAN D — Data demo historis (seeder opsional TERPISAH, meniru pola TrenDemoSeeder):
+Buat `KepengurusanDemoSeeder` yang TIDAK dipanggil DatabaseSeeder/DemoSeeder dan TIDAK mengubah keduanya: membuat satu Periode lama tidak aktif bertanda demo (nama "Periode Demo 2022/2023") dan 7 pengurus demo untuk periode itu yang MENIRU komposisi situs lama: 4 lingkup Wilayah (1 Pembina, 1 Ketua Umum, 1 Sekretaris Umum, 1 Bendahara Umum) dan 3 Ketua Komisariat yang masing-masing menjadi kepala kelompok Komsat UNG, IAIN, dan UG — nama bertanda "(Demo Periode Lama)", kontak contoh — secara idempoten (jalan dua kali tidak menggandakan). Tulis cara aktivasi + pemulihannya di docs/07-skrip-demo-uas.md mengikuti pola catatan TrenDemoSeeder. Data kanonis DemoSeeder tidak berubah sama sekali.
+
+BAGIAN E — Test:
+Test fitur baru: (1) props publik memuat daftar periode berdata terurut terbaru → terlama dan default-nya Periode aktif; (2) memilih periode lama menampilkan pengurus periode itu (bukan yang aktif) dan memilih lingkup menyaring kelompok dengan benar; (3) param tidak valid jatuh ke default dengan aman; (4) seeder opsional idempoten (jalan dua kali: periode demo lama tetap 1, pengurus demo lama tetap 7) dan tidak mengubah data kanonis; (5) bila Bagian C dikerjakan, test pemilih periode admin. Suite TIDAK boleh turun dari baseline yang diberikan pada perintah pendamping dan jumlah passed WAJIB naik.
+
+VERIFIKASI BROWSER (http://127.0.0.1:8000/kepengurusan, tanpa login; jalankan KepengurusanDemoSeeder sekali agar ada dua periode): linimasa menampilkan dua periode (aktif terbaru lebih dulu); mengklik periode lama mengganti seluruh direktori ke pengurus periode lama dan URL memuat param periode; chip lingkup menyaring kelompok; klik kartu tetap membalik & mengunci sisi kontak pada periode lama juga; overflow 0 px di 360/390/768/1280/1536; console error 0. Laporkan hasil per lebar + keadaan dua periode itu. Berkas screenshot/skrip verifikasi sementara dihapus dari repo sesudah selesai.
+
+GERBANG: test terkait + suite penuh, vendor\bin\pint, composer types:check, npm run types:check, npm run check, npm run build.
+LAPORAN: hasil audit (termasuk putusan Bagian C beserta buktinya), file berubah, hasil verifikasi browser, angka gerbang.
+Pesan commit yang disarankan: feat: add multi-period board directory with timeline filter
