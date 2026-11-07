@@ -7,11 +7,11 @@ import {
     Phone,
     RotateCw,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { RevealSection } from '@/components/ui/reveal-section';
-import PublicLayout from '@/layouts/public-layout';
+import PublicLayout, { usePublicHeader } from '@/layouts/public-layout';
 import { cn } from '@/lib/utils';
 import { kepengurusan } from '@/routes/public';
 
@@ -1133,65 +1133,6 @@ function AnchorJumpList({
     );
 }
 
-function MobileGroupChips({
-    groups,
-    activeGroupKey,
-}: {
-    groups: { key: string; title: string }[];
-    activeGroupKey: string | null;
-}) {
-    const handleChipClick = (key: string) => {
-        const element = document.getElementById(`group-${key}`);
-        if (element) {
-            const reducedMotion = window.matchMedia(
-                '(prefers-reduced-motion: reduce)',
-            ).matches;
-            element.scrollIntoView({
-                behavior: reducedMotion ? 'auto' : 'smooth',
-                block: 'start',
-            });
-        }
-    };
-
-    if (groups.length <= 1) {
-        return null;
-    }
-
-    return (
-        <div className="sticky top-[142px] z-30 -mx-4 border-b border-border/80 bg-background/95 backdrop-blur-sm sm:-mx-6 lg:hidden">
-            <div className="[scrollbar-width:none] overflow-x-auto px-4 py-2 sm:px-6 [&::-webkit-scrollbar]:hidden">
-                <div
-                    className="flex gap-2"
-                    role="group"
-                    aria-label="Navigasi kelompok kepengurusan"
-                >
-                    {groups.map((group) => {
-                        const isActive = activeGroupKey === group.key;
-                        const label =
-                            group.key === 'wilayah' ? 'Wilayah' : group.key;
-                        return (
-                            <button
-                                key={group.key}
-                                type="button"
-                                onClick={() => handleChipClick(group.key)}
-                                className={cn(
-                                    'shrink-0 rounded-full border px-3.5 py-1.5 text-xs transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-                                    isActive
-                                        ? 'border-[#0035a0] bg-[#0035a0] font-semibold text-white shadow-xs'
-                                        : 'border-border bg-background font-medium text-muted-foreground hover:border-[#0035a0]/50 hover:text-foreground',
-                                )}
-                                aria-current={isActive ? 'location' : undefined}
-                            >
-                                {label}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
-}
-
 export function DirektoriKepengurusanContent({
     periode_terpilih,
     daftar_periode,
@@ -1200,6 +1141,10 @@ export function DirektoriKepengurusanContent({
     filters,
     filterUrl,
 }: KepengurusanPageProps & { filterUrl: string }) {
+    const { isHeaderVisible } = usePublicHeader();
+    const activePillRef = useRef<HTMLButtonElement | null>(null);
+    const pillContainerRef = useRef<HTMLDivElement | null>(null);
+
     const handlePeriodeSelect = (periodeId: number) => {
         router.get(
             filterUrl,
@@ -1247,6 +1192,29 @@ export function DirektoriKepengurusanContent({
 
     const activeLingkup = filters.lingkup || 'semua';
     const activeGroupKey = useActiveGroupScrollspy(groups);
+
+    useEffect(() => {
+        if (activePillRef.current && pillContainerRef.current) {
+            const container = pillContainerRef.current;
+            const pill = activePillRef.current;
+            const pillLeft = pill.offsetLeft;
+            const pillRight = pillLeft + pill.offsetWidth;
+            const containerLeft = container.scrollLeft;
+            const containerRight = containerLeft + container.clientWidth;
+
+            if (pillLeft < containerLeft) {
+                container.scrollTo({
+                    left: Math.max(0, pillLeft - 16),
+                    behavior: 'smooth',
+                });
+            } else if (pillRight > containerRight) {
+                container.scrollTo({
+                    left: pillRight - container.clientWidth + 16,
+                    behavior: 'smooth',
+                });
+            }
+        }
+    }, [activeLingkup]);
 
     return (
         <div className="space-y-8">
@@ -1304,100 +1272,133 @@ export function DirektoriKepengurusanContent({
                 {/* Right content: period context + scope chips + directory */}
                 <div className="min-w-0 flex-1 space-y-6">
                     {currentPeriode && (
-                        <div className="space-y-4">
-                            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-4 py-3">
-                                <div className="flex flex-wrap items-center gap-2 text-sm">
-                                    <span className="text-muted-foreground">
-                                        Periode:
-                                    </span>
-                                    <span className="text-base font-bold text-foreground">
-                                        {currentPeriode.nama}
-                                    </span>
-                                    {currentPeriode.aktif ? (
-                                        <span className="rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                                            Periode Aktif
-                                        </span>
-                                    ) : (
-                                        <span className="rounded-md bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                                            Arsip Periode
-                                        </span>
-                                    )}
-                                </div>
-                                <span className="text-xs font-medium text-muted-foreground tabular-nums sm:text-sm">
-                                    {currentPeriode.jumlah_pengurus} pengurus
-                                    terdaftar
+                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border bg-muted/30 px-4 py-3">
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                                <span className="text-muted-foreground">
+                                    Periode:
                                 </span>
+                                <span className="text-base font-bold text-foreground">
+                                    {currentPeriode.nama}
+                                </span>
+                                {currentPeriode.aktif ? (
+                                    <span className="rounded-md bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                                        Periode Aktif
+                                    </span>
+                                ) : (
+                                    <span className="rounded-md bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                                        Arsip Periode
+                                    </span>
+                                )}
                             </div>
+                            <span className="text-xs font-medium text-muted-foreground tabular-nums sm:text-sm">
+                                {currentPeriode.jumlah_pengurus} pengurus
+                                terdaftar
+                            </span>
+                        </div>
+                    )}
 
+                    {currentPeriode && (
+                        <div
+                            id="bar-komsat"
+                            className={cn(
+                                'sticky z-30 -mx-4 border-b border-border/80 bg-background px-4 py-2.5 transition-[top] duration-300 motion-reduce:transition-none sm:-mx-6 sm:px-6 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0',
+                                isHeaderVisible ? 'top-[142px]' : 'top-0',
+                            )}
+                        >
                             <div className="space-y-2">
                                 <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                     Pilihan Lingkup
                                 </p>
                                 <div
-                                    className="flex flex-wrap gap-2"
-                                    role="group"
-                                    aria-label="Filter Lingkup Kepengurusan"
+                                    ref={pillContainerRef}
+                                    className="[scrollbar-width:none] overflow-x-auto md:overflow-visible [&::-webkit-scrollbar]:hidden"
                                 >
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant={
-                                            activeLingkup === 'semua'
-                                                ? 'default'
-                                                : 'outline'
-                                        }
-                                        onClick={() =>
-                                            handleLingkupSelect('semua')
-                                        }
-                                        className={cn(
-                                            'h-11 px-4 text-sm md:h-9',
-                                            activeLingkup === 'semua' &&
-                                                'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
-                                        )}
+                                    <div
+                                        className="flex gap-2 pb-1 md:flex-wrap md:pb-0"
+                                        role="group"
+                                        aria-label="Filter Lingkup Kepengurusan"
                                     >
-                                        Semua
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        size="sm"
-                                        variant={
-                                            activeLingkup === 'wilayah'
-                                                ? 'default'
-                                                : 'outline'
-                                        }
-                                        onClick={() =>
-                                            handleLingkupSelect('wilayah')
-                                        }
-                                        className={cn(
-                                            'h-11 px-4 text-sm md:h-9',
-                                            activeLingkup === 'wilayah' &&
-                                                'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
-                                        )}
-                                    >
-                                        Wilayah
-                                    </Button>
-                                    {komsat_tersedia.map((komsat) => (
                                         <Button
-                                            key={komsat.kode}
                                             type="button"
                                             size="sm"
                                             variant={
-                                                activeLingkup === komsat.kode
+                                                activeLingkup === 'semua'
                                                     ? 'default'
                                                     : 'outline'
                                             }
                                             onClick={() =>
-                                                handleLingkupSelect(komsat.kode)
+                                                handleLingkupSelect('semua')
+                                            }
+                                            ref={
+                                                activeLingkup === 'semua'
+                                                    ? activePillRef
+                                                    : null
                                             }
                                             className={cn(
-                                                'h-11 px-4 text-sm md:h-9',
-                                                activeLingkup === komsat.kode &&
+                                                'h-11 shrink-0 px-4 text-sm md:h-9',
+                                                activeLingkup === 'semua' &&
                                                     'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
                                             )}
                                         >
-                                            {komsat.kode}
+                                            Semua
                                         </Button>
-                                    ))}
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant={
+                                                activeLingkup === 'wilayah'
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            onClick={() =>
+                                                handleLingkupSelect('wilayah')
+                                            }
+                                            ref={
+                                                activeLingkup === 'wilayah'
+                                                    ? activePillRef
+                                                    : null
+                                            }
+                                            className={cn(
+                                                'h-11 shrink-0 px-4 text-sm md:h-9',
+                                                activeLingkup === 'wilayah' &&
+                                                    'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
+                                            )}
+                                        >
+                                            Wilayah
+                                        </Button>
+                                        {komsat_tersedia.map((komsat) => (
+                                            <Button
+                                                key={komsat.kode}
+                                                type="button"
+                                                size="sm"
+                                                variant={
+                                                    activeLingkup ===
+                                                    komsat.kode
+                                                        ? 'default'
+                                                        : 'outline'
+                                                }
+                                                onClick={() =>
+                                                    handleLingkupSelect(
+                                                        komsat.kode,
+                                                    )
+                                                }
+                                                ref={
+                                                    activeLingkup ===
+                                                    komsat.kode
+                                                        ? activePillRef
+                                                        : null
+                                                }
+                                                className={cn(
+                                                    'h-11 shrink-0 px-4 text-sm md:h-9',
+                                                    activeLingkup ===
+                                                        komsat.kode &&
+                                                        'bg-[#0035a0] text-white hover:bg-[#0035a0]/90',
+                                                )}
+                                            >
+                                                {komsat.kode}
+                                            </Button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1413,12 +1414,6 @@ export function DirektoriKepengurusanContent({
                         </Card>
                     ) : (
                         <div className="space-y-10">
-                            {activeLingkup === 'semua' && groups.length > 1 && (
-                                <MobileGroupChips
-                                    groups={groups}
-                                    activeGroupKey={activeGroupKey}
-                                />
-                            )}
                             {groups.map((group) => (
                                 <OrgChartGroup
                                     key={group.key}
