@@ -459,7 +459,7 @@ function OrgChartGroup({
         tier3 = entries.slice(4);
     }
 
-    const hasDualPuncak = puncak.length === 2;
+    const hasMultiPuncak = puncak.length >= 2;
 
     return (
         <RevealSection
@@ -480,8 +480,8 @@ function OrgChartGroup({
             {/* Mobile Vertical Rail Layout (< 768px) */}
             <div className="relative ml-3 border-l-2 border-primary/30 pl-5 md:hidden">
                 <div className="space-y-6">
-                    {/* Puncak: strip horizontal bila dual, kartu tunggal bila single */}
-                    {hasDualPuncak ? (
+                    {/* Puncak: strip horizontal bila multi, kartu tunggal bila single */}
+                    {hasMultiPuncak ? (
                         <div className="relative">
                             <span
                                 aria-hidden="true"
@@ -554,46 +554,72 @@ function OrgChartGroup({
 
             {/* Desktop Hierarchical Org-Chart (>= 768px) */}
             <div className="hidden md:block">
-                {/* Tier 1: Puncak (dual atau single) */}
-                {hasDualPuncak ? (
+                {/* Tier 1: Puncak (multi atau single) */}
+                {hasMultiPuncak ? (
                     <div className="relative flex flex-col items-center">
-                        <div className="flex justify-center gap-12">
-                            {puncak.map((entry, idx) => (
-                                <div
-                                    key={entry.id}
-                                    className="relative flex w-[270px] flex-col items-center sm:w-[290px]"
-                                >
-                                    <KepengurusanPlayingCard
-                                        entry={entry}
-                                        size="featured"
-                                    />
-                                    {(tier2.length > 0 || tier3.length > 0) && (
-                                        <>
-                                            <div
-                                                aria-hidden="true"
-                                                className="relative z-0 h-8 w-0.5 bg-border"
-                                            />
-                                            <div
-                                                aria-hidden="true"
-                                                className={cn(
-                                                    'absolute bottom-0 z-0 h-0.5 bg-border',
-                                                    idx === 0 &&
-                                                        '-right-6 left-1/2',
-                                                    idx === 1 &&
-                                                        'right-1/2 -left-6',
-                                                )}
-                                            />
-                                        </>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        {(tier2.length > 0 || tier3.length > 0) && (
+                        <div
+                            className={cn(
+                                'w-full',
+                                puncak.length > 2 && 'overflow-x-auto',
+                            )}
+                        >
                             <div
-                                aria-hidden="true"
-                                className="relative z-0 h-8 w-0.5 bg-border"
-                            />
-                        )}
+                                className={cn(
+                                    'flex gap-8',
+                                    puncak.length > 2
+                                        ? 'w-max min-w-full justify-start px-4'
+                                        : 'justify-center',
+                                )}
+                            >
+                                {puncak.map((entry, idx) => (
+                                    <div
+                                        key={entry.id}
+                                        className="relative flex w-[270px] flex-none flex-col items-center sm:w-[290px]"
+                                    >
+                                        <KepengurusanPlayingCard
+                                            entry={entry}
+                                            size="featured"
+                                        />
+                                        {(tier2.length > 0 ||
+                                            tier3.length > 0) && (
+                                            <>
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="relative z-0 h-8 w-0.5 bg-border"
+                                                />
+                                                <div
+                                                    aria-hidden="true"
+                                                    className={cn(
+                                                        'absolute bottom-8 z-0 h-0.5 bg-border',
+                                                        idx === 0 &&
+                                                            '-right-4 left-1/2',
+                                                        idx > 0 &&
+                                                            idx <
+                                                                puncak.length -
+                                                                    1 &&
+                                                            '-right-4 -left-4',
+                                                        idx ===
+                                                            puncak.length - 1 &&
+                                                            'right-1/2 -left-4',
+                                                    )}
+                                                />
+                                                {idx === 0 ? (
+                                                    <div
+                                                        aria-hidden="true"
+                                                        className="relative z-0 h-8 w-0.5 bg-border"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        aria-hidden="true"
+                                                        className="h-8"
+                                                    />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     tier1 && (
@@ -633,7 +659,10 @@ function OrgChartGroup({
                                             aria-hidden="true"
                                             className={cn(
                                                 'absolute top-0 z-0 h-0.5 bg-border',
-                                                idx === 0 && 'right-0 left-1/2',
+                                                idx === 0 &&
+                                                    (hasMultiPuncak
+                                                        ? 'right-0 left-0'
+                                                        : 'right-0 left-1/2'),
                                                 idx === tier2.length - 1 &&
                                                     'right-1/2 left-0',
                                                 idx > 0 &&
