@@ -460,6 +460,18 @@ function OrgChartGroup({
     }
 
     const hasMultiPuncak = puncak.length >= 2;
+    const tier2ColWidth = 280;
+    const ketuaColWidth = 290;
+    const tier2GridWidth =
+        tier2.length === 1
+            ? ketuaColWidth
+            : tier2.length > 1
+              ? tier2.length * tier2ColWidth
+              : 0;
+    const canvasOffsetKiri =
+        hasMultiPuncak && tier2.length > 1
+            ? Math.max(0, (tier2GridWidth - ketuaColWidth) / 2)
+            : 0;
 
     return (
         <RevealSection
@@ -490,7 +502,7 @@ function OrgChartGroup({
                             <p className="mb-2 text-xs font-semibold tracking-wider text-primary uppercase">
                                 Pimpinan Utama
                             </p>
-                            <div className="-mr-5 [scrollbar-width:none] scrollbar-thin overflow-x-auto pr-5 pb-2 [&::-webkit-scrollbar]:hidden">
+                            <div className="-mr-5 [scrollbar-width:none] overflow-x-auto pr-5 pb-2 [&::-webkit-scrollbar]:hidden">
                                 <div className="flex gap-4">
                                     {puncak.map((entry) => (
                                         <div
@@ -554,168 +566,272 @@ function OrgChartGroup({
 
             {/* Desktop Hierarchical Org-Chart (>= 768px) */}
             <div className="hidden md:block">
-                {/* Tier 1: Puncak (multi atau single) */}
                 {hasMultiPuncak ? (
-                    <div className="relative flex flex-col items-center">
-                        <div
-                            className={cn(
-                                'w-full',
-                                puncak.length > 2 && 'overflow-x-auto',
-                            )}
-                        >
+                    /* JALUR KANVAS GESER (Wilayah dengan Pembina) */
+                    <div className="[scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden">
+                        <div className="mx-auto w-max">
+                            {/* Tier 1: Puncak (multi) */}
                             <div
-                                className={cn(
-                                    'flex gap-8',
-                                    puncak.length > 2
-                                        ? 'w-max min-w-full justify-start px-4'
-                                        : 'justify-center',
-                                )}
+                                className="relative flex flex-col items-start"
+                                style={
+                                    canvasOffsetKiri > 0
+                                        ? {
+                                              paddingLeft: `${canvasOffsetKiri}px`,
+                                          }
+                                        : undefined
+                                }
                             >
-                                {puncak.map((entry, idx) => (
-                                    <div
-                                        key={entry.id}
-                                        className="relative flex w-[270px] flex-none flex-col items-center sm:w-[290px]"
-                                    >
-                                        <KepengurusanPlayingCard
-                                            entry={entry}
-                                            size="featured"
-                                        />
-                                        {(tier2.length > 0 ||
-                                            tier3.length > 0) && (
-                                            <>
-                                                <div
-                                                    aria-hidden="true"
-                                                    className="relative z-0 h-8 w-0.5 bg-border"
-                                                />
-                                                <div
-                                                    aria-hidden="true"
-                                                    className={cn(
-                                                        'absolute bottom-8 z-0 h-0.5 bg-border',
-                                                        idx === 0 &&
-                                                            '-right-4 left-1/2',
-                                                        idx > 0 &&
-                                                            idx <
-                                                                puncak.length -
-                                                                    1 &&
-                                                            '-right-4 -left-4',
-                                                        idx ===
-                                                            puncak.length - 1 &&
-                                                            'right-1/2 -left-4',
-                                                    )}
-                                                />
-                                                {idx === 0 ? (
+                                <div className="flex justify-center gap-8">
+                                    {puncak.map((entry, idx) => (
+                                        <div
+                                            key={entry.id}
+                                            className="relative flex w-[270px] flex-none flex-col items-center sm:w-[290px]"
+                                        >
+                                            <KepengurusanPlayingCard
+                                                entry={entry}
+                                                size="featured"
+                                            />
+                                            {(tier2.length > 0 ||
+                                                tier3.length > 0) && (
+                                                <>
                                                     <div
                                                         aria-hidden="true"
                                                         className="relative z-0 h-8 w-0.5 bg-border"
                                                     />
-                                                ) : (
                                                     <div
                                                         aria-hidden="true"
-                                                        className="h-8"
+                                                        className={cn(
+                                                            'absolute bottom-8 z-0 h-0.5 bg-border',
+                                                            idx === 0 &&
+                                                                '-right-4 left-1/2',
+                                                            idx > 0 &&
+                                                                idx <
+                                                                    puncak.length -
+                                                                        1 &&
+                                                                '-right-4 -left-4',
+                                                            idx ===
+                                                                puncak.length -
+                                                                    1 &&
+                                                                'right-1/2 -left-4',
+                                                        )}
+                                                    />
+                                                    {idx === 0 ? (
+                                                        <div
+                                                            aria-hidden="true"
+                                                            className="relative z-0 h-8 w-0.5 bg-border"
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            aria-hidden="true"
+                                                            className="h-8"
+                                                        />
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Tier 2: Maksimal 3 kartu sejajar di dalam kanvas (berlabuh di bawah Ketua Umum) */}
+                            {tier2.length > 0 && (
+                                <div
+                                    className="relative flex flex-col items-center"
+                                    style={{ width: `${tier2GridWidth}px` }}
+                                >
+                                    <div
+                                        className={cn(
+                                            'grid w-full',
+                                            tier2.length === 1 && 'grid-cols-1',
+                                            tier2.length === 2 && 'grid-cols-2',
+                                            tier2.length >= 3 && 'grid-cols-3',
+                                        )}
+                                    >
+                                        {tier2.map((entry, idx) => (
+                                            <div
+                                                key={entry.id}
+                                                className="relative flex flex-col items-center px-3"
+                                            >
+                                                {tier2.length > 1 && (
+                                                    <div
+                                                        aria-hidden="true"
+                                                        className={cn(
+                                                            'absolute top-0 z-0 h-0.5 bg-border',
+                                                            idx === 0 &&
+                                                                'right-0 left-1/2',
+                                                            idx ===
+                                                                tier2.length -
+                                                                    1 &&
+                                                                'right-1/2 left-0',
+                                                            idx > 0 &&
+                                                                idx <
+                                                                    tier2.length -
+                                                                        1 &&
+                                                                'inset-x-0',
+                                                        )}
                                                     />
                                                 )}
-                                            </>
-                                        )}
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="relative z-0 h-6 w-0.5 bg-border"
+                                                />
+                                                <KepengurusanPlayingCard
+                                                    entry={entry}
+                                                    size="medium"
+                                                />
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                    {tier3.length > 0 && (
+                                        <div
+                                            aria-hidden="true"
+                                            className="relative z-0 h-8 w-0.5 bg-border"
+                                        />
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Tier 3: Grid Pengurus Lainnya di dalam kanvas */}
+                            {tier3.length > 0 && (
+                                <div
+                                    className="relative flex flex-col items-center"
+                                    style={{ width: `${tier2GridWidth}px` }}
+                                >
+                                    <div
+                                        aria-hidden="true"
+                                        className="relative z-0 h-0.5 w-3/4 bg-border"
+                                    />
+                                    <div className="grid w-full gap-x-5 gap-y-6 md:grid-cols-3">
+                                        {tier3.map((entry, idx) => (
+                                            <div
+                                                key={entry.id}
+                                                className="relative flex flex-col items-center"
+                                            >
+                                                {idx < 3 && (
+                                                    <div
+                                                        aria-hidden="true"
+                                                        className="relative z-0 h-5 w-0.5 bg-border"
+                                                    />
+                                                )}
+                                                <KepengurusanPlayingCard
+                                                    entry={entry}
+                                                    size="standard"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ) : (
-                    tier1 && (
-                        <div className="relative flex flex-col items-center">
-                            <KepengurusanPlayingCard
-                                entry={tier1}
-                                size="featured"
-                            />
-                            {(tier2.length > 0 || tier3.length > 0) && (
+                    /* JALUR NON-KANVAS (Wilayah tanpa Pembina & semua Komsat) */
+                    <>
+                        {/* Tier 1: Puncak tunggal */}
+                        {tier1 && (
+                            <div className="relative flex flex-col items-center">
+                                <KepengurusanPlayingCard
+                                    entry={tier1}
+                                    size="featured"
+                                />
+                                {(tier2.length > 0 || tier3.length > 0) && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="relative z-0 h-8 w-0.5 bg-border"
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* Tier 2: Maksimal 3 kartu sejajar */}
+                        {tier2.length > 0 && (
+                            <div className="relative flex flex-col items-center">
+                                <div
+                                    className={cn(
+                                        'grid w-full max-w-4xl',
+                                        tier2.length === 1 && 'grid-cols-1',
+                                        tier2.length === 2 && 'grid-cols-2',
+                                        tier2.length >= 3 && 'grid-cols-3',
+                                    )}
+                                >
+                                    {tier2.map((entry, idx) => (
+                                        <div
+                                            key={entry.id}
+                                            className="relative flex flex-col items-center px-3"
+                                        >
+                                            {tier2.length > 1 && (
+                                                <div
+                                                    aria-hidden="true"
+                                                    className={cn(
+                                                        'absolute top-0 z-0 h-0.5 bg-border',
+                                                        idx === 0 &&
+                                                            'right-0 left-1/2',
+                                                        idx ===
+                                                            tier2.length - 1 &&
+                                                            'right-1/2 left-0',
+                                                        idx > 0 &&
+                                                            idx <
+                                                                tier2.length -
+                                                                    1 &&
+                                                            'inset-x-0',
+                                                    )}
+                                                />
+                                            )}
+                                            <div
+                                                aria-hidden="true"
+                                                className="relative z-0 h-6 w-0.5 bg-border"
+                                            />
+                                            <KepengurusanPlayingCard
+                                                entry={entry}
+                                                size="medium"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                {tier3.length > 0 && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="relative z-0 h-8 w-0.5 bg-border"
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {/* Tier 3: Grid Pengurus Lainnya */}
+                        {tier3.length > 0 && (
+                            <div className="relative flex flex-col items-center">
                                 <div
                                     aria-hidden="true"
-                                    className="relative z-0 h-8 w-0.5 bg-border"
+                                    className="relative z-0 h-0.5 w-3/4 bg-border"
                                 />
-                            )}
-                        </div>
-                    )
-                )}
-
-                {/* Tier 2: Maksimal 3 kartu sejajar */}
-                {tier2.length > 0 && (
-                    <div className="relative flex flex-col items-center">
-                        <div
-                            className={cn(
-                                'grid w-full max-w-4xl',
-                                tier2.length === 1 && 'grid-cols-1',
-                                tier2.length === 2 && 'grid-cols-2',
-                                tier2.length >= 3 && 'grid-cols-3',
-                            )}
-                        >
-                            {tier2.map((entry, idx) => (
-                                <div
-                                    key={entry.id}
-                                    className="relative flex flex-col items-center px-3"
-                                >
-                                    {tier2.length > 1 && (
+                                <div className="grid w-full gap-x-5 gap-y-6 md:grid-cols-3 lg:grid-cols-4">
+                                    {tier3.map((entry, idx) => (
                                         <div
-                                            aria-hidden="true"
-                                            className={cn(
-                                                'absolute top-0 z-0 h-0.5 bg-border',
-                                                idx === 0 &&
-                                                    (hasMultiPuncak
-                                                        ? 'right-0 left-0'
-                                                        : 'right-0 left-1/2'),
-                                                idx === tier2.length - 1 &&
-                                                    'right-1/2 left-0',
-                                                idx > 0 &&
-                                                    idx < tier2.length - 1 &&
-                                                    'inset-x-0',
+                                            key={entry.id}
+                                            className="relative flex flex-col items-center"
+                                        >
+                                            {idx < 3 && (
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="relative z-0 h-5 w-0.5 bg-border"
+                                                />
                                             )}
-                                        />
-                                    )}
-                                    <div
-                                        aria-hidden="true"
-                                        className="relative z-0 h-6 w-0.5 bg-border"
-                                    />
-                                    <KepengurusanPlayingCard
-                                        entry={entry}
-                                        size="medium"
-                                    />
+                                            {idx === 3 && (
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="relative z-0 hidden h-5 w-0.5 bg-border lg:block"
+                                                />
+                                            )}
+                                            <KepengurusanPlayingCard
+                                                entry={entry}
+                                                size="standard"
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        {tier3.length > 0 && (
-                            <div
-                                aria-hidden="true"
-                                className="relative z-0 h-8 w-0.5 bg-border"
-                            />
+                            </div>
                         )}
-                    </div>
-                )}
-
-                {/* Tier 3: Grid Pengurus Lainnya */}
-                {tier3.length > 0 && (
-                    <div className="relative flex flex-col items-center">
-                        <div
-                            aria-hidden="true"
-                            className="relative z-0 h-0.5 w-3/4 bg-border"
-                        />
-                        <div className="grid w-full gap-x-5 gap-y-6 md:grid-cols-3 lg:grid-cols-4">
-                            {tier3.map((entry) => (
-                                <div
-                                    key={entry.id}
-                                    className="relative flex flex-col items-center"
-                                >
-                                    <div
-                                        aria-hidden="true"
-                                        className="relative z-0 h-5 w-0.5 bg-border"
-                                    />
-                                    <KepengurusanPlayingCard
-                                        entry={entry}
-                                        size="standard"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    </>
                 )}
             </div>
         </RevealSection>
@@ -734,7 +850,7 @@ function PeriodeTimelineDesktop({
     return (
         <nav
             aria-label="Linimasa Periode Kepengurusan"
-            className="relative max-h-[calc(100vh-6rem)] scrollbar-thin overflow-y-auto pr-2"
+            className="relative max-h-[calc(100vh-6rem)] [scrollbar-width:none] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
         >
             <div className="relative space-y-1">
                 {/* Garis vertikal netral 2px menembus titik-titik simpul */}
@@ -810,7 +926,7 @@ function PeriodeTimelineMobile({
             <p className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                 Linimasa Periode
             </p>
-            <div className="-mx-4 scrollbar-thin overflow-x-auto px-4">
+            <div className="-mx-4 [scrollbar-width:none] overflow-x-auto px-4 [&::-webkit-scrollbar]:hidden">
                 <div
                     className="flex snap-x snap-mandatory gap-2 pb-1"
                     role="group"
@@ -1043,7 +1159,7 @@ function MobileGroupChips({
 
     return (
         <div className="sticky top-[142px] z-30 -mx-4 border-b border-border/80 bg-background/95 backdrop-blur-sm sm:-mx-6 lg:hidden">
-            <div className="scrollbar-thin overflow-x-auto px-4 py-2 sm:px-6">
+            <div className="[scrollbar-width:none] overflow-x-auto px-4 py-2 sm:px-6 [&::-webkit-scrollbar]:hidden">
                 <div
                     className="flex gap-2"
                     role="group"
