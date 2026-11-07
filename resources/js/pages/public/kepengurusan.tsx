@@ -414,9 +414,48 @@ function OrgChartGroup({
     subtitle: string;
     entries: KepengurusanEntry[];
 }) {
-    const tier1 = entries[0] ?? null;
-    const tier2 = entries.slice(1, 4);
-    const tier3 = entries.slice(4);
+    // BAGIAN 1: Deteksi Pembina untuk kelompok Wilayah
+    const isWilayah = groupKey === 'wilayah';
+
+    let puncak: KepengurusanEntry[] = [];
+    let tier1: KepengurusanEntry | null = null;
+    let tier2: KepengurusanEntry[] = [];
+    let tier3: KepengurusanEntry[] = [];
+
+    if (isWilayah) {
+        // Deteksi Pembina berdasarkan teks jabatan (case-insensitive, trim, dimulai dengan "Pembina")
+        const pembinaIdx = entries.findIndex((e) =>
+            e.jabatan.trim().toLowerCase().startsWith('pembina'),
+        );
+
+        if (pembinaIdx !== -1) {
+            // Pembina ditemukan: bentuk puncak [pembina, ketua]
+            const pembina = entries[pembinaIdx];
+            const sisaEntries = entries.filter((_, idx) => idx !== pembinaIdx);
+            const ketua = sisaEntries[0];
+
+            if (ketua) {
+                puncak = [pembina, ketua];
+                tier2 = sisaEntries.slice(1, 4);
+                tier3 = sisaEntries.slice(4);
+            } else {
+                // Edge case: hanya ada Pembina
+                tier1 = pembina;
+            }
+        } else {
+            // Pembina tidak ditemukan: pakai pemotongan lama
+            tier1 = entries[0] ?? null;
+            tier2 = entries.slice(1, 4);
+            tier3 = entries.slice(4);
+        }
+    } else {
+        // Kelompok Komsat: pemotongan lama tidak berubah
+        tier1 = entries[0] ?? null;
+        tier2 = entries.slice(1, 4);
+        tier3 = entries.slice(4);
+    }
+
+    const hasDualPuncak = puncak.length === 2;
 
     return (
         <RevealSection
@@ -437,7 +476,8 @@ function OrgChartGroup({
             {/* Mobile Vertical Rail Layout (< 768px) */}
             <div className="relative ml-3 border-l-2 border-primary/30 pl-5 md:hidden">
                 <div className="space-y-6">
-                    {tier1 && (
+                    {/* Puncak: strip horizontal bila dual, kartu tunggal bila single */}
+                    {hasDualPuncak ? (
                         <div className="relative">
                             <span
                                 aria-hidden="true"
@@ -446,11 +486,38 @@ function OrgChartGroup({
                             <p className="mb-2 text-xs font-semibold tracking-wider text-primary uppercase">
                                 Pimpinan Utama
                             </p>
-                            <KepengurusanPlayingCard
-                                entry={tier1}
-                                size="featured"
-                            />
+                            <div className="-mr-5 [scrollbar-width:none] scrollbar-thin overflow-x-auto pr-5 pb-2 [&::-webkit-scrollbar]:hidden">
+                                <div className="flex gap-4">
+                                    {puncak.map((entry) => (
+                                        <div
+                                            key={entry.id}
+                                            className="w-[270px] flex-none"
+                                        >
+                                            <KepengurusanPlayingCard
+                                                entry={entry}
+                                                size="featured"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+                    ) : (
+                        tier1 && (
+                            <div className="relative">
+                                <span
+                                    aria-hidden="true"
+                                    className="absolute top-8 -left-[27px] size-3.5 rounded-full border-2 border-background bg-primary ring-2 ring-primary/30"
+                                />
+                                <p className="mb-2 text-xs font-semibold tracking-wider text-primary uppercase">
+                                    Pimpinan Utama
+                                </p>
+                                <KepengurusanPlayingCard
+                                    entry={tier1}
+                                    size="featured"
+                                />
+                            </div>
+                        )
                     )}
 
                     {tier2.map((entry) => (
@@ -483,13 +550,40 @@ function OrgChartGroup({
 
             {/* Desktop Hierarchical Org-Chart (>= 768px) */}
             <div className="hidden md:block">
-                {/* Tier 1: Puncak */}
-                {tier1 && (
+                {/* Tier 1: Puncak (dual atau single) */}
+                {hasDualPuncak ? (
                     <div className="relative flex flex-col items-center">
-                        <KepengurusanPlayingCard
-                            entry={tier1}
-                            size="featured"
-                        />
+                        <div className="flex justify-center gap-12">
+                            {puncak.map((entry, idx) => (
+                                <div
+                                    key={entry.id}
+                                    className="relative flex w-[270px] flex-col items-center sm:w-[290px]"
+                                >
+                                    <KepengurusanPlayingCard
+                                        entry={entry}
+                                        size="featured"
+                                    />
+                                    {(tier2.length > 0 || tier3.length > 0) && (
+                                        <>
+                                            <div
+                                                aria-hidden="true"
+                                                className="relative z-0 h-8 w-0.5 bg-border"
+                                            />
+                                            <div
+                                                aria-hidden="true"
+                                                className={cn(
+                                                    'absolute bottom-0 z-0 h-0.5 bg-border',
+                                                    idx === 0 &&
+                                                        '-right-6 left-1/2',
+                                                    idx === 1 &&
+                                                        'right-1/2 -left-6',
+                                                )}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                         {(tier2.length > 0 || tier3.length > 0) && (
                             <div
                                 aria-hidden="true"
@@ -497,6 +591,21 @@ function OrgChartGroup({
                             />
                         )}
                     </div>
+                ) : (
+                    tier1 && (
+                        <div className="relative flex flex-col items-center">
+                            <KepengurusanPlayingCard
+                                entry={tier1}
+                                size="featured"
+                            />
+                            {(tier2.length > 0 || tier3.length > 0) && (
+                                <div
+                                    aria-hidden="true"
+                                    className="relative z-0 h-8 w-0.5 bg-border"
+                                />
+                            )}
+                        </div>
+                    )
                 )}
 
                 {/* Tier 2: Maksimal 3 kartu sejajar */}
