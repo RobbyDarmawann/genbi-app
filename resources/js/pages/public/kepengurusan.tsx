@@ -423,27 +423,31 @@ function OrgChartGroup({
     let tier3: KepengurusanEntry[] = [];
 
     if (isWilayah) {
-        // Deteksi Pembina berdasarkan teks jabatan (case-insensitive, trim, dimulai dengan "Pembina")
-        const pembinaIdx = entries.findIndex((e) =>
+        // Kumpulkan SEMUA Pembina (pertahankan urutan simpan)
+        const semuaPembina = entries.filter((e) =>
             e.jabatan.trim().toLowerCase().startsWith('pembina'),
         );
 
-        if (pembinaIdx !== -1) {
-            // Pembina ditemukan: bentuk puncak [pembina, ketua]
-            const pembina = entries[pembinaIdx];
-            const sisaEntries = entries.filter((_, idx) => idx !== pembinaIdx);
-            const ketua = sisaEntries[0];
+        // Kumpulkan semua non-Pembina
+        const nonPembina = entries.filter(
+            (e) => !e.jabatan.trim().toLowerCase().startsWith('pembina'),
+        );
+
+        if (semuaPembina.length > 0) {
+            // Ada Pembina: ketua = non-Pembina pertama
+            const ketua = nonPembina[0];
 
             if (ketua) {
-                puncak = [pembina, ketua];
-                tier2 = sisaEntries.slice(1, 4);
-                tier3 = sisaEntries.slice(4);
+                // puncak = [ketua, ...semuaPembina] (Ketua Umum KIRI, Pembina KANAN)
+                puncak = [ketua, ...semuaPembina];
+                tier2 = nonPembina.slice(1, 4);
+                tier3 = nonPembina.slice(4);
             } else {
-                // Edge case: hanya ada Pembina
-                tier1 = pembina;
+                // Edge case: hanya ada Pembina tanpa ketua
+                tier1 = semuaPembina[0] ?? null;
             }
         } else {
-            // Pembina tidak ditemukan: pakai pemotongan lama
+            // Tidak ada Pembina: pakai pemotongan lama
             tier1 = entries[0] ?? null;
             tier2 = entries.slice(1, 4);
             tier3 = entries.slice(4);
