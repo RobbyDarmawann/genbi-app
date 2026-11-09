@@ -73,7 +73,9 @@ function SummaryCard({
 }
 
 function EmptyState({ children }: { children: string }) {
-    return <p className="py-2 text-sm text-muted-foreground">{children}</p>;
+    return (
+        <p className="min-w-0 py-2 text-sm text-muted-foreground">{children}</p>
+    );
 }
 
 export default function AdminDashboard({
@@ -132,11 +134,14 @@ export default function AdminDashboard({
                             Prioritas kerja terbaru dan agenda terdekat.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="grid gap-6 lg:grid-cols-3">
-                        <section aria-labelledby="koreksi-menunggu-title">
+                    <CardContent className="grid min-w-0 gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))]">
+                        <section
+                            aria-labelledby="koreksi-menunggu-title"
+                            className="min-w-0"
+                        >
                             <h2
                                 id="koreksi-menunggu-title"
-                                className="mb-3 flex items-center gap-2 font-semibold"
+                                className="mb-3 flex min-w-0 items-center gap-2 font-semibold"
                             >
                                 <FileWarning className="size-4 text-muted-foreground" />
                                 Koreksi menunggu
@@ -146,16 +151,16 @@ export default function AdminDashboard({
                                     Tidak ada koreksi yang menunggu.
                                 </EmptyState>
                             ) : (
-                                <ul className="grid gap-2">
+                                <ul className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2">
                                     {koreksi_menunggu.map((item) => (
-                                        <li key={item.id}>
+                                        <li key={item.id} className="min-w-0">
                                             <Link
                                                 href={admin.koreksi.show({
                                                     koreksi: item.id,
                                                 })}
-                                                className="group flex min-h-11 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                className="group flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                             >
-                                                <span className="min-w-0">
+                                                <span className="min-w-0 flex-1">
                                                     <span className="block truncate font-medium">
                                                         {item.mahasiswa_nama}
                                                     </span>
@@ -171,10 +176,13 @@ export default function AdminDashboard({
                             )}
                         </section>
 
-                        <section aria-labelledby="kehadiran-menunggu-title">
+                        <section
+                            aria-labelledby="kehadiran-menunggu-title"
+                            className="min-w-0"
+                        >
                             <h2
                                 id="kehadiran-menunggu-title"
-                                className="mb-3 flex items-center gap-2 font-semibold"
+                                className="mb-3 flex min-w-0 items-center gap-2 font-semibold"
                             >
                                 <ClipboardCheck className="size-4 text-muted-foreground" />
                                 Kehadiran menunggu
@@ -184,16 +192,16 @@ export default function AdminDashboard({
                                     Tidak ada kehadiran yang menunggu tinjau.
                                 </EmptyState>
                             ) : (
-                                <ul className="grid gap-2">
+                                <ul className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2">
                                     {kehadiran_menunggu.map((item) => (
-                                        <li key={item.id}>
+                                        <li key={item.id} className="min-w-0">
                                             <Link
                                                 href={admin.kegiatan.monitoring(
                                                     item.kegiatan_id,
                                                 )}
-                                                className="group flex min-h-11 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                className="group flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                             >
-                                                <span className="min-w-0">
+                                                <span className="min-w-0 flex-1">
                                                     <span className="block truncate font-medium">
                                                         {item.mahasiswa_nama}
                                                     </span>
@@ -209,10 +217,13 @@ export default function AdminDashboard({
                             )}
                         </section>
 
-                        <section aria-labelledby="kegiatan-terdekat-title">
+                        <section
+                            aria-labelledby="kegiatan-terdekat-title"
+                            className="min-w-0"
+                        >
                             <h2
                                 id="kegiatan-terdekat-title"
-                                className="mb-3 flex items-center gap-2 font-semibold"
+                                className="mb-3 flex min-w-0 items-center gap-2 font-semibold"
                             >
                                 <CalendarDays className="size-4 text-muted-foreground" />
                                 Kegiatan terdekat
@@ -222,16 +233,16 @@ export default function AdminDashboard({
                                     Tidak ada kegiatan terdekat.
                                 </EmptyState>
                             ) : (
-                                <ul className="grid gap-2">
+                                <ul className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2">
                                     {kegiatan_terdekat.map((item) => (
                                         <li key={item.id} className="min-w-0">
                                             <Link
                                                 href={admin.kegiatan.show(
                                                     item.id,
                                                 )}
-                                                className="group flex min-h-11 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                className="group flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                                             >
-                                                <span className="min-w-0">
+                                                <span className="min-w-0 flex-1">
                                                     <span className="block truncate font-medium">
                                                         {item.judul}
                                                     </span>
