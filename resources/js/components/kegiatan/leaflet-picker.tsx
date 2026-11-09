@@ -40,6 +40,16 @@ function MapUpdater({ center }: { center: [number, number] }) {
     useEffect(() => {
         map.setView(center, map.getZoom());
     }, [center, map]);
+    useEffect(() => {
+        map.invalidateSize();
+        const handleResize = () => {
+            map.invalidateSize();
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [map]);
     return null;
 }
 
@@ -56,7 +66,7 @@ export default function LeafletPicker({
     const center: [number, number] = [safeLat, safeLng];
 
     return (
-        <div className="relative z-0 h-72 w-full overflow-hidden rounded-md border">
+        <div className="relative z-0 h-72 w-full max-w-full min-w-0 overflow-hidden rounded-md border">
             <MapContainer
                 center={center}
                 zoom={16}

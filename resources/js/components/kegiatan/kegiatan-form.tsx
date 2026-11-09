@@ -151,7 +151,7 @@ export function KegiatanForm({
         <Form
             {...endpoint}
             options={{ preserveScroll: true }}
-            className="space-y-6"
+            className="min-w-0 space-y-6"
         >
             {({ errors, processing }) => (
                 <>
@@ -168,11 +168,11 @@ export function KegiatanForm({
                             </p>
                         </div>
                     )}
-                    <section className="grid gap-4 rounded-lg border p-4 sm:p-6">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border p-4 sm:p-6">
                         <h2 className="text-lg font-semibold">
                             Informasi kegiatan
                         </h2>
-                        <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
                             <Field
                                 label="Judul kegiatan"
                                 name="judul"
@@ -305,7 +305,7 @@ export function KegiatanForm({
                             />
                         </div>
                     </section>
-                    <section className="grid gap-4 rounded-lg border p-4 sm:p-6">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border p-4 sm:p-6">
                         <div>
                             <h2 className="text-lg font-semibold">
                                 Lokasi dan absensi
@@ -329,7 +329,7 @@ export function KegiatanForm({
                                       }
                             }
                         />
-                        <div className="grid gap-4 md:grid-cols-3">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                             <Field
                                 label="Latitude"
                                 name="latitude"
@@ -404,8 +404,8 @@ export function KegiatanForm({
                                 defaultValue={record?.batas_daftar_at}
                             />
                         </div>
-                        <div className="grid gap-3 rounded-md border p-4">
-                            <div className="flex flex-wrap items-end justify-between gap-3">
+                        <div className="grid min-w-0 grid-cols-1 gap-3 rounded-md border p-3 sm:p-4">
+                            <div className="flex min-w-0 flex-wrap items-end justify-between gap-3">
                                 <div>
                                     <h3 className="font-medium">
                                         Jadwal absensi per hari
@@ -415,15 +415,15 @@ export function KegiatanForm({
                                         hanya satu hari.
                                     </p>
                                 </div>
-                                <div className="flex items-end gap-2">
-                                    <div className="grid gap-1">
+                                <div className="grid w-full min-w-0 grid-cols-2 items-end gap-2 sm:w-auto">
+                                    <div className="grid min-w-0 gap-1">
                                         <Label htmlFor="jam_semua_buka">
                                             Jam untuk semua hari
                                         </Label>
                                         <Input
                                             id="jam_semua_buka"
                                             type="time"
-                                            className="h-11 w-32 md:h-9"
+                                            className="h-11 w-full min-w-0 sm:w-32 md:h-9"
                                             onChange={(event) =>
                                                 setAllSessionTimes(
                                                     event.target.value,
@@ -432,14 +432,14 @@ export function KegiatanForm({
                                             }
                                         />
                                     </div>
-                                    <div className="grid gap-1">
+                                    <div className="grid min-w-0 gap-1">
                                         <Label htmlFor="jam_semua_tutup">
                                             Jam tutup
                                         </Label>
                                         <Input
                                             id="jam_semua_tutup"
                                             type="time"
-                                            className="h-11 w-32 md:h-9"
+                                            className="h-11 w-full min-w-0 sm:w-32 md:h-9"
                                             onChange={(event) =>
                                                 setAllSessionTimes(
                                                     undefined,
@@ -453,9 +453,9 @@ export function KegiatanForm({
                             {sessions.map((session, index) => (
                                 <div
                                     key={session.tanggal}
-                                    className="grid gap-3 rounded-md bg-muted/40 p-3 md:grid-cols-[minmax(0,1fr)_10rem_10rem]"
+                                    className="grid min-w-0 grid-cols-2 gap-3 rounded-md bg-muted/40 p-3 md:grid-cols-[minmax(0,1fr)_10rem_10rem]"
                                 >
-                                    <div className="flex items-center text-sm font-medium">
+                                    <div className="col-span-2 flex min-w-0 items-center text-sm font-medium md:col-span-1">
                                         {sessionLabel(session.tanggal)}
                                         <input
                                             type="hidden"
@@ -503,7 +503,7 @@ export function KegiatanForm({
                             <InputError message={errors.sesi_absensi} />
                         </div>
                     </section>
-                    <section className="grid gap-4 rounded-lg border p-4 sm:p-6">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border p-4 sm:p-6">
                         <div>
                             <h2 className="text-lg font-semibold">
                                 Target divisi
@@ -554,7 +554,7 @@ export function KegiatanForm({
                         ))}
                         <InputError message={errors.divisi_ids} />
                     </section>
-                    <section className="grid gap-4 rounded-lg border p-4 sm:p-6">
+                    <section className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border p-4 sm:p-6">
                         <div>
                             <h2 className="text-lg font-semibold">
                                 Bobot poin peran
@@ -564,7 +564,7 @@ export function KegiatanForm({
                                 diterbitkan.
                             </p>
                         </div>
-                        <div className="grid gap-4 md:grid-cols-3">
+                        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                             <Field
                                 label="Peserta"
                                 name="bobot[peserta]"
@@ -676,14 +676,14 @@ function Field({
             ? { value, onChange }
             : { defaultValue: defaultValue ?? '' };
     return (
-        <div className="grid gap-2">
+        <div className="grid min-w-0 gap-2">
             <Label htmlFor={name}>{label}</Label>
             <Input
                 id={name}
                 name={name}
                 type={type}
                 required={required}
-                className="h-11 md:h-9"
+                className="h-11 w-full max-w-full min-w-0 md:h-9"
                 {...controlledProps}
                 {...inputProps}
             />
