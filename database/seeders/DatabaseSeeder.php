@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             KomsatSeeder::class,
             DivisiSeeder::class,
             PeriodeSeeder::class,
+            LokasiKegiatanSeeder::class,
         ]);
 
         // Demo User Development Only
