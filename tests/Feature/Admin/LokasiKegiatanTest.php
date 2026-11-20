@@ -280,4 +280,43 @@ describe('Kegiatan Location Snapshot Integration', function () {
             ->and((float) $kegiatan->longitude)->toEqualWithDelta(123.0622222, 0.00001)
             ->and($kegiatan->radius_m)->toBe(100);
     });
+
+    test('activity form receives active master lokasi in lokasiOptions prop', function () {
+        LokasiKegiatan::factory()->create([
+            'nama' => 'Kampus 1 UNG',
+            'latitude' => 0.5550,
+            'longitude' => 123.0624,
+            'radius_m' => 300,
+            'aktif' => true,
+        ]);
+
+        LokasiKegiatan::factory()->create([
+            'nama' => 'Lokasi Nonaktif',
+            'aktif' => false,
+        ]);
+
+        $ung = Komsat::query()->where('kode', 'UNG')->firstOrFail();
+        $kegiatan = Kegiatan::factory()->create([
+            'komsat_id' => $ung->id,
+            'dibuat_oleh' => $this->internal->id,
+        ]);
+
+        $this->actingAs($this->internal)
+            ->get(route('admin.kegiatan.create'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('admin/kegiatan/create')
+                ->has('lokasiOptions', 1)
+                ->where('lokasiOptions.0.nama', 'Kampus 1 UNG')
+            );
+
+        $this->actingAs($this->internal)
+            ->get(route('admin.kegiatan.edit', $kegiatan))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('admin/kegiatan/edit')
+                ->has('lokasiOptions', 1)
+                ->where('lokasiOptions.0.nama', 'Kampus 1 UNG')
+            );
+    });
 });

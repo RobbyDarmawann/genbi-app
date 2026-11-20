@@ -1,10 +1,18 @@
 import { Form, Link } from '@inertiajs/react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Check, MapPin, Search } from 'lucide-react';
 import { useState } from 'react';
 import LeafletPicker from '@/components/kegiatan/leaflet-picker';
 import AdminKegiatanController from '@/actions/App/Http/Controllers/Admin/KegiatanController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -102,6 +110,8 @@ export function KegiatanForm({
     const [lokasiId, setLokasiId] = useState<string>(
         record?.lokasi_id ? String(record.lokasi_id) : 'manual',
     );
+    const [lokasiDialogOpen, setLokasiDialogOpen] = useState(false);
+    const [lokasiSearchQuery, setLokasiSearchQuery] = useState('');
     const [lokasiNama, setLokasiNama] = useState<string>(
         record?.lokasi_nama ?? '',
     );
@@ -139,6 +149,17 @@ export function KegiatanForm({
         );
     });
     const locationLocked = Boolean(record && peringatanKehadiran);
+    const selectedLokasiMaster =
+        lokasiId !== 'manual' && lokasiId !== ''
+            ? (lokasiOptions.find(
+                  (item) => String(item.id) === String(lokasiId),
+              ) ?? null)
+            : null;
+    const filteredLokasiOptions = lokasiOptions.filter((item) =>
+        item.nama
+            .toLowerCase()
+            .includes(lokasiSearchQuery.trim().toLowerCase()),
+    );
     const pilihLokasi = (value: string) => {
         setLokasiId(value);
         const master = lokasiOptions.find((item) => String(item.id) === value);
@@ -149,6 +170,8 @@ export function KegiatanForm({
             setLongitude(master.longitude);
             setRadius(master.radius_m);
         }
+
+        setLokasiDialogOpen(false);
     };
     const endpoint = record
         ? AdminKegiatanController.update.form(record.id)
@@ -346,34 +369,84 @@ export function KegiatanForm({
                                 geofence.
                             </p>
                         </div>
-                        <div className="grid gap-2 md:max-w-md">
-                            <Label htmlFor="lokasi_id">Sumber lokasi</Label>
-                            <Select
+                        <div className="grid gap-2">
+                            <Label htmlFor="sumber_lokasi_trigger">
+                                Sumber lokasi
+                            </Label>
+                            <input
+                                type="hidden"
                                 name="lokasi_id"
-                                value={lokasiId}
-                                onValueChange={pilihLokasi}
-                                disabled={locationLocked}
-                            >
-                                <SelectTrigger
-                                    id="lokasi_id"
-                                    className="h-11 md:h-9"
-                                >
-                                    <SelectValue placeholder="Pilih lokasi" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="manual">
-                                        Tentukan lokasi manual
-                                    </SelectItem>
-                                    {lokasiOptions.map((item) => (
-                                        <SelectItem
-                                            key={item.id}
-                                            value={String(item.id)}
-                                        >
-                                            {item.nama}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                value={lokasiId === 'manual' ? '' : lokasiId}
+                            />
+                            {selectedLokasiMaster ? (
+                                <div className="flex flex-col gap-3 rounded-lg border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="flex min-w-0 items-start gap-3">
+                                        <div className="shrink-0 rounded-md border bg-background p-2 text-primary">
+                                            <MapPin className="size-4" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <p className="truncate text-sm font-semibold text-foreground">
+                                                    {selectedLokasiMaster.nama}
+                                                </p>
+                                                <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                                                    Master Lokasi
+                                                </span>
+                                            </div>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Radius bawaan:{' '}
+                                                {selectedLokasiMaster.radius_m}{' '}
+                                                m
+                                                {selectedLokasiMaster.keterangan
+                                                    ? ` • ${selectedLokasiMaster.keterangan}`
+                                                    : ''}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        id="sumber_lokasi_trigger"
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-11 shrink-0 md:h-9"
+                                        onClick={() => {
+                                            setLokasiSearchQuery('');
+                                            setLokasiDialogOpen(true);
+                                        }}
+                                        disabled={locationLocked}
+                                    >
+                                        Ganti
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3 rounded-lg border border-dashed p-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-medium text-foreground">
+                                            Input manual
+                                        </p>
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                            Titik koordinat dan radius
+                                            ditentukan bebas pada peta atau
+                                            input di bawah.
+                                        </p>
+                                    </div>
+                                    <Button
+                                        id="sumber_lokasi_trigger"
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-11 shrink-0 md:h-9"
+                                        onClick={() => {
+                                            setLokasiSearchQuery('');
+                                            setLokasiDialogOpen(true);
+                                        }}
+                                        disabled={locationLocked}
+                                    >
+                                        <MapPin className="size-4" />
+                                        <span>Pilih dari daftar lokasi</span>
+                                    </Button>
+                                </div>
+                            )}
                             <p className="text-xs text-muted-foreground">
                                 Data lokasi disalin ke kegiatan; titik dan
                                 radius tetap dapat disesuaikan untuk kegiatan
@@ -381,6 +454,147 @@ export function KegiatanForm({
                             </p>
                             <InputError message={errors.lokasi_id} />
                         </div>
+
+                        <Dialog
+                            open={lokasiDialogOpen}
+                            onOpenChange={setLokasiDialogOpen}
+                        >
+                            <DialogContent className="flex max-h-[85vh] max-w-lg flex-col gap-0 overflow-hidden p-0">
+                                <DialogHeader className="border-b p-4 pb-3">
+                                    <DialogTitle>
+                                        Pilih Lokasi Kegiatan
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        Pilih titik lokasi dari daftar master
+                                        data atau gunakan mode input manual.
+                                    </DialogDescription>
+                                    <div className="relative mt-3">
+                                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            placeholder="Cari nama lokasi..."
+                                            value={lokasiSearchQuery}
+                                            onChange={(event) =>
+                                                setLokasiSearchQuery(
+                                                    event.target.value,
+                                                )
+                                            }
+                                            className="h-10 pl-9"
+                                            autoFocus
+                                        />
+                                    </div>
+                                </DialogHeader>
+
+                                <div className="flex-1 space-y-2 overflow-y-auto p-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => pilihLokasi('manual')}
+                                        className={`flex w-full items-start justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent ${
+                                            lokasiId === 'manual' || !lokasiId
+                                                ? 'border-primary bg-primary/5'
+                                                : 'border-border'
+                                        }`}
+                                    >
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-foreground">
+                                                Input manual
+                                            </p>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Tentukan nama lokasi, titik
+                                                koordinat, dan radius secara
+                                                bebas tanpa menautkan master
+                                                data.
+                                            </p>
+                                        </div>
+                                        {(lokasiId === 'manual' ||
+                                            !lokasiId) && (
+                                            <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                                        )}
+                                    </button>
+
+                                    <div className="pt-2 pb-1">
+                                        <span className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                            Daftar Lokasi Master (
+                                            {filteredLokasiOptions.length})
+                                        </span>
+                                    </div>
+
+                                    {filteredLokasiOptions.length === 0 ? (
+                                        <div className="py-8 text-center text-sm text-muted-foreground">
+                                            Tidak ada lokasi yang cocok dengan
+                                            &quot;{lokasiSearchQuery}&quot;.
+                                        </div>
+                                    ) : (
+                                        filteredLokasiOptions.map((item) => {
+                                            const isSelected =
+                                                String(item.id) ===
+                                                String(lokasiId);
+                                            return (
+                                                <button
+                                                    key={item.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        pilihLokasi(
+                                                            String(item.id),
+                                                        )
+                                                    }
+                                                    className={`flex w-full items-start justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent ${
+                                                        isSelected
+                                                            ? 'border-primary bg-primary/5'
+                                                            : 'border-border'
+                                                    }`}
+                                                >
+                                                    <div className="min-w-0 space-y-1">
+                                                        <p className="text-sm leading-tight font-semibold text-foreground">
+                                                            {item.nama}
+                                                        </p>
+                                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                                                            <span>
+                                                                Radius:{' '}
+                                                                {item.radius_m}{' '}
+                                                                m
+                                                            </span>
+                                                            <span>•</span>
+                                                            <span className="font-mono text-[11px] opacity-75">
+                                                                {Number(
+                                                                    item.latitude,
+                                                                ).toFixed(6)}
+                                                                ,{' '}
+                                                                {Number(
+                                                                    item.longitude,
+                                                                ).toFixed(6)}
+                                                            </span>
+                                                        </div>
+                                                        {item.keterangan && (
+                                                            <p className="line-clamp-2 text-xs text-muted-foreground">
+                                                                {
+                                                                    item.keterangan
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    {isSelected && (
+                                                        <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                                                    )}
+                                                </button>
+                                            );
+                                        })
+                                    )}
+                                </div>
+
+                                <DialogFooter className="border-t bg-muted/20 p-3 sm:justify-end">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                            setLokasiDialogOpen(false)
+                                        }
+                                    >
+                                        Tutup
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                         <LeafletPicker
                             latitude={latitude}
                             longitude={longitude}
