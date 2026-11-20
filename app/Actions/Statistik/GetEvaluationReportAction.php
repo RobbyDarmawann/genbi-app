@@ -12,6 +12,7 @@ use App\Models\Mahasiswa;
 use App\Models\Pendaftaran;
 use App\Models\Periode;
 use App\Models\PoinTransaksi;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class GetEvaluationReportAction
@@ -37,21 +38,23 @@ class GetEvaluationReportAction
             }
         }
 
-        $query = Kegiatan::query();
+        $baseQuery = Kegiatan::query();
         if ($mulai) {
-            $query->whereDate('tanggal', '>=', $mulai);
+            $baseQuery->whereDate('tanggal', '>=', $mulai);
         }
         if ($akhir) {
-            $query->whereDate('tanggal', '<=', $akhir);
-        }
-        if ($komsatId) {
-            $query->where('komsat_id', $komsatId);
+            $baseQuery->whereDate('tanggal', '<=', $akhir);
         }
         if ($divisiId) {
-            $query->whereHas('divisiTarget', fn ($q) => $q->where('divisi.id', $divisiId));
+            $baseQuery->whereHas('divisiTarget', fn ($q) => $q->where('divisi.id', $divisiId));
         }
         if ($status) {
-            $query->statusEfektif($status);
+            $baseQuery->statusEfektif($status);
+        }
+
+        $query = clone $baseQuery;
+        if ($komsatId) {
+            $query->where('komsat_id', $komsatId);
         }
 
         $ids = (clone $query)->pluck('id')->all();
@@ -83,68 +86,71 @@ class GetEvaluationReportAction
             ];
         }
 
-        $trendMap = [];
+        $trendKeys = $this->trendAxis($baseQuery, $mulai, $akhir);
+        $trendIndex = array_flip($trendKeys);
+        $kegiatanPerBulan = array_fill(0, count($trendKeys), 0);
+        $partisipasiPerBulan = array_fill(0, count($trendKeys), 0);
+
         $trendActivities = (clone $query)->withCount(['pendaftaran' => fn ($q) => $q->where('status', StatusPendaftaran::Terdaftar)])->orderBy('tanggal')->get();
         foreach ($trendActivities as $activity) {
-            $key = Carbon::parse($activity->tanggal)->format('Y-m');
-            $trendMap[$key] ??= ['bulan' => Carbon::parse($activity->tanggal)->translatedFormat('M Y'), 'kegiatan' => 0, 'partisipasi' => 0];
-            $trendMap[$key]['kegiatan']++;
-            $trendMap[$key]['partisipasi'] += (int) $activity->pendaftaran_count;
+            $index = $trendIndex[Carbon::parse($activity->tanggal)->format('Y-m')] ?? null;
+            if ($index !== null) {
+                $kegiatanPerBulan[$index]++;
+                $partisipasiPerBulan[$index] += (int) $activity->pendaftaran_count;
+            }
         }
 
-        $trendRangeStart = $mulai ? Carbon::parse($mulai)->startOfMonth() : ($trendActivities->first() ? Carbon::parse($trendActivities->first()->tanggal)->startOfMonth() : null);
-        $trendRangeEnd = $akhir ? Carbon::parse($akhir)->startOfMonth() : ($trendActivities->last() ? Carbon::parse($trendActivities->last()->tanggal)->startOfMonth() : null);
-        $trendKeys = array_keys($trendMap);
-        if ($trendRangeStart !== null && $trendRangeEnd !== null && $trendRangeStart->lte($trendRangeEnd)) {
-            $filledTrend = [];
-            $trendKeys = [];
-            for ($month = $trendRangeStart->copy(); $month->lte($trendRangeEnd); $month->addMonth()) {
-                $key = $month->format('Y-m');
-                $trendKeys[] = $key;
-                $filledTrend[] = $trendMap[$key] ?? [
-                    'bulan' => $month->translatedFormat('M Y'),
-                    'kegiatan' => 0,
-                    'partisipasi' => 0,
-                ];
-            }
-            $trend = $filledTrend;
-        } else {
-            $trend = array_values($trendMap);
+        $trend = [];
+        foreach ($trendKeys as $index => $key) {
+            $trend[] = [
+                'bulan' => Carbon::createFromFormat('Y-m-d', $key.'-01')->translatedFormat('M Y'),
+                'kegiatan' => $kegiatanPerBulan[$index],
+                'partisipasi' => $partisipasiPerBulan[$index],
+            ];
         }
-        $aggregateProjection = $this->linearProjection(array_column($trend, 'partisipasi'));
+
+        $aggregateProjection = $this->linearProjection($partisipasiPerBulan);
         $trendChart = $trend;
-        if ($aggregateProjection['projection'] !== null && $trend !== []) {
-            $lastMonth = $trendRangeEnd?->copy() ?? Carbon::now()->startOfMonth();
-            $trendChart[count($trendChart) - 1]['proyeksi'] = $trendChart[count($trendChart) - 1]['partisipasi'];
+        if ($aggregateProjection['projection'] !== null && $trendKeys !== []) {
+            $lastIndex = count($trendKeys) - 1;
+            $trendChart[$lastIndex]['proyeksi'] = $partisipasiPerBulan[$lastIndex];
             $trendChart[] = [
-                'bulan' => $lastMonth->addMonth()->translatedFormat('M Y'),
+                'bulan' => Carbon::createFromFormat('Y-m-d', $trendKeys[$lastIndex].'-01')->addMonth()->translatedFormat('M Y'),
                 'kegiatan' => 0,
                 'partisipasi' => 0,
                 'proyeksi' => $aggregateProjection['projection'],
             ];
         }
+        $monthlyByKomsat = [];
+        foreach (Pendaftaran::query()
+            ->whereIn('kegiatan_id', $ids)
+            ->where('status', StatusPendaftaran::Terdaftar)
+            ->with(['kegiatan:id,tanggal', 'mahasiswa:id,komsat_id'])
+            ->get() as $registration) {
+            $index = $trendIndex[Carbon::parse($registration->kegiatan->tanggal)->format('Y-m')] ?? null;
+            if ($index !== null && $registration->mahasiswa !== null) {
+                $monthlyByKomsat[$registration->mahasiswa->komsat_id][$index] = ($monthlyByKomsat[$registration->mahasiswa->komsat_id][$index] ?? 0) + 1;
+            }
+        }
 
         $proyeksiPerKomsat = [];
         foreach (Komsat::orderBy('id')->get() as $komsat) {
-            $monthlyParticipation = [];
-            foreach ($trend as $row) {
-                $monthlyParticipation[] = 0;
+            $monthlyParticipation = array_fill(0, count($trendKeys), 0);
+            foreach ($monthlyByKomsat[$komsat->id] ?? [] as $index => $total) {
+                $monthlyParticipation[$index] = $total;
             }
-            foreach (Pendaftaran::query()
-                ->whereIn('kegiatan_id', $ids)
-                ->where('status', StatusPendaftaran::Terdaftar)
-                ->whereHas('mahasiswa', fn ($q) => $q->where('komsat_id', $komsat->id))
-                ->with('kegiatan:id,tanggal')
-                ->get() as $registration) {
-                $key = Carbon::parse($registration->kegiatan->tanggal)->format('Y-m');
-                foreach ($trend as $index => $row) {
-                    if (($trendKeys[$index] ?? null) === $key) {
-                        $monthlyParticipation[$index]++;
-                        break;
-                    }
-                }
+
+            if (array_sum($monthlyParticipation) === 0) {
+                $projection = [
+                    'n' => count($monthlyParticipation),
+                    'trend' => 'Stabil',
+                    'projection' => null,
+                    'message' => 'Belum ada data pada rentang ini.',
+                ];
+            } else {
+                $projection = $this->linearProjection($monthlyParticipation);
             }
-            $projection = $this->linearProjection($monthlyParticipation);
+
             $proyeksiPerKomsat[] = [
                 'komsat' => $komsat->kode,
                 'bulan_data' => $projection['n'],
@@ -208,6 +214,38 @@ class GetEvaluationReportAction
             'kehadiran' => $kehadiranData,
             'transaksi_poin' => $transaksiPoinData,
         ];
+    }
+
+    /**
+     * Sumbu bulan ditentukan rentang tanggal tanpa filter Komsat dan dibatasi sampai bulan berjalan.
+     *
+     * @param  Builder<Kegiatan>  $baseQuery
+     * @return list<string>
+     */
+    private function trendAxis(Builder $baseQuery, ?string $mulai, ?string $akhir): array
+    {
+        $currentMonth = Carbon::now(config('app.timezone'))->startOfMonth();
+        $currentMonthEnd = $currentMonth->copy()->endOfMonth()->toDateString();
+
+        $eligibleQuery = (clone $baseQuery)->whereDate('tanggal', '<=', $currentMonthEnd);
+        $first = $mulai ?: (clone $eligibleQuery)->min('tanggal');
+        $last = $akhir ?: (clone $eligibleQuery)->max('tanggal');
+        if ($first === null || $last === null) {
+            return [];
+        }
+
+        $start = Carbon::parse($first)->startOfMonth();
+        $end = Carbon::parse($last)->startOfMonth();
+        if ($end->gt($currentMonth)) {
+            $end = $currentMonth;
+        }
+
+        $keys = [];
+        for ($month = $start->copy(); $month->lte($end); $month->addMonth()) {
+            $keys[] = $month->format('Y-m');
+        }
+
+        return $keys;
     }
 
     /**

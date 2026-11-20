@@ -20,6 +20,7 @@ use App\Models\User;
 use Database\Seeders\KomsatSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -389,4 +390,116 @@ test('regresi linear menolak deret kurang dari empat titik', function () {
 test('regresi linear meng-clamp proyeksi negatif menjadi nol', function () {
     expect(app(GetEvaluationReportAction::class)->linearProjection([10, 5, 0, -5]))
         ->toMatchArray(['projection' => 0, 'trend' => 'Turun']);
+});
+
+function seedKegiatanDenganPendaftar(object $test, Komsat $komsat, Mahasiswa $mahasiswa, string $tanggal): Kegiatan
+{
+    $kegiatan = Kegiatan::factory()->create([
+        'komsat_id' => $komsat->id,
+        'status' => StatusKegiatan::Terkunci,
+        'tanggal' => $tanggal,
+    ]);
+    Pendaftaran::factory()->create([
+        'kegiatan_id' => $kegiatan->id,
+        'mahasiswa_id' => $mahasiswa->id,
+        'peran' => PeranKegiatan::Peserta,
+        'status' => StatusPendaftaran::Terdaftar,
+    ]);
+
+    return $kegiatan;
+}
+
+describe('deret tren evaluasi', function () {
+    beforeEach(function () {
+        Carbon::setTestNow(Carbon::parse('2026-10-15 10:00:00', config('app.timezone')));
+        Kegiatan::query()->delete();
+    });
+
+    afterEach(function () {
+        Carbon::setTestNow();
+    });
+
+    test('panjang deret terfilter komsat sama dengan agregat pada rentang yang sama', function () {
+        seedKegiatanDenganPendaftar($this, $this->iain, $this->mhsIain, '2026-06-10');
+        seedKegiatanDenganPendaftar($this, $this->iain, $this->mhsIain, '2026-10-05');
+        foreach (['2026-07-10', '2026-08-10', '2026-09-10'] as $tanggal) {
+            seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, $tanggal);
+        }
+
+        $rentang = ['mulai' => '2026-06-01', 'akhir' => '2026-10-31'];
+        $action = app(GetEvaluationReportAction::class);
+        $agregat = $action->handle($rentang);
+        $terfilter = $action->handle($rentang + ['komsat_id' => (string) $this->ung->id]);
+
+        expect($agregat['tren'])->toHaveCount(5)
+            ->and($terfilter['tren'])->toHaveCount(5)
+            ->and(array_column($terfilter['tren'], 'bulan'))->toBe(array_column($agregat['tren'], 'bulan'))
+            ->and(array_column($terfilter['tren'], 'partisipasi'))->toBe([0, 1, 1, 1, 0]);
+
+        $ungAgregat = collect($agregat['proyeksi_tren'])->firstWhere('komsat', 'UNG');
+        $ungTerfilter = collect($terfilter['proyeksi_tren'])->firstWhere('komsat', 'UNG');
+
+        expect($ungTerfilter)->toBe($ungAgregat)
+            ->and($ungAgregat['bulan_data'])->toBe(5);
+    });
+
+    test('sumbu tanpa filter tanggal tidak menyusut oleh filter komsat', function () {
+        Kegiatan::query()->delete();
+        seedKegiatanDenganPendaftar($this, $this->iain, $this->mhsIain, '2026-06-10');
+        seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, '2026-08-10');
+        seedKegiatanDenganPendaftar($this, $this->iain, $this->mhsIain, '2026-10-05');
+
+        $action = app(GetEvaluationReportAction::class);
+
+        expect($action->handle([])['tren'])->toHaveCount(5)
+            ->and($action->handle(['komsat_id' => (string) $this->ung->id])['tren'])->toHaveCount(5);
+    });
+
+    test('kegiatan bulan depan tidak memperpanjang deret namun tetap tampil di katalog', function () {
+        foreach (['2026-07-10', '2026-08-10', '2026-09-10', '2026-10-05'] as $tanggal) {
+            seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, $tanggal);
+        }
+        $depan = seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, '2026-11-10');
+        $depan->update(['judul' => 'Kegiatan Bulan Depan']);
+
+        $report = app(GetEvaluationReportAction::class)->handle(['mulai' => '2026-07-01', 'akhir' => '2026-12-31']);
+
+        expect($report['tren'])->toHaveCount(4)
+            ->and(collect($report['tren'])->last()['bulan'])->toBe(Carbon::parse('2026-10-01')->translatedFormat('M Y'))
+            ->and(collect($report['partisipasi'])->pluck('judul'))->toContain('Kegiatan Bulan Depan')
+            ->and($report['ringkasan']['total_kegiatan'])->toBe(5);
+    });
+
+    test('proyeksi tepat satu langkah sesudah bulan terakhir deret', function () {
+        $perBulan = ['2026-06' => 1, '2026-07' => 2, '2026-08' => 3, '2026-09' => 4, '2026-10' => 5];
+        foreach ($perBulan as $bulan => $jumlah) {
+            for ($i = 1; $i <= $jumlah; $i++) {
+                seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, $bulan.'-'.sprintf('%02d', $i));
+            }
+        }
+
+        $report = app(GetEvaluationReportAction::class)->handle(['mulai' => '2026-06-01', 'akhir' => '2026-12-31']);
+        $chart = $report['tren_chart'];
+        $ung = collect($report['proyeksi_tren'])->firstWhere('komsat', 'UNG');
+
+        expect($report['tren'])->toHaveCount(5)
+            ->and($chart)->toHaveCount(6)
+            ->and($chart[5]['bulan'])->toBe(Carbon::parse('2026-11-01')->translatedFormat('M Y'))
+            ->and($chart[5]['proyeksi'])->toBe(6)
+            ->and($ung['proyeksi_partisipasi'])->toBe(6)
+            ->and($ung['tren'])->toBe('Naik');
+    });
+
+    test('komsat tanpa pendaftaran menampilkan pesan belum ada data', function () {
+        foreach (['2026-07-10', '2026-08-10', '2026-09-10', '2026-10-05'] as $tanggal) {
+            seedKegiatanDenganPendaftar($this, $this->ung, $this->mhsUng, $tanggal);
+        }
+
+        $report = app(GetEvaluationReportAction::class)->handle(['mulai' => '2026-07-01', 'akhir' => '2026-10-31']);
+        $ubm = collect($report['proyeksi_tren'])->firstWhere('komsat', 'UBM');
+
+        expect($ubm['proyeksi_partisipasi'])->toBeNull()
+            ->and($ubm['pesan'])->toBe('Belum ada data pada rentang ini.')
+            ->and(collect($report['proyeksi_tren'])->firstWhere('komsat', 'UNG')['pesan'])->toBeNull();
+    });
 });
