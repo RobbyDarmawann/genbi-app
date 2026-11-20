@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\KepengurusanController as AdminKepengurusanController;
 use App\Http\Controllers\Admin\KomsatController;
 use App\Http\Controllers\Admin\KoreksiController as AdminKoreksiController;
+use App\Http\Controllers\Admin\LokasiKegiatanController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\MonitoringKegiatanController;
 use App\Http\Controllers\Admin\PeriodeController;
@@ -89,6 +90,11 @@ Route::middleware(['auth'])->group(function () {
             ->only(['index', 'store', 'update', 'destroy'])
             ->parameters(['divisi' => 'divisi']);
         Route::patch('divisi/{divisi}/aktif', [DivisiController::class, 'toggleAktif'])->name('divisi.toggle-aktif');
+
+        Route::resource('lokasi', LokasiKegiatanController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->parameters(['lokasi' => 'lokasi']);
+        Route::patch('lokasi/{lokasi}/aktif', [LokasiKegiatanController::class, 'toggleAktif'])->name('lokasi.toggle-aktif');
 
         Route::get('kehadiran', [MonitoringKegiatanController::class, 'index'])->name('kehadiran.index');
         Route::get('koreksi', [AdminKoreksiController::class, 'index'])->name('koreksi.index');

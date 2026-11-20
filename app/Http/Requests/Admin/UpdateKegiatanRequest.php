@@ -6,6 +6,7 @@ use App\Enums\PeranKegiatan;
 use App\Enums\StatusKegiatan;
 use App\Models\Kegiatan;
 use App\Models\KegiatanBobot;
+use App\Models\LokasiKegiatan;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Carbon;
@@ -39,6 +40,28 @@ class UpdateKegiatanRequest extends FormRequest
 
         if (in_array($this->input('komsat_id'), ['', 'wilayah', '0', 0], true)) {
             $merges['komsat_id'] = null;
+        }
+
+        if (in_array($this->input('lokasi_id'), ['', 'manual', '0', 0, null], true)) {
+            $merges['lokasi_id'] = null;
+        } elseif (is_numeric($this->input('lokasi_id'))) {
+            $lokasiId = (int) $this->input('lokasi_id');
+            $merges['lokasi_id'] = $lokasiId;
+            $lokasiMaster = LokasiKegiatan::query()->find($lokasiId);
+            if ($lokasiMaster !== null) {
+                if (! $this->filled('lokasi_nama')) {
+                    $merges['lokasi_nama'] = $lokasiMaster->nama;
+                }
+                if (! $this->filled('latitude')) {
+                    $merges['latitude'] = (string) $lokasiMaster->latitude;
+                }
+                if (! $this->filled('longitude')) {
+                    $merges['longitude'] = (string) $lokasiMaster->longitude;
+                }
+                if (! $this->filled('radius_m')) {
+                    $merges['radius_m'] = $lokasiMaster->radius_m;
+                }
+            }
         }
 
         foreach (['jam_mulai', 'jam_selesai'] as $timeField) {
@@ -112,6 +135,17 @@ class UpdateKegiatanRequest extends FormRequest
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string', 'max:10000'],
             'komsat_id' => ['nullable', 'integer', Rule::exists('komsat', 'id')],
+            'lokasi_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('lokasi_kegiatan', 'id')->where(function ($query) use ($kegiatan): void {
+                    if ($kegiatan->lokasi_id !== null) {
+                        $query->where(fn ($sub) => $sub->where('aktif', true)->orWhere('id', $kegiatan->lokasi_id));
+                    } else {
+                        $query->where('aktif', true);
+                    }
+                }),
+            ],
             'lokasi_nama' => ['required', 'string', 'max:255'],
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],

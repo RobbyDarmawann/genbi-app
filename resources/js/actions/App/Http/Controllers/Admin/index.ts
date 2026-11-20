@@ -6,6 +6,7 @@ import MahasiswaController from './MahasiswaController'
 import PeriodeController from './PeriodeController'
 import KomsatController from './KomsatController'
 import DivisiController from './DivisiController'
+import LokasiKegiatanController from './LokasiKegiatanController'
 import KoreksiController from './KoreksiController'
 import RekapController from './RekapController'
 import KepengurusanController from './KepengurusanController'
@@ -18,6 +19,7 @@ MahasiswaController: Object.assign(MahasiswaController, MahasiswaController),
 PeriodeController: Object.assign(PeriodeController, PeriodeController),
 KomsatController: Object.assign(KomsatController, KomsatController),
 DivisiController: Object.assign(DivisiController, DivisiController),
+LokasiKegiatanController: Object.assign(LokasiKegiatanController, LokasiKegiatanController),
 KoreksiController: Object.assign(KoreksiController, KoreksiController),
 RekapController: Object.assign(RekapController, RekapController),
 KepengurusanController: Object.assign(KepengurusanController, KepengurusanController),

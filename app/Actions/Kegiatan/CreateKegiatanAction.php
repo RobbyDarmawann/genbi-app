@@ -21,6 +21,7 @@ class CreateKegiatanAction
                 'judul' => $data['judul'],
                 'deskripsi' => $data['deskripsi'] ?? null,
                 'komsat_id' => $data['komsat_id'] ?? null,
+                'lokasi_id' => $data['lokasi_id'] ?? null,
                 'lokasi_nama' => $data['lokasi_nama'],
                 'latitude' => $data['latitude'],
                 'longitude' => $data['longitude'],

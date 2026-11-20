@@ -18,8 +18,17 @@ import { Spinner } from '@/components/ui/spinner';
 
 type Option = { id: number; kode: string; nama: string };
 type DivisiGroup = Option & { divisi: { id: number; nama: string }[] };
+type LokasiOption = {
+    id: number;
+    nama: string;
+    latitude: number;
+    longitude: number;
+    radius_m: number;
+    keterangan: string | null;
+};
 type Activity = {
     id: number;
+    lokasi_id?: number | null;
     judul: string;
     deskripsi: string | null;
     komsat_id: number | null;
@@ -74,6 +83,7 @@ function sessionLabel(date: string): string {
 type Props = {
     record?: Activity;
     komsatOptions: Option[];
+    lokasiOptions?: LokasiOption[];
     divisiGroups: DivisiGroup[];
     statusOptions: { value: string; label: string }[];
     peringatanKehadiran?: boolean;
@@ -83,11 +93,18 @@ type Props = {
 export function KegiatanForm({
     record,
     komsatOptions,
+    lokasiOptions = [],
     divisiGroups,
     statusOptions,
     peringatanKehadiran,
     cancelHref,
 }: Props) {
+    const [lokasiId, setLokasiId] = useState<string>(
+        record?.lokasi_id ? String(record.lokasi_id) : 'manual',
+    );
+    const [lokasiNama, setLokasiNama] = useState<string>(
+        record?.lokasi_nama ?? '',
+    );
     const [selectedDivisi, setSelectedDivisi] = useState<number[]>(
         record?.divisi_ids ?? [],
     );
@@ -122,6 +139,17 @@ export function KegiatanForm({
         );
     });
     const locationLocked = Boolean(record && peringatanKehadiran);
+    const pilihLokasi = (value: string) => {
+        setLokasiId(value);
+        const master = lokasiOptions.find((item) => String(item.id) === value);
+
+        if (master) {
+            setLokasiNama(master.nama);
+            setLatitude(master.latitude);
+            setLongitude(master.longitude);
+            setRadius(master.radius_m);
+        }
+    };
     const endpoint = record
         ? AdminKegiatanController.update.form(record.id)
         : AdminKegiatanController.store.form();
@@ -229,7 +257,10 @@ export function KegiatanForm({
                                 label="Nama lokasi"
                                 name="lokasi_nama"
                                 error={errors.lokasi_nama}
-                                defaultValue={record?.lokasi_nama}
+                                value={lokasiNama}
+                                onChange={(event) =>
+                                    setLokasiNama(event.target.value)
+                                }
                                 required
                             />
                             <Field
@@ -314,6 +345,41 @@ export function KegiatanForm({
                                 Klik pada peta untuk memilih titik pusat
                                 geofence.
                             </p>
+                        </div>
+                        <div className="grid gap-2 md:max-w-md">
+                            <Label htmlFor="lokasi_id">Sumber lokasi</Label>
+                            <Select
+                                name="lokasi_id"
+                                value={lokasiId}
+                                onValueChange={pilihLokasi}
+                                disabled={locationLocked}
+                            >
+                                <SelectTrigger
+                                    id="lokasi_id"
+                                    className="h-11 md:h-9"
+                                >
+                                    <SelectValue placeholder="Pilih lokasi" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="manual">
+                                        Tentukan lokasi manual
+                                    </SelectItem>
+                                    {lokasiOptions.map((item) => (
+                                        <SelectItem
+                                            key={item.id}
+                                            value={String(item.id)}
+                                        >
+                                            {item.nama}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                                Data lokasi disalin ke kegiatan; titik dan
+                                radius tetap dapat disesuaikan untuk kegiatan
+                                ini saja.
+                            </p>
+                            <InputError message={errors.lokasi_id} />
                         </div>
                         <LeafletPicker
                             latitude={latitude}

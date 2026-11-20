@@ -4,6 +4,7 @@ import mahasiswa from './mahasiswa'
 import periode from './periode'
 import komsat from './komsat'
 import divisi from './divisi'
+import lokasi from './lokasi'
 import kehadiran from './kehadiran'
 import koreksi from './koreksi'
 import rekap from './rekap'
@@ -93,6 +94,7 @@ mahasiswa: Object.assign(mahasiswa, mahasiswa),
 periode: Object.assign(periode, periode),
 komsat: Object.assign(komsat, komsat),
 divisi: Object.assign(divisi, divisi),
+lokasi: Object.assign(lokasi, lokasi),
 kehadiran: Object.assign(kehadiran, kehadiran),
 koreksi: Object.assign(koreksi, koreksi),
 rekap: Object.assign(rekap, rekap),

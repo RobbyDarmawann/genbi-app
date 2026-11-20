@@ -9,7 +9,7 @@ class ToggleMasterDataRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $resource = $this->route('periode') ?? $this->route('komsat') ?? $this->route('divisi');
+        $resource = $this->route('periode') ?? $this->route('komsat') ?? $this->route('divisi') ?? $this->route('lokasi');
 
         return $resource !== null && ($this->user()?->can('update', $resource) ?? false);
     }

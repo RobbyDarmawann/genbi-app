@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 type Props = {
     kegiatan: Parameters<typeof KegiatanForm>[0]['record'];
     komsatOptions: { id: number; kode: string; nama: string }[];
+    lokasiOptions?: Parameters<typeof KegiatanForm>[0]['lokasiOptions'];
     divisiGroups: {
         id: number;
         kode: string;
@@ -18,6 +19,7 @@ type Props = {
 export default function Edit({
     kegiatan,
     komsatOptions,
+    lokasiOptions,
     divisiGroups,
     statusOptions,
     peringatanKehadiran,
@@ -34,6 +36,7 @@ export default function Edit({
                 <KegiatanForm
                     record={kegiatan}
                     komsatOptions={komsatOptions}
+                    lokasiOptions={lokasiOptions}
                     divisiGroups={divisiGroups}
                     statusOptions={statusOptions}
                     peringatanKehadiran={peringatanKehadiran}

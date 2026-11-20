@@ -5,6 +5,14 @@ import AppLayout from '@/layouts/app-layout';
 
 type Props = {
     komsatOptions: { id: number; kode: string; nama: string }[];
+    lokasiOptions?: {
+        id: number;
+        nama: string;
+        latitude: number;
+        longitude: number;
+        radius_m: number;
+        keterangan: string | null;
+    }[];
     divisiGroups: {
         id: number;
         kode: string;
@@ -16,6 +24,7 @@ type Props = {
 };
 export default function Create({
     komsatOptions,
+    lokasiOptions,
     divisiGroups,
     statusOptions,
 }: Props) {
@@ -34,6 +43,7 @@ export default function Create({
                 </header>
                 <KegiatanForm
                     komsatOptions={komsatOptions}
+                    lokasiOptions={lokasiOptions}
                     divisiGroups={divisiGroups}
                     statusOptions={statusOptions}
                     cancelHref={AdminKegiatanController.index().url}

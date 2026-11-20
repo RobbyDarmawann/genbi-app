@@ -37,6 +37,7 @@ class UpdateKegiatanAction
                 'judul' => $data['judul'],
                 'deskripsi' => $data['deskripsi'] ?? null,
                 'komsat_id' => $data['komsat_id'] ?? null,
+                'lokasi_id' => array_key_exists('lokasi_id', $data) ? $data['lokasi_id'] : $kegiatan->lokasi_id,
                 'lokasi_nama' => $data['lokasi_nama'],
                 'latitude' => $data['latitude'],
                 'longitude' => $data['longitude'],

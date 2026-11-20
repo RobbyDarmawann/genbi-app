@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $judul
  * @property string|null $deskripsi
  * @property int|null $komsat_id
+ * @property int|null $lokasi_id
  * @property string $lokasi_nama
  * @property string $latitude
  * @property string $longitude
@@ -43,6 +44,7 @@ use Illuminate\Support\Carbon;
     'judul',
     'deskripsi',
     'komsat_id',
+    'lokasi_id',
     'lokasi_nama',
     'latitude',
     'longitude',
@@ -92,6 +94,16 @@ class Kegiatan extends Model
     public function komsat(): BelongsTo
     {
         return $this->belongsTo(Komsat::class);
+    }
+
+    /**
+     * Referensi asal saja; koordinat tersimpan di kegiatan adalah snapshot.
+     *
+     * @return BelongsTo<LokasiKegiatan, $this>
+     */
+    public function lokasi(): BelongsTo
+    {
+        return $this->belongsTo(LokasiKegiatan::class, 'lokasi_id');
     }
 
     /**

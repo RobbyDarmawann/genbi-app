@@ -148,6 +148,12 @@ export default function PeriodeIndex({ periode, filters }: PageProps) {
                     >
                         Divisi
                     </Link>
+                    <Link
+                        className="rounded-md px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        href={admin.lokasi.index()}
+                    >
+                        Lokasi
+                    </Link>
                 </nav>
 
                 <Form

@@ -15,6 +15,7 @@ use App\Http\Requests\Admin\UpdateStatusKegiatanRequest;
 use App\Models\Divisi;
 use App\Models\Kegiatan;
 use App\Models\Komsat;
+use App\Models\LokasiKegiatan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -154,6 +155,18 @@ class KegiatanController extends Controller
     {
         return [
             'komsatOptions' => Komsat::query()->where('aktif', true)->orderBy('nama')->get(['id', 'kode', 'nama']),
+            'lokasiOptions' => LokasiKegiatan::query()
+                ->where('aktif', true)
+                ->orderBy('nama')
+                ->get(['id', 'nama', 'latitude', 'longitude', 'radius_m', 'keterangan'])
+                ->map(fn (LokasiKegiatan $lokasi): array => [
+                    'id' => $lokasi->id,
+                    'nama' => $lokasi->nama,
+                    'latitude' => (float) $lokasi->latitude,
+                    'longitude' => (float) $lokasi->longitude,
+                    'radius_m' => (int) $lokasi->radius_m,
+                    'keterangan' => $lokasi->keterangan,
+                ]),
             'divisiGroups' => Komsat::query()->where('aktif', true)->with(['divisi' => fn ($query) => $query->where('aktif', true)->orderBy('nama')])->orderBy('nama')->get(['id', 'kode', 'nama'])->map(fn (Komsat $komsat): array => [
                 'id' => $komsat->id, 'kode' => $komsat->kode, 'nama' => $komsat->nama,
                 'divisi' => $komsat->divisi->map(fn (Divisi $divisi): array => ['id' => $divisi->id, 'nama' => $divisi->nama]),
