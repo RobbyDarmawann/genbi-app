@@ -174,6 +174,15 @@ class UpdateKegiatanRequest extends FormRequest
                 }
 
                 $targetStatus = StatusKegiatan::tryFrom($this->string('status')->toString());
+                if ($targetStatus !== null && $kegiatan->status === StatusKegiatan::Draft && $targetStatus === StatusKegiatan::Terbit) {
+                    $validator->errors()->add(
+                        'status',
+                        'Penerbitan kegiatan harus dilakukan melalui aksi Terbitkan, bukan melalui formulir edit.'
+                    );
+
+                    return;
+                }
+
                 if ($targetStatus !== null && ! $kegiatan->status->canTransitionTo($targetStatus)) {
                     $validator->errors()->add(
                         'status',

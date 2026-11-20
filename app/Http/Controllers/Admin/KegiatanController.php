@@ -33,7 +33,7 @@ class KegiatanController extends Controller
         $tanggal = $request->string('tanggal')->toString();
 
         $kegiatan = Kegiatan::query()
-            ->with(['komsat:id,kode,nama', 'divisiTarget:id,komsat_id,nama', 'bobot'])
+            ->with(['komsat:id,kode,nama', 'divisiTarget:id,komsat_id,nama', 'bobot', 'sesiAbsensi'])
             ->withCount([
                 'pendaftaran' => fn ($query) => $query->where('status', StatusPendaftaran::Terdaftar),
                 'kehadiran as jumlah_hadir' => fn ($query) => $query->where('kehadiran.status', 'valid'),
@@ -63,6 +63,10 @@ class KegiatanController extends Controller
                     ] : null,
                     'pendaftaran_count' => (int) ($k->getAttribute('pendaftaran_count') ?? 0),
                     'jumlah_hadir' => (int) ($k->getAttribute('jumlah_hadir') ?? 0),
+                    'kuota' => $k->kuota,
+                    'divisi_target_count' => $k->divisiTarget->count(),
+                    'bobot_peserta' => $k->bobot->firstWhere('peran', PeranKegiatan::Peserta)?->poin,
+                    'sesi_count' => $k->sesiAbsensi->count(),
                 ];
             });
 
@@ -101,7 +105,7 @@ class KegiatanController extends Controller
     public function show(Kegiatan $kegiatan): Response
     {
         Gate::authorize('view', $kegiatan);
-        $kegiatan->load(['komsat:id,kode,nama', 'divisiTarget.komsat:id,kode,nama', 'bobot', 'pembuat:id,name'])
+        $kegiatan->load(['komsat:id,kode,nama', 'divisiTarget.komsat:id,kode,nama', 'bobot', 'sesiAbsensi', 'pembuat:id,name'])
             ->loadCount([
                 'pendaftaran' => fn ($query) => $query->where('status', StatusPendaftaran::Terdaftar),
                 'kehadiran as jumlah_hadir' => fn ($query) => $query->where('kehadiran.status', 'valid'),

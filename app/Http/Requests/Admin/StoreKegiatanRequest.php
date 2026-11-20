@@ -60,6 +60,8 @@ class StoreKegiatanRequest extends FormRequest
             $merges['divisi_ids'] = [];
         }
 
+        $merges['status'] = StatusKegiatan::Draft->value;
+
         $sesiAbsensi = $this->input('sesi_absensi');
         if (is_array($sesiAbsensi) && ! empty($sesiAbsensi)) {
             $sortedSesi = $sesiAbsensi;
@@ -75,9 +77,7 @@ class StoreKegiatanRequest extends FormRequest
             }
         }
 
-        if (! empty($merges)) {
-            $this->merge($merges);
-        }
+        $this->merge($merges);
     }
 
     /**
@@ -85,12 +85,6 @@ class StoreKegiatanRequest extends FormRequest
      */
     public function rules(): array
     {
-        $statusInput = $this->string('status')->toString();
-        $requiresPublishReadiness = ! in_array($statusInput, [
-            StatusKegiatan::Draft->value,
-            StatusKegiatan::Dibatalkan->value,
-        ], true);
-
         return [
             'judul' => ['required', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string', 'max:10000'],
@@ -110,18 +104,16 @@ class StoreKegiatanRequest extends FormRequest
             'kuota' => ['nullable', 'integer', 'min:1'],
             'status' => [
                 'required',
-                Rule::in([StatusKegiatan::Draft->value, StatusKegiatan::Terbit->value]),
+                Rule::in([StatusKegiatan::Draft->value]),
             ],
             'sesi_absensi' => ['required', 'array', 'min:1'],
             'sesi_absensi.*.tanggal' => ['required', 'date_format:Y-m-d'],
             'sesi_absensi.*.jam_buka' => ['required', 'date_format:H:i'],
             'sesi_absensi.*.jam_tutup' => ['required', 'date_format:H:i', 'after:sesi_absensi.*.jam_buka'],
-            'divisi_ids' => $requiresPublishReadiness ? ['required', 'array', 'min:1'] : ['nullable', 'array'],
+            'divisi_ids' => ['nullable', 'array'],
             'divisi_ids.*' => ['integer', 'distinct', Rule::exists('divisi', 'id')->where('aktif', true)],
             'bobot' => ['nullable', 'array'],
-            'bobot.peserta' => $requiresPublishReadiness
-                ? ['required', 'integer', 'min:0', 'max:1000']
-                : ['nullable', 'integer', 'min:0', 'max:1000'],
+            'bobot.peserta' => ['nullable', 'integer', 'min:0', 'max:1000'],
             'bobot.panitia' => ['nullable', 'integer', 'min:0', 'max:1000'],
             'bobot.pemateri' => ['nullable', 'integer', 'min:0', 'max:1000'],
         ];

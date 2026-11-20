@@ -604,15 +604,22 @@ export function KegiatanForm({
                                 </SelectTrigger>
                                 <SelectContent>
                                     {statusOptions
-                                        .filter((option) =>
-                                            record
-                                                ? option.value !== 'terkunci' ||
-                                                  record.status === 'selesai' ||
-                                                  record.status === 'terkunci'
-                                                : ['draft', 'terbit'].includes(
-                                                      option.value,
-                                                  ),
-                                        )
+                                        .filter((option) => {
+                                            if (!record) {
+                                                return option.value === 'draft';
+                                            }
+                                            if (record.status === 'draft') {
+                                                return (
+                                                    option.value !== 'terbit' &&
+                                                    option.value !== 'terkunci'
+                                                );
+                                            }
+                                            return (
+                                                option.value !== 'terkunci' ||
+                                                record.status === 'selesai' ||
+                                                record.status === 'terkunci'
+                                            );
+                                        })
                                         .map((option) => (
                                             <SelectItem
                                                 key={option.value}

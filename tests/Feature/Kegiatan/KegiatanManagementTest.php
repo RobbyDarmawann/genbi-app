@@ -149,7 +149,7 @@ describe('Creation and Validation', function () {
         ]);
     });
 
-    test('creating terbit kegiatan requires at least one target division and participant weight', function () {
+    test('creating kegiatan with status terbit in payload still forces status to draft', function () {
         $payload = [
             'judul' => 'Workshop Literasi Kebanksentralan',
             'lokasi_nama' => 'Aula UNG',
@@ -159,17 +159,95 @@ describe('Creation and Validation', function () {
             'tanggal' => '2026-05-01',
             'jam_mulai' => '09:00',
             'jam_selesai' => '13:00',
-            'absensi_buka_at' => '2026-05-01T08:30',
-            'absensi_tutup_at' => '2026-05-01T13:30',
+            'sesi_absensi' => [['tanggal' => '2026-05-01', 'jam_buka' => '08:30', 'jam_tutup' => '13:30']],
             'status' => 'terbit',
-            'divisi_ids' => [],
+            'divisi_ids' => [$this->divisiUng->id],
             'bobot' => [
-                'peserta' => '',
+                'peserta' => 10,
             ],
         ];
 
         $response = $this->actingAs($this->internal)->post(route('admin.kegiatan.store'), $payload);
-        $response->assertSessionHasErrors(['divisi_ids', 'bobot.peserta']);
+        $kegiatan = Kegiatan::query()->where('judul', 'Workshop Literasi Kebanksentralan')->firstOrFail();
+
+        $response->assertRedirect(route('admin.kegiatan.show', $kegiatan));
+        expect($kegiatan->status)->toBe(StatusKegiatan::Draft);
+        $this->assertDatabaseMissing('audit_logs', [
+            'aksi' => 'kegiatan.published',
+            'subject_id' => $kegiatan->id,
+        ]);
+    });
+
+    test('publishing draft via updateStatus is rejected when target division is empty or participant weight is missing', function () {
+        $kegiatan = Kegiatan::factory()->create([
+            'status' => StatusKegiatan::Draft,
+            'dibuat_oleh' => $this->internal->id,
+        ]);
+
+        // Divisi target kosong & bobot peserta belum diatur
+        $this->actingAs($this->internal)
+            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'terbit'])
+            ->assertSessionHasErrors(['status']);
+        expect(session('errors')->get('status'))->toHaveCount(2);
+        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Draft);
+
+        // Divisi target terisi, tetapi bobot peserta belum diatur
+        $kegiatan->divisiTarget()->sync([$this->divisiUng->id]);
+        $this->actingAs($this->internal)
+            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'terbit'])
+            ->assertSessionHasErrors(['status' => 'Kegiatan tidak dapat diterbitkan karena bobot poin peserta belum diatur.']);
+        expect(session('errors')->get('status'))->toHaveCount(1);
+        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Draft);
+
+        // Bobot peserta terisi, tetapi divisi target dikosongkan
+        $kegiatan->divisiTarget()->sync([]);
+        KegiatanBobot::create([
+            'kegiatan_id' => $kegiatan->id,
+            'peran' => PeranKegiatan::Peserta,
+            'poin' => 15,
+        ]);
+        $this->actingAs($this->internal)
+            ->patch(route('admin.kegiatan.update-status', $kegiatan), ['status' => 'terbit'])
+            ->assertSessionHasErrors(['status' => 'Kegiatan tidak dapat diterbitkan karena belum memiliki divisi target.']);
+        expect(session('errors')->get('status'))->toHaveCount(1);
+        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Draft);
+    });
+
+    test('updating draft via edit form rejects setting status directly to terbit', function () {
+        $kegiatan = Kegiatan::factory()->create([
+            'status' => StatusKegiatan::Draft,
+            'dibuat_oleh' => $this->internal->id,
+            'tanggal' => '2026-07-10',
+            'jam_mulai' => '08:00:00',
+            'jam_selesai' => '12:00:00',
+            'absensi_buka_at' => '2026-07-10 07:30:00',
+            'absensi_tutup_at' => '2026-07-10 12:30:00',
+        ]);
+        $kegiatan->divisiTarget()->sync([$this->divisiUng->id]);
+        KegiatanBobot::create([
+            'kegiatan_id' => $kegiatan->id,
+            'peran' => PeranKegiatan::Peserta,
+            'poin' => 15,
+        ]);
+
+        $this->actingAs($this->internal)
+            ->put(route('admin.kegiatan.update', $kegiatan), [
+                'judul' => $kegiatan->judul,
+                'lokasi_nama' => $kegiatan->lokasi_nama,
+                'latitude' => $kegiatan->latitude,
+                'longitude' => $kegiatan->longitude,
+                'radius_m' => $kegiatan->radius_m,
+                'tanggal' => '2026-07-10',
+                'jam_mulai' => '08:00',
+                'jam_selesai' => '12:00',
+                'sesi_absensi' => [['tanggal' => '2026-07-10', 'jam_buka' => '07:30', 'jam_tutup' => '12:30']],
+                'status' => 'terbit',
+                'divisi_ids' => [$this->divisiUng->id],
+                'bobot' => ['peserta' => 15],
+            ])
+            ->assertSessionHasErrors(['status']);
+
+        expect($kegiatan->fresh()->status)->toBe(StatusKegiatan::Draft);
     });
 
     test('validates radius coordinates times and registration deadlines', function () {

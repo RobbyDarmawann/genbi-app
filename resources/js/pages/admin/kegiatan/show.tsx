@@ -7,7 +7,9 @@ import {
     Pencil,
     Users,
 } from 'lucide-react';
+import { useState } from 'react';
 import AdminKegiatanController from '@/actions/App/Http/Controllers/Admin/KegiatanController';
+import { DialogTerbitkanKegiatan } from '@/components/kegiatan/dialog-terbitkan-kegiatan';
 import LeafletPicker from '@/components/kegiatan/leaflet-picker';
 import {
     kegiatanStatusLabel,
@@ -41,6 +43,12 @@ type Activity = {
         komsat_kode?: string | null;
     }[];
     bobot_list: { peran: string; label: string; poin: number }[];
+    sesi_absensi?: {
+        id: number;
+        tanggal: string;
+        jam_buka: string;
+        jam_tutup: string;
+    }[];
     kuota: number | null;
     sisa_kuota: number | null;
     pendaftaran_count: number;
@@ -52,6 +60,8 @@ type Props = {
     map: { latitude: number; longitude: number; radius_m: number };
 };
 export default function Show({ kegiatan, map }: Props) {
+    const [terbitkanOpen, setTerbitkanOpen] = useState(false);
+
     const changeStatus = (status: string) => {
         router.patch(
             AdminKegiatanController.updateStatus(kegiatan.id).url,
@@ -59,6 +69,11 @@ export default function Show({ kegiatan, map }: Props) {
             { preserveScroll: true },
         );
     };
+
+    const bobotPeserta =
+        kegiatan.bobot_list.find((item) => item.peran === 'peserta')?.poin ??
+        null;
+
     return (
         <>
             <Head title={kegiatan.judul} />
@@ -86,7 +101,7 @@ export default function Show({ kegiatan, map }: Props) {
                         {kegiatan.status === 'draft' && (
                             <Button
                                 type="button"
-                                onClick={() => changeStatus('terbit')}
+                                onClick={() => setTerbitkanOpen(true)}
                                 className="h-11 md:h-9"
                             >
                                 Terbitkan
@@ -285,6 +300,20 @@ export default function Show({ kegiatan, map }: Props) {
                     </Card>
                 )}
             </div>
+            <DialogTerbitkanKegiatan
+                open={terbitkanOpen}
+                onOpenChange={setTerbitkanOpen}
+                kegiatan={{
+                    id: kegiatan.id,
+                    judul: kegiatan.judul,
+                    tanggal: kegiatan.tanggal,
+                    tanggal_selesai: kegiatan.tanggal_selesai,
+                    sesi_count: kegiatan.sesi_absensi?.length ?? 1,
+                    divisi_target_count: kegiatan.divisi_target.length,
+                    kuota: kegiatan.kuota,
+                    bobot_peserta: bobotPeserta,
+                }}
+            />
         </>
     );
 }

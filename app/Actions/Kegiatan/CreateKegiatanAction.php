@@ -15,8 +15,7 @@ class CreateKegiatanAction
     public function handle(array $data, User $actor, ?string $ipAddress = null): Kegiatan
     {
         return DB::transaction(function () use ($data, $actor, $ipAddress): Kegiatan {
-            $statusValue = is_string($data['status'] ?? null) ? $data['status'] : StatusKegiatan::Draft->value;
-            $status = StatusKegiatan::from($statusValue);
+            $status = StatusKegiatan::Draft;
 
             $kegiatan = Kegiatan::create([
                 'judul' => $data['judul'],
@@ -43,14 +42,6 @@ class CreateKegiatanAction
                 'judul' => $kegiatan->judul,
                 'status' => $kegiatan->status->value,
             ], $ipAddress);
-
-            if ($status === StatusKegiatan::Terbit) {
-                AuditLog::catat('kegiatan.published', $actor->id, Kegiatan::class, $kegiatan->id, [
-                    'judul' => $kegiatan->judul,
-                    'dari' => StatusKegiatan::Draft->value,
-                    'ke' => StatusKegiatan::Terbit->value,
-                ], $ipAddress);
-            }
 
             return $kegiatan;
         });

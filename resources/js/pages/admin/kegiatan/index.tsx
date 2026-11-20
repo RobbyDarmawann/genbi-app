@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Eye, Pencil, Plus, Search } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import AdminKegiatanController from '@/actions/App/Http/Controllers/Admin/KegiatanController';
+import { DialogTerbitkanKegiatan } from '@/components/kegiatan/dialog-terbitkan-kegiatan';
 import {
     kegiatanStatusLabel,
     kegiatanStatusToSemantic,
@@ -31,6 +32,10 @@ type Activity = {
     komsat: { kode: string; nama: string } | null;
     pendaftaran_count: number;
     jumlah_hadir: number;
+    kuota: number | null;
+    divisi_target_count: number;
+    bobot_peserta: number | null;
+    sesi_count: number;
 };
 type Props = {
     kegiatan: { data: Activity[]; links: unknown[]; meta: unknown };
@@ -50,6 +55,9 @@ export default function Index({
     );
     const [komsatFilter, setKomsatFilter] = useState<string>(
         filters.komsat_id || 'all',
+    );
+    const [terbitkanTarget, setTerbitkanTarget] = useState<Activity | null>(
+        null,
     );
 
     const handleSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -211,7 +219,12 @@ export default function Index({
                             key: 'aksi',
                             header: 'Aksi',
                             align: 'right',
-                            cell: (row) => <RowActions row={row} />,
+                            cell: (row) => (
+                                <RowActions
+                                    row={row}
+                                    onTerbitkan={setTerbitkanTarget}
+                                />
+                            ),
                         },
                     ]}
                     data={kegiatan.data}
@@ -253,19 +266,47 @@ export default function Index({
                                     hadir
                                 </span>
                             </div>
-                            <RowActions row={row} />
+                            <RowActions
+                                row={row}
+                                onTerbitkan={setTerbitkanTarget}
+                            />
                         </div>
                     )}
                 />
             </div>
+            <DialogTerbitkanKegiatan
+                open={terbitkanTarget !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setTerbitkanTarget(null);
+                    }
+                }}
+                kegiatan={terbitkanTarget}
+            />
         </>
     );
 }
 Index.layout = (page: React.ReactNode) => <AppLayout>{page}</AppLayout>;
 
-function RowActions({ row }: { row: Activity }) {
+function RowActions({
+    row,
+    onTerbitkan,
+}: {
+    row: Activity;
+    onTerbitkan: (row: Activity) => void;
+}) {
     return (
         <div className="flex flex-wrap items-center justify-end gap-2">
+            {row.status === 'draft' && (
+                <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => onTerbitkan(row)}
+                    className="h-11 md:h-8"
+                >
+                    <span>Terbitkan</span>
+                </Button>
+            )}
             <Button variant="outline" size="sm" asChild className="h-11 md:h-8">
                 <Link href={admin.kegiatan.show(row.id)}>
                     <Eye className="size-3.5" />
