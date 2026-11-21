@@ -56,6 +56,12 @@ class SesiAbsensi extends Model
 
     public function tutupAt(): Carbon
     {
-        return Carbon::parse($this->tanggal->toDateString().' '.$this->jam_tutup, config('app.timezone'));
+        $tutup = Carbon::parse($this->tanggal->toDateString().' '.$this->jam_tutup, config('app.timezone'));
+
+        if ($tutup->lte($this->bukaAt())) {
+            $tutup->addDay();
+        }
+
+        return $tutup;
     }
 }

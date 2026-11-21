@@ -23,6 +23,7 @@ use Database\Seeders\KomsatSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -448,4 +449,49 @@ test('halaman absensi menampilkan komponen Inertia checkin untuk pendaftar aktif
             ->where('kegiatan.id', $this->kegiatan->id)
             ->where('pendaftaran.id', $this->pendaftaran->id)
         );
+});
+
+test('absensi yang jendelanya melewati tengah malam tetap diterima sebelum jam tutup', function () {
+    $this->travelTo(Carbon::parse('2026-06-15 23:00:00', config('app.timezone')));
+
+    $kegiatan = Kegiatan::factory()->create([
+        'status' => StatusKegiatan::Berlangsung,
+        'latitude' => (string) $this->centerLat,
+        'longitude' => (string) $this->centerLng,
+        'radius_m' => 100,
+        'tanggal' => now()->toDateString(),
+        'pendaftaran_dibuka_at' => now()->subDays(2),
+        'batas_daftar_at' => now()->subHour(),
+        'absensi_buka_at' => now()->subMinutes(30),
+        'absensi_tutup_at' => now()->addMinutes(90),
+        'dibuat_oleh' => $this->internal->id,
+    ]);
+    $kegiatan->divisiTarget()->sync([$this->divisiUng->id]);
+
+    KegiatanBobot::query()->create([
+        'kegiatan_id' => $kegiatan->id,
+        'peran' => PeranKegiatan::Peserta,
+        'poin' => 10,
+    ]);
+
+    $pendaftaran = Pendaftaran::query()->create([
+        'kegiatan_id' => $kegiatan->id,
+        'mahasiswa_id' => $this->mahasiswa->id,
+        'peran' => PeranKegiatan::Peserta,
+        'status' => StatusPendaftaran::Terdaftar,
+    ]);
+
+    $this->actingAs($this->mahasiswaUser)->post(
+        route('mahasiswa.absensi.submit', $kegiatan),
+        [
+            'latitude' => $this->centerLat,
+            'longitude' => $this->centerLng,
+            'akurasi_m' => 10.0,
+            'foto' => UploadedFile::fake()->image('selfie-tengah-malam.jpg', 640, 480),
+        ],
+    )->assertRedirect(route('mahasiswa.absensi.form', $kegiatan));
+
+    $kehadiran = Kehadiran::query()->where('pendaftaran_id', $pendaftaran->id)->first();
+    expect($kehadiran)->not->toBeNull()
+        ->and($kehadiran->status)->toBe(StatusKehadiran::Valid);
 });
